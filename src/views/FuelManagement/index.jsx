@@ -118,9 +118,12 @@ const FuelRecords = () => {
       headerName: 'Action',
       width: 100,
       sortable: false,
-      renderCell: (params) => (
+      renderCell: (params) => {
+        const navigate = useNavigate();
+
+        return (
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <IconButton sx={{ color: '#17a2b8', py: 2 }} onClick={() => handleEdit(params.row)}>
+            <IconButton sx={{ color: '#17a2b8', py: 2 }} onClick={() => navigate(`/add-fuel/${params.row.id}`)}>
               <BorderColorIcon />
             </IconButton>
             <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5, alignSelf: 'center' }} />
@@ -128,7 +131,8 @@ const FuelRecords = () => {
               <DeleteIcon />
             </IconButton>
           </Box>
-      )
+        );
+      }
     }
   ];
 

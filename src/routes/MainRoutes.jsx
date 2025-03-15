@@ -16,12 +16,15 @@ const Reminder = Loadable(lazy(() => import('views/Reminder')));
 const Finance = Loadable(lazy(() => import('views/IncomeExpense')));
 const UserManagement = Loadable(lazy(() => import('views/UserManagement')));
 const PartsInventory = Loadable(lazy(() => import('views/PartsInventory')));
+const Reports = Loadable(lazy(() => import('views/Reports')));
 const VehicleGroup = Loadable(lazy(() => import('views/Vehicle Group')));
 const AddVehicle = Loadable(lazy(() => import('views/AddVehicle')));
 const AddDriver = Loadable(lazy(() => import('views/AddDriver')));
 const AddBooking = Loadable(lazy(() => import('views/AddBooking')));
 const AddFuel = Loadable(lazy(() => import('views/AddFuel')));
 const AddMaintenance = Loadable(lazy(() => import('views/AddMaintenance')));
+const ViewVehiclePage = Loadable(lazy(() => import ('views/ViewVehicle')));
+const ViewBookingsPage = Loadable(lazy(() => import('views/ViewBookings')));
 
 // ==============================|| MAIN ROUTES ||============================== //
 
@@ -54,11 +57,23 @@ const MainRoutes = {
       element: <AddVehicle />
     },
     {
+      path: '/add-vehicle/:id',
+      element: <AddVehicle />
+    },
+    {
+      path: '/view-vehicle/:id',
+      element: <ViewVehiclePage />
+    },
+    {
       path: '/drivers',
       element: <Drivers />
     },
     {
       path: '/add-driver',
+      element: <AddDriver />
+    },
+    {
+      path: '/add-driver/:id',
       element: <AddDriver />
     },
     {
@@ -68,6 +83,14 @@ const MainRoutes = {
     {
       path: '/add-booking',
       element: <AddBooking />
+    },
+    {
+      path: '/add-booking/:id',
+      element: <AddBooking />
+    },
+    {
+      path: '/view-booking/:id',
+      element: <ViewBookingsPage />
     },
     {
       path: '/customer',
@@ -94,12 +117,20 @@ const MainRoutes = {
       element: <AddFuel/>
     },
     {
+      path: '/add-fuel/:id',
+      element: <AddFuel/>
+    },
+    {
       path: '/reminder',
       element: <Reminder />
     },
     {
       path: '/finance',
       element: <Finance />
+    },
+    {
+      path: '/reports',
+      element: <Reports />
     },
     {
       path: '/users',

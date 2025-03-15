@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import {
   Grid,
@@ -18,9 +18,12 @@ import {
   FormControl,
 } from "@mui/material";
 import { gridSpacing } from "config";
-import { Link } from "react-router-dom";
+import { Link, useParams } from 'react-router-dom';
 
 const FuelExpenseForm = ({ initialData = null, onSubmit }) => {
+    const { id } = useParams();
+    const [loading, setLoading] = useState(false);
+  
   const {
     register,
     handleSubmit,
@@ -41,10 +44,8 @@ const FuelExpenseForm = ({ initialData = null, onSubmit }) => {
     },
   });
 
-  // Watch confirm checkbox
   const confirmExpense = watch("confirm");
 
-  // Agar update ke liye initialData mile, toh form ko prefill karna
   useEffect(() => {
     if (initialData) {
       Object.keys(initialData).forEach((key) => setValue(key, initialData[key]));
@@ -60,7 +61,7 @@ const FuelExpenseForm = ({ initialData = null, onSubmit }) => {
     <>
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", p: 0, m: 0 }}>
         <Typography variant="h3" sx={{ m: 0 }}>
-          {initialData ? "Update Fuel" : "Add Fuel"}
+          {id ? "Update Fuel" : "Add Fuel"}
         </Typography>
         <Breadcrumbs separator="/" aria-label="breadcrumb">
           <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
@@ -75,7 +76,7 @@ const FuelExpenseForm = ({ initialData = null, onSubmit }) => {
           <form onSubmit={handleSubmit(onSubmitForm)}>
             <Grid container spacing={gridSpacing}>
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: "bold", fontSize: "16px" }}>Select Vehicle*</FormLabel>
+                <FormLabel sx={{ fontWeight: "bold", fontSize: "16px" }}>Vehicle*</FormLabel>
                 <FormControl fullWidth>
                   <Select {...register("vehicle", { required: true })} size="small">
                     <MenuItem value="">Select Vehicle</MenuItem>
@@ -87,7 +88,7 @@ const FuelExpenseForm = ({ initialData = null, onSubmit }) => {
               </Grid>
 
                <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: "bold", fontSize: "16px" }}>Select Driver*</FormLabel>
+                <FormLabel sx={{ fontWeight: "bold", fontSize: "16px" }}>Added Driver*</FormLabel>
                 <FormControl fullWidth>
                   <Select {...register("driver", { required: true })} size="small">
                     <MenuItem value="">Select Driver</MenuItem>
@@ -123,7 +124,7 @@ const FuelExpenseForm = ({ initialData = null, onSubmit }) => {
               </Grid>
 
                 <Grid item xs={12} sm={6} md={6}>
-                <FormLabel sx={{ fontWeight: "bold", fontSize: "16px" }}>Fuel Comments</FormLabel>
+                <FormLabel sx={{ fontWeight: "bold", fontSize: "16px" }}>Comments</FormLabel>
                 <TextField fullWidth {...register("comment")} size="small" />
               </Grid>
 
@@ -137,7 +138,7 @@ const FuelExpenseForm = ({ initialData = null, onSubmit }) => {
 
             <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
               <Button variant="contained" color="primary" type="submit">
-                {initialData ? "Update Fuel" : "Add Fuel"}
+                {id ? "Update Fuel" : "Add Fuel"}
               </Button>
             </Box>
           </form>

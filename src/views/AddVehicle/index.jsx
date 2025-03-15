@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useState,useEffect} from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import {
   Grid,
@@ -17,17 +17,15 @@ import {
   Card,
   CardContent
 } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link , useParams} from 'react-router-dom';
 import { gridSpacing } from 'config.js';
 
 const VehicleForm = () => {
+  const { id } = useParams();  
+  const [loading, setLoading] = useState(false);
+
   const {
-    register,
-    handleSubmit,
-    control,
-    setValue,
-    watch,
-    reset,
+    register, handleSubmit, control, setValue, watch, reset,
     formState: { errors }
   } = useForm({
     defaultValues: {
@@ -49,18 +47,51 @@ const VehicleForm = () => {
       apiPassword: ''
     }
   });
-
   const vehicleColor = watch('vehicleColor');
 
+  useEffect(() => {
+    if (id) {
+      setLoading(true);
+     
+      const vehicleData = {
+        registrationNumber: "ABC123",
+        vehicleName: "Test Vehicle",
+        model: "2024",
+        chassisNo: "CH123456",
+        engineNo: "EN987654",
+        manufacturedBy: "Test Manufacturer",
+        vehicleType: "car",
+        vehicleColor: "#FF5733",
+        registrationExpiryDate: "2025-12-31",
+        vehicleGroup: "Fleet A",
+        vehicleImage: null,
+        vehicleDocument: null,
+        traccarDeviceId: "12345",
+        gpsApiUrl: "https://codeforts.com/vms/api",
+        apiUsername: "testUser",
+        apiPassword: "testPass",
+      };
+  
+      setTimeout(() => {
+        Object.keys(vehicleData).forEach((key) => {
+          setValue(key, vehicleData[key]);
+        });
+        setLoading(false);
+        console.log("Vehicle Data Loaded:", vehicleData); 
+      }, 1000);  
+    }
+  }, [id, setValue]);
+  
+
   const onSubmit = (data) => {
-    console.log(data);
-    reset();
+    console.log("Form Submitted:", data);  
   };
+  
 
   return (
     <>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant="h3">Add Vehicle</Typography>
+        <Typography variant="h3">{id ? 'Edit Vehicle' : 'Add Vehicle'}</Typography>
         <Breadcrumbs separator="/" aria-label="breadcrumb">
           <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
             <Typography color="#17a2b8">Dashboard</Typography>
@@ -175,7 +206,7 @@ const VehicleForm = () => {
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
               <Button variant="contained" color="primary" type="submit">
-                Add Vehicle
+                {id ? 'Update Vehicle' : 'Add Vehicle'}
               </Button>
             </Box>
           </form>

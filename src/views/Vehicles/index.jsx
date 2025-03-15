@@ -44,14 +44,16 @@ const columns = [
     headerName: 'Action',
     width: 150,
     sortable: false,
-    renderCell: (params) => (
-      <>
+    renderCell: (params) => {
+      const navigate = useNavigate();
+
+      return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <IconButton color="primary" sx={{ py: 2 }} onClick={() => alert(`Viewing ${params.row.vehicleName}`)}>
+          <IconButton color="primary" sx={{ py: 2 }} onClick={() => navigate(`/view-vehicle/${params.row.id}`)}>
             <VisibilityIcon />
           </IconButton>
           <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5, alignSelf: 'center' }} />
-          <IconButton sx={{ color: '#17a2b8', py: 2 }} onClick={() => alert(`Editing ${params.row.vehicleName}`)}>
+          <IconButton sx={{ color: '#17a2b8', py: 2 }} onClick={() => navigate(`/add-vehicle/${params.row.id}`)}>
             <BorderColorIcon />
           </IconButton>
           <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5, alignSelf: 'center' }} />
@@ -59,8 +61,8 @@ const columns = [
             <DeleteIcon />
           </IconButton>
         </Box>
-      </>
-    )
+      );
+    }
   }
 ];
 
@@ -124,10 +126,11 @@ const VehiclePage = () => {
                 disableRowSelectionOnClick
                 sx={{
                   '.MuiDataGrid-columnHeaderTitle': {
-                    fontWeight: 'bold',  fontSize: '16px'
+                    fontWeight: 'bold',
+                    fontSize: '16px'
                   },
                   '.MuiDataGrid-cell': {
-                    fontSize: '16px',  
+                    fontSize: '16px'
                   }
                 }}
               />

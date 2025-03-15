@@ -50,21 +50,24 @@ const columns = [
     headerName: 'Action',
     width: 150,
     sortable: false,
-    renderCell: (params) => (
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <IconButton color="primary" sx={{ py: 2 }} onClick={() => alert(`Viewing ${params.row.vehicle}`)}>
-          <VisibilityIcon />
-        </IconButton>
-        <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5, alignSelf: 'center' }} />
-        <IconButton sx={{ color: '#17a2b8', py: 2 }} onClick={() => alert(`Editing ${params.row.vehicle}`)}>
-          <BorderColorIcon />
-        </IconButton>
-        <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5, alignSelf: 'center' }} />
-        <IconButton color="error" sx={{ py: 2 }} onClick={() => alert(`Deleting ${params.row.vehicle}`)}>
-          <DeleteIcon />
-        </IconButton>
-      </Box>
-    )
+    renderCell: (params) => {
+      const navigate = useNavigate();
+      return (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <IconButton color="primary" sx={{ py: 2 }} onClick={() => navigate(`/view-booking/${params.row.id}`)}>
+            <VisibilityIcon />
+          </IconButton>
+          <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5, alignSelf: 'center' }} />
+          <IconButton sx={{ color: '#17a2b8', py: 2 }} onClick={() => navigate(`/add-booking/${params.row.id}`)}>
+            <BorderColorIcon />
+          </IconButton>
+          <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5, alignSelf: 'center' }} />
+          <IconButton color="error" sx={{ py: 2 }} onClick={() => alert(`Deleting ${params.row.vehicle}`)}>
+            <DeleteIcon />
+          </IconButton>
+        </Box>
+      );
+    }
   }
 ];
 

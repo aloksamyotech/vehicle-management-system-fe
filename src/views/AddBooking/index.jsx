@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   Grid,
@@ -13,13 +13,46 @@ import {
   Breadcrumbs,
   Link as MuiLink,
   Card,
-  CardContent
+  CardContent,
+  Checkbox,
+  FormControlLabel
 } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { gridSpacing } from 'config.js';
 
 const DriverForm = () => {
-  const { register, handleSubmit, reset } = useForm();
+  const { id } = useParams();
+  const [loading, setLoading] = useState(false);
+
+  const { register, handleSubmit, setValue,reset } = useForm();
+
+  useEffect(() => {
+    if (id) {
+      setLoading(true);
+        const bookingData = {
+          customerName: 'Customer1',
+          vehicle: 'Vehicle1',
+          driver: 'Driver1',
+          tripType: 'One Way',
+          tripStartLocation: 'New York',
+          tripEndLocation: 'Los Angeles',
+          approxTotalKm: '4500',
+          tripStartDate: '2024-04-10',
+          tripEndDate: '2024-04-12',
+          totalAmount: '2500',
+          tripStatus: 'Scheduled',
+          sendEmailConfirmation: true
+        };
+
+      setTimeout(() => {
+        Object.keys(bookingData).forEach((key) => {
+          setValue(key, bookingData[key]);
+        });
+        setLoading(false);
+        console.log('Booking Data Loaded:', bookingData);
+      }, 1000);
+    }
+  }, [id, setValue]);
 
   const onSubmit = (data) => {
     console.log(data);
@@ -29,14 +62,12 @@ const DriverForm = () => {
   return (
     <>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 0, m: 0 }}>
-        <Typography variant="h3" sx={{ m: 0 }}>
-          Add Driver
-        </Typography>
+        <Typography variant="h3">{id ? 'Edit Booking' : 'Add Booking'}</Typography>
         <Breadcrumbs separator="/" aria-label="breadcrumb" sx={{ display: 'flex', alignItems: 'center', p: 0, m: 0 }}>
           <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
             <Typography color="#17a2b8">Dashboard</Typography>
           </MuiLink>
-          <Typography color="text.primary">Add Driver</Typography>
+          <Typography color="text.primary">Add Booking</Typography>
         </Breadcrumbs>
       </Box>
 
@@ -45,43 +76,47 @@ const DriverForm = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <Grid container spacing={gridSpacing}>
               {[
-                { label: 'Driver Name*', name: 'driverName' },
-                { label: 'Mobile*', name: 'mobile' },
-                { label: 'Age*', name: 'age' },
-                { label: 'License No*', name: 'licenseNo' },
-                { label: 'License Expiry Date*', name: 'licenseExpiryDate', type: 'date' },
-                { label: 'Total Experience*', name: 'totalExperience' },
-                { label: 'Date of Joining*', name: 'dateOfJoining', type: 'date' },
-                { label: 'Reference/Notes', name: 'referenceNotes' },
-                { label: 'Address*', name: 'address', multiline: true, rows: 2 }
-              ].map(({ label, name, type, ...rest }) => (
+                { label: 'Customer Name*', name: 'customerName', type: 'select', options: ['Customer1', 'Customer2'] },
+                { label: 'Vehicle*', name: 'vehicle', type: 'select', options: ['Vehicle1', 'Vehicle2'] },
+                { label: 'Driver*', name: 'driver', type: 'select', options: ['Driver1', 'Driver2'] },
+                { label: 'Trip Type*', name: 'tripType', type: 'select', options: ['One Way', 'Round Trip'] },
+                { label: 'Trip Start Location*', name: 'tripStartLocation' },
+                { label: 'Trip End Location*', name: 'tripEndLocation' },
+                { label: 'Approx Total KM*', name: 'approxTotalKm' },
+                { label: 'Trip Start Date*', name: 'tripStartDate', type: 'date' },
+                { label: 'Trip End Date*', name: 'tripEndDate', type: 'date' },
+                { label: 'Total Amount*', name: 'totalAmount' },
+                { label: 'Trip Status*', name: 'tripStatus', type: 'select', options: ['Scheduled', 'Ongoing', 'Completed', 'Cancelled'] }
+              ].map(({ label, name, type, options, ...rest }) => (
                 <Grid item xs={12} sm={4} md={3} key={name}>
                   <FormLabel sx={{ fontSize: '16px', fontWeight: 700 }}>{label}</FormLabel>
-                  <TextField fullWidth size="small" type={type || 'text'} {...register(name)} {...rest} />
+                  {type === 'select' ? (
+                    <FormControl fullWidth size="small">
+                      <Select {...register(name)} defaultValue="">
+                        {options.map((option, index) => (
+                          <MenuItem key={index} value={option}>
+                            {option}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  ) : (
+                    <TextField fullWidth size="small" type={type || 'text'} {...register(name)} {...rest} />
+                  )}
                 </Grid>
               ))}
 
-              <Grid item xs={12} sm={4} md={3}>
-                <FormControl fullWidth size="small">
-                  <FormLabel sx={{ fontSize: '16px', fontWeight: 700 }}>Driver Status</FormLabel>
-                  <Select {...register('driverStatus')} defaultValue="">
-                    <MenuItem value="active">Active</MenuItem>
-                    <MenuItem value="inactive">Inactive</MenuItem>
-                  </Select>
-                </FormControl>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={<Checkbox {...register('sendEmailConfirmation')} />}
+                  label="Is need to send email confirmation after booking?"
+                />
               </Grid>
-
-              {[{ label: 'Driver Photo', name: 'driverPhoto' }, { label: 'Driver Document', name: 'driverDocument' }].map(({ label, name }) => (
-                <Grid item xs={12} sm={4} md={3} key={name}>
-                  <FormLabel sx={{ fontSize: '16px', fontWeight: 700 }}>{label}</FormLabel>
-                  <TextField fullWidth type="file" size="small" {...register(name)} sx={{ mb: 1 }} />
-                </Grid>
-              ))}
             </Grid>
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-              <Button type="submit" variant="contained" color="primary">
-                Add Driver
+              <Button variant="contained" color="primary" type="submit">
+                {id ? 'Update Booking' : 'Add Booking'}
               </Button>
             </Box>
           </form>

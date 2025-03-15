@@ -19,6 +19,7 @@ import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
+import SummarizeIcon from '@mui/icons-material/Summarize';
 
 const icons = {
   NavigationOutlinedIcon: NavigationOutlinedIcon,
@@ -40,7 +41,8 @@ const icons = {
   LocalGasStationIcon: LocalGasStationIcon,
   CampaignIcon: CampaignIcon,
   AttachMoneyIcon: AttachMoneyIcon,
-  VerifiedUserIcon: VerifiedUserIcon
+  VerifiedUserIcon: VerifiedUserIcon,
+  SummarizeIcon: SummarizeIcon
 };
 
 export default {
@@ -139,6 +141,13 @@ export default {
           type: 'item',
           url: '/finance',
           icon: icons['AttachMoneyIcon']
+        },
+        {
+          id: 'reports',
+          title: 'Reports',
+          type: 'item',
+          url: '/reports',
+          icon: icons['SummarizeIcon']
         },
         {
           id: 'users',

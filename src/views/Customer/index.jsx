@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Card, Box, Grid, Typography, IconButton, Button, Breadcrumbs, Divider, Link as MuiLink, Modal } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { gridSpacing } from 'config.js';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddCustomerForm from './addCustomer.jsx';
@@ -39,10 +38,6 @@ const columns = (handleEdit, handleDelete) => [
     width: 150,
     renderCell: (params) => (
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <IconButton color="primary" sx={{ py: 2 }} onClick={() => alert(`Viewing ${params.row.id}`)}>
-          <VisibilityIcon />
-        </IconButton>
-        <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5, alignSelf: 'center' }} />
         <IconButton sx={{ color: '#17a2b8', py: 2 }} onClick={() => handleEdit(params.row)}>
           <BorderColorIcon />
         </IconButton>
