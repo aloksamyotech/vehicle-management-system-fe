@@ -1,6 +1,8 @@
 import axios from 'axios';
 
 export const postApi = async (url, data, headers = {}) => {
+
+  console.log("url=================>>>>>>>",url)
   try {
     const isFormData = data instanceof FormData;
     const defaultHeaders = {

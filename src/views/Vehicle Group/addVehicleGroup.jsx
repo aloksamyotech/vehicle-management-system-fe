@@ -1,61 +1,49 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Modal, Box, Typography, Grid, FormLabel, TextField, Button } from '@mui/material';
+import { useForm, Controller } from 'react-hook-form';
 import { urls } from 'common/urls';
-import { postApi , updateApi } from 'common/apiClient';
+import { postApi, updateApiPatch } from 'common/apiClient';
+import toast from 'react-hot-toast';
 
 const AddVehicleGroupModal = ({ open, handleClose, refreshData, editItem }) => {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [loading, setLoading] = useState(false);
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting }
+  } = useForm({
+    defaultValues: {
+      name: '',
+      description: ''
+    },
+    mode: 'all'
+  });
 
   useEffect(() => {
     if (editItem) {
-      setName(editItem.name);
-      setDescription(editItem.description);
+      reset({
+        name: editItem.name || '',
+        description: editItem.description || ''
+      });
     } else {
-      setName('');
-      setDescription('');
+      reset();
     }
-  }, [editItem]);
+  }, [editItem, open, reset]);
 
-  const handleSubmit = async () => {
-    if (!name || !description) {
-      alert("Please fill all fields.");
-      return;
-    }
-
-    setLoading(true);
-    
+  const onSubmit = async (data) => {
     try {
-      let response;
-      
       if (editItem) {
-        response = await updateApi(urls.vehicleGroup.update, {
-          id: editItem.id,
-          name,
-          description
-        });
+        await updateApiPatch(urls.vehicleGroup.update.replace(':id', editItem.id), data);
+        toast.success('Vehicle group updated!');
       } else {
-        response = await postApi(urls.vehicleGroup.save, {
-          name,
-          description
-        });
-        console.log("API URL:", urls.vehicleGroup.create);
-
+        await postApi(urls.vehicleGroup.create, data);
+        toast.success('Vehicle group added!');
       }
 
-      if (response?.status === 200 || response?.status === 201) {
-        console.log(response);
-        alert(editItem ? "Vehicle group updated!" : "Vehicle group added!");
-        refreshData(); 
-        handleClose();
-      } else {
-        throw new Error("API request failed!");
-      }
+      handleClose();
+      refreshData();
     } catch (error) {
-      alert("Failed to save vehicle group.");
-    } finally {
-      setLoading(false);
+      toast.error(error?.response?.data?.message || 'Something went wrong!');
     }
   };
 
@@ -76,25 +64,90 @@ const AddVehicleGroupModal = ({ open, handleClose, refreshData, editItem }) => {
         <Typography variant="h5" mb={2}>
           {editItem ? 'Edit' : 'Add'} Vehicle Group
         </Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Name</FormLabel>
-            <TextField fullWidth required value={name} onChange={(e) => setName(e.target.value)} size="small" />
-          </Grid>
-          <Grid item xs={12}>
-            <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Description</FormLabel>
-            <TextField fullWidth required value={description} onChange={(e) => setDescription(e.target.value)} size="small" />
-          </Grid>
-        </Grid>
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-          <Button variant="contained" color="primary" onClick={handleSubmit} disabled={loading}>
-            {loading ? "Saving..." : editItem ? 'Update' : 'Add'} Group
-          </Button>
-          <Button variant="outlined" onClick={handleClose} disabled={loading}>
-            Cancel
-          </Button>
-        </Box>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Name</FormLabel>
+              <Controller
+                name="name"
+                control={control}
+                rules={{
+                  required: 'Name is required',
+                  maxLength: { value: 30, message: 'Max 30 characters' },
+                  pattern: {
+                    value: /^[A-Za-z\s]+$/,
+                    message: 'Only alphabets are allowed'
+                  }
+                }}
+                render={({ field: { onChange, onBlur, value, ref } }) => (
+                  <TextField
+                    fullWidth
+                    size="small"
+                    inputRef={ref}
+                    value={value}
+                    onChange={(e) => {
+                      const alphabeticValue = e.target.value.replace(/[^A-Za-z\s]/g, '');
+                      onChange(alphabeticValue);
+                    }}
+                    onBlur={onBlur}
+                    error={!!errors.name}
+                    helperText={errors.name?.message}
+                    onKeyPress={(e) => {
+                      if (!/[A-Za-z\s]/.test(e.key)) {
+                        e.preventDefault();
+                      }
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Description</FormLabel>
+              <Controller
+                name="description"
+                control={control}
+                rules={{
+                  validate: (value) => {
+                    if (!value.trim()) return 'Description is required';
+                    const wordCount = value.trim().split(/\s+/).length;
+                    return wordCount <= 100 || 'Description must be at most 100 words';
+                  }
+                }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    multiline
+                    rows={2}
+                    fullWidth
+                    inputRef={field.ref}
+                    onChange={(e) => {
+                      const alphabeticValue = e.target.value.replace(/[^A-Za-z\s]/g, '');
+                      field.onChange(alphabeticValue);
+                    }}
+                    error={!!errors.description}
+                    helperText={errors.description?.message}
+                    onKeyPress={(e) => {
+                      if (!/[A-Za-z\s]/.test(e.key)) {
+                        e.preventDefault();
+                      }
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+          </Grid>
+
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+            <Button type="submit" variant="contained" color="primary" disabled={isSubmitting}>
+              {isSubmitting ? 'Processing...' : editItem?.id ? 'Update Group' : 'Add Group'}
+            </Button>
+            <Button variant="outlined" onClick={handleClose} disabled={isSubmitting}>
+              Cancel
+            </Button>
+          </Box>
+        </form>
       </Box>
     </Modal>
   );
