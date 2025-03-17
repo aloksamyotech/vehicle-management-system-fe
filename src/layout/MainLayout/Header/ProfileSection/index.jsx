@@ -10,7 +10,7 @@ import DraftsTwoToneIcon from '@mui/icons-material/DraftsTwoTone';
 import LockOpenTwoTone from '@mui/icons-material/LockOpenTwoTone';
 import SettingsTwoToneIcon from '@mui/icons-material/SettingsTwoTone';
 import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
-import MeetingRoomTwoToneIcon from '@mui/icons-material/MeetingRoomTwoTone';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 // ==============================|| PROFILE SECTION ||============================== //
 
@@ -107,7 +107,7 @@ const ProfileSection = () => {
                     </ListItemIcon>
                     <ListItemText primary="Profile" />
                   </ListItemButton>
-                  <ListItemButton selected={selectedIndex === 2} onClick={(event) => handleListItemClick(event, 2)}>
+                  {/* <ListItemButton selected={selectedIndex === 2} onClick={(event) => handleListItemClick(event, 2)}>
                     <ListItemIcon>
                       <DraftsTwoToneIcon />
                     </ListItemIcon>
@@ -118,10 +118,10 @@ const ProfileSection = () => {
                       <LockOpenTwoTone />
                     </ListItemIcon>
                     <ListItemText primary="Lock Screen" />
-                  </ListItemButton>
+                  </ListItemButton> */}
                   <ListItemButton selected={selectedIndex === 4}>
                     <ListItemIcon>
-                      <MeetingRoomTwoToneIcon />
+                      <LogoutIcon />
                     </ListItemIcon>
                     <ListItemText primary="Logout" />
                   </ListItemButton>

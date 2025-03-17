@@ -21,7 +21,7 @@ const FinanceIndex = () => {
     if (editData) {
       setRows(rows.map((row) => (row.id === editData.id ? { ...row, ...data } : row)));
     } else {
-      setRows([...rows, { id: Date.now(), ...data }]); // Ensure unique ID
+      setRows([...rows, { id: Date.now(), ...data }]);
     }
     setEditData(null);
     setOpen(false);
