@@ -34,7 +34,6 @@ const NewComponent = () => {
     }
   };
   
-
   const handleOpenModal = (item = null) => {
     setEditItem(item);
     setOpenModal(true);
@@ -63,11 +62,18 @@ const NewComponent = () => {
     { field: 'sno', headerName: 'S.No', width: 80 },
     { field: 'name', headerName: 'Name', width: 180 },
     { field: 'description', headerName: 'Description', width: 350 },
-    { field: 'createdAt', headerName: 'Created Date', width: 180 },
+    {
+      field: 'createdAt',
+      headerName: 'Created Date',
+      width: 150,
+      renderCell: (params) => {
+        return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
+      }
+    },
     {
       field: 'actions',
       headerName: 'Action',
-      width: 120,
+      width: 100,
       sortable: false,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>

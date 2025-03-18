@@ -41,7 +41,7 @@ const CustomerManagementPage = () => {
     { field: 'name', headerName: 'Name', width: 150 },
     { field: 'mobileNo', headerName: 'Mobile', width: 150 },
     { field: 'email', headerName: 'Email', width: 200 },
-    { field: 'address', headerName: 'Address', width: 220 },
+    { field: 'address', headerName: 'Address', width: 200 },
     {
       field: 'status',
       headerName: 'Status',
@@ -64,7 +64,7 @@ const CustomerManagementPage = () => {
     {
       field: 'actions',
       headerName: 'Action',
-      width: 150,
+      width: 100,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <IconButton sx={{ color: '#17a2b8', py: 2 }} onClick={() => handleOpen(params.row)}>

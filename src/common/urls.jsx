@@ -31,5 +31,20 @@ export const urls = Object.freeze({
     getById: `${baseUrl}/driver/getById/:id`,
     update: `${baseUrl}/driver/update/:id`,
     delete: `${baseUrl}/driver/delete/:id`,
-  }
+  },
+  partsInventory: {
+    create: `${baseUrl}/parts/save`,
+    get: `${baseUrl}/parts/fetch`,
+    getById: `${baseUrl}/parts/getById/:id`,
+    update: `${baseUrl}/parts/update/:id`,
+    delete: `${baseUrl}/parts/delete/:id`,
+  },
+  reminder: {
+    create: `${baseUrl}/reminder/save`,
+    get: `${baseUrl}/reminder/fetch`,
+    getById: `${baseUrl}/reminder/getById/:id`,
+    update: `${baseUrl}/reminder/update/:id`,
+    delete: `${baseUrl}/reminder/delete/:id`,
+  },
+
 });

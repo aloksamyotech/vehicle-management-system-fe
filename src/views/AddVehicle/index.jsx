@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import {
   Grid,
@@ -7,7 +7,7 @@ import {
   MenuItem,
   Select,
   FormControl,
-  InputLabel,
+  FormHelperText,
   Box,
   FormLabel,
   Typography,
@@ -17,76 +17,90 @@ import {
   Card,
   CardContent
 } from '@mui/material';
-import { Link , useParams} from 'react-router-dom';
+import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { gridSpacing } from 'config.js';
+import { urls } from 'common/urls';
+import { postApi, getApi, updateApiPatch } from 'common/apiClient';
+import toast from 'react-hot-toast';
 
 const VehicleForm = () => {
-  const { id } = useParams();  
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const location = useLocation();
+  const initialData = location.state || null;
+  const [vehicleGroups, setVehicleGroups] = useState([]);
+
+  useEffect(() => {
+    const fetchVehicleGroups = async () => {
+      try {
+        const response = await getApi(urls.vehicleGroup.get);
+        setVehicleGroups(response.data);
+      } catch (error) {
+        console.error('Error fetching vehicle groups:', error);
+      }
+    };
+
+    fetchVehicleGroups();
+  }, []);
 
   const {
-    register, handleSubmit, control, setValue, watch, reset,
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    watch,
+    reset,
     formState: { errors }
   } = useForm({
     defaultValues: {
-      registrationNumber: '',
+      registrationNo: '',
       vehicleName: '',
       model: '',
-      chassisNo: '',
+      chasisNo: '',
       engineNo: '',
       manufacturedBy: '',
       vehicleType: '',
       vehicleColor: '#D6E1F3',
-      registrationExpiryDate: '',
-      vehicleGroup: '',
-      vehicleImage: null,
-      vehicleDocument: null,
-      traccarDeviceId: '',
+      registrationExpiry: '',
+      vehicleGroupId: '',
+      image: null,
+      doc: null,
       gpsApiUrl: 'https://codeforts.com/vms/api',
-      apiUsername: '',
-      apiPassword: ''
-    }
+      apiUsername: 'testUser',
+      apiPassword: 'testPass'
+    },
+    mode: 'all'
   });
   const vehicleColor = watch('vehicleColor');
 
   useEffect(() => {
-    if (id) {
-      setLoading(true);
-     
-      const vehicleData = {
-        registrationNumber: "ABC123",
-        vehicleName: "Test Vehicle",
-        model: "2024",
-        chassisNo: "CH123456",
-        engineNo: "EN987654",
-        manufacturedBy: "Test Manufacturer",
-        vehicleType: "car",
-        vehicleColor: "#FF5733",
-        registrationExpiryDate: "2025-12-31",
-        vehicleGroup: "Fleet A",
-        vehicleImage: null,
-        vehicleDocument: null,
-        traccarDeviceId: "12345",
-        gpsApiUrl: "https://codeforts.com/vms/api",
-        apiUsername: "testUser",
-        apiPassword: "testPass",
-      };
-  
-      setTimeout(() => {
-        Object.keys(vehicleData).forEach((key) => {
-          setValue(key, vehicleData[key]);
-        });
-        setLoading(false);
-        console.log("Vehicle Data Loaded:", vehicleData); 
-      }, 1000);  
+    if (initialData) {
+      console.log(initialData);
+      Object.keys(initialData).forEach((key) => {
+        setValue(key, initialData[key]);
+      });
     }
-  }, [id, setValue]);
-  
+  }, [initialData, setValue]);
 
-  const onSubmit = (data) => {
-    console.log("Form Submitted:", data);  
+  const onSubmit = async (data) => {
+    const { sNo,group,gpsApiUrl, apiUsername, apiPassword, ...filteredData } = data;
+    try {
+      let response;
+      if (id) {
+        response = await updateApiPatch(urls.vehicle.update.replace(':id', id), filteredData);
+        toast.success('Vehicle updated successfully');
+      } else {
+        response = await postApi(urls.vehicle.create, filteredData);
+        toast.success('Vehicle added successfully');
+      }
+
+      reset();
+      navigate('/vehicles');
+    } catch (error) {
+      toast.error('Error: ' + (error.response?.data?.error || 'Something went wrong!'));
+    }
   };
-  
 
   return (
     <>
@@ -106,44 +120,104 @@ const VehicleForm = () => {
             <Grid container spacing={gridSpacing}>
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Registration Number</FormLabel>
-                <TextField
-                  fullWidth
-                  size="small"
-                  {...register('registrationNumber', { required: true })}
-                  error={!!errors.registrationNumber}
+                <Controller
+                  name="registrationNo"
+                  control={control}
+                  rules={{ required: 'Registration Number is required' }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      size="small"
+                      error={!!errors.registrationNo}
+                      helperText={errors.registrationNo?.message}
+                    />
+                  )}
                 />
               </Grid>
+
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Vehicle Name</FormLabel>
-                <TextField fullWidth size="small" {...register('vehicleName', { required: true })} error={!!errors.vehicleName} />
+                <Controller
+                  name="vehicleName"
+                  control={control}
+                  rules={{
+                    required: 'Vehicle Name is required',
+                    minLength: { value: 3, message: 'At least 3 characters required' }
+                  }}
+                  render={({ field }) => (
+                    <TextField {...field} fullWidth size="small" error={!!errors.vehicleName} helperText={errors.vehicleName?.message} />
+                  )}
+                />
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Model</FormLabel>
-                <TextField fullWidth size="small" {...register('model', { required: true })} error={!!errors.model} />
+                <Controller
+                  name="model"
+                  control={control}
+                  rules={{ required: 'Model is required' }}
+                  render={({ field }) => (
+                    <TextField {...field} fullWidth size="small" error={!!errors.model} helperText={errors.model?.message} />
+                  )}
+                />
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Chassis No</FormLabel>
-                <TextField fullWidth size="small" {...register('chassisNo')} />
+                <Controller
+                  name="chasisNo"
+                  control={control}
+                  rules={{
+                    required: 'Chasis No is required',
+                    minLength: { value: 5, message: 'At least 5 characters required' }
+                  }}
+                  render={({ field }) => (
+                    <TextField {...field} fullWidth size="small" error={!!errors.chasisNo} helperText={errors.chasisNo?.message} />
+                  )}
+                />
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Engine No</FormLabel>
-                <TextField fullWidth size="small" {...register('engineNo')} />
+                <Controller
+                  name="engineNo"
+                  control={control}
+                  rules={{
+                    required: 'Engine No is required',
+                    pattern: { value: /^[A-Za-z0-9]+$/, message: 'Invalid Engine No format' }
+                  }}
+                  render={({ field }) => (
+                    <TextField {...field} fullWidth size="small" error={!!errors.engineNo} helperText={errors.engineNo?.message} />
+                  )}
+                />
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Manufactured By</FormLabel>
-                <TextField fullWidth size="small" {...register('manufacturedBy')} />
+                <Controller
+                  name="manufacturedBy"
+                  control={control}
+                  rules={{ required: 'Manufactured By is required' }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      size="small"
+                      error={!!errors.manufacturedBy}
+                      helperText={errors.manufacturedBy?.message}
+                    />
+                  )}
+                />
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormControl fullWidth>
+                <FormControl fullWidth error={!!errors.vehicleType}>
                   <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Vehicle Type</FormLabel>
                   <Controller
                     name="vehicleType"
                     control={control}
+                    rules={{ required: 'Vehicle Type is required' }}
                     render={({ field }) => (
                       <Select {...field} size="small">
                         <MenuItem value="car">CAR</MenuItem>
@@ -155,27 +229,97 @@ const VehicleForm = () => {
                       </Select>
                     )}
                   />
+                  {errors.vehicleType && <FormHelperText>{errors.vehicleType.message}</FormHelperText>}
                 </FormControl>
               </Grid>
+
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Vehicle Color</FormLabel>
-                <TextField fullWidth type="color" {...register('vehicleColor')} size="small" />
-                <Typography sx={{ mt: 1, color: '#000' }}>{vehicleColor}</Typography>
+                <Controller
+                  name="vehicleColor"
+                  control={control}
+                  render={({ field }) => <TextField {...field} fullWidth type="color" size="small" />}
+                />
+                <Typography sx={{ color: '#000' }}>{watch('vehicleColor')}</Typography>
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Registration Expiry Date</FormLabel>
-                <TextField fullWidth type="date" size="small" {...register('registrationExpiryDate')} />
+                <Controller
+                  name="registrationExpiry"
+                  control={control}
+                  rules={{ required: 'Registration Expiry Date is required' }}
+                  render={({ field }) => (
+                    <TextField
+                      fullWidth
+                      type="date"
+                      size="small"
+                      value={field.value ? field.value.split('T')[0] : ''}
+                      onChange={(e) => field.onChange(new Date(e.target.value).toISOString())}
+                      error={!!errors.registrationExpiry}
+                      helperText={errors.registrationExpiry?.message}
+                    />
+                  )}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={4} md={3}>
+                <FormControl fullWidth>
+                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Vehicle Group</FormLabel>
+                  <Controller
+                    name="vehicleGroupId"
+                    control={control}
+                    rules={{ required: 'Vehicle group is required' }}
+                    render={({ field }) => (
+                      <Select {...field} size="small" displayEmpty>
+                        <MenuItem value="" disabled>
+                          Select Vehicle Group
+                        </MenuItem>
+                        {vehicleGroups.map((group) => (
+                          <MenuItem key={group.id} value={group.id}>
+                            {group.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    )}
+                  />
+                  {errors.vehicleGroupId && <Typography color="error">{errors.vehicleGroupId.message}</Typography>}
+                </FormControl>
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Vehicle Image</FormLabel>
-                <TextField fullWidth type="file" size="small" {...register('vehicleImage')} />
+                <Controller
+                  name="image"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      fullWidth
+                      size="small"
+                      type="file"
+                      inputProps={{ accept: 'image/*' }}
+                      onChange={(e) => setValue('image', e.target.files[0])}
+                    />
+                  )}
+                />
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Vehicle Document</FormLabel>
-                <TextField fullWidth type="file" size="small" {...register('vehicleDocument')} />
+                <Controller
+                  name="doc"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      size="small"
+                      type="file"
+                      inputProps={{ accept: 'application/pdf, image/*' }}
+                      onChange={(e) => setValue('doc', e.target.files[0])}
+                    />
+                  )}
+                />
               </Grid>
             </Grid>
 

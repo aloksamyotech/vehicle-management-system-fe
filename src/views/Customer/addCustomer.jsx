@@ -49,7 +49,6 @@ const AddCustomerForm = ({ initialData, onSave, refreshData, onCancel }) => {
       refreshData();
       reset();
     } catch (error) {
-      console.error('API Error:', error);
       toast.error(error?.response?.data?.message || 'Something went wrong!');
     }
   };

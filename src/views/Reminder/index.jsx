@@ -1,37 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, Button, Box, Grid, Typography, Breadcrumbs, IconButton,Link as MuiLink, Modal, Fade, Backdrop } from '@mui/material';
+import { Card, Button, Box, Grid, Typography, Breadcrumbs, IconButton, Link as MuiLink, Modal, Fade, Backdrop } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FuelReminderForm from './addReminder.jsx';
-
-const initialRows = [
-  { id: 1, vehicle: 'Toyota Landcruiser', date: '2025-02-21', message: 'Oil change due' },
-  { id: 2, vehicle: 'Kia Loader', date: '2025-02-15', message: 'Check tire pressure' }
-];
+import { getApi, deleteApi } from 'common/apiClient';
+import { urls } from 'common/urls';
+import toast from 'react-hot-toast';
 
 const FuelReminderIndex = () => {
-  const [rows, setRows] = useState(initialRows);
-  const [open, setOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleDelete = (id) => {
-    setRows(rows.filter((row) => row.id !== id));
-  };
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  const handleAddReminder = (newReminder) => {
-    setRows([...rows, { id: rows.length + 1, ...newReminder }]);
-    setOpen(false);
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await getApi(urls.reminder.get);
+      const formattedData = response.data.map((rem, index) => ({
+        id: rem.id,
+        reminderDate: rem.reminderDate,
+        message: rem.message,
+        vehicleId: rem.vehicle.id,
+        group: rem.vehicle?.vehicleName || 'N/A'
+      }));
+      setRows(formattedData);
+    } catch (error) {
+      toast.error('Failed to fetch data');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const columns = [
-    { field: 'id', headerName: 'S.No', width: 80 },
-    { field: 'vehicle', headerName: 'Vehicle', width: 250 },
-    { field: 'date', headerName: 'Date', width: 150 },
+    { field: 'sNo', headerName: 'S.No', width: 80 },
+    { field: 'group', headerName: 'Vehicle', width: 250 },
+    {
+      field: 'reminderDate',
+      headerName: 'Date',
+      width: 150,
+      renderCell: (params) => {
+        return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
+      }
+    },
     { field: 'message', headerName: 'Message', width: 400 },
     {
       field: 'actions',
       headerName: 'Action',
-      width: 150,
+      width: 100,
       sortable: false,
       renderCell: (params) => (
         <IconButton color="error" onClick={() => handleDelete(params.row.id)}>
@@ -40,6 +60,28 @@ const FuelReminderIndex = () => {
       )
     }
   ];
+
+  const handleOpen = () => {
+    setModalOpen(true);
+  };
+
+  const handleClose = () => {
+    setModalOpen(false);
+  };
+
+  const refreshData = () => {
+    fetchData();
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteApi(urls.reminder.delete.replace(':id', id));
+      toast.success('Reminder deleted successfully');
+      fetchData();
+    } catch (error) {
+      toast.error('Failed to reminder');
+    }
+  };
 
   return (
     <>
@@ -53,7 +95,7 @@ const FuelReminderIndex = () => {
         </Breadcrumbs>
       </Box>
 
-      <Button variant="contained" color="primary" sx={{ my: 2 }} onClick={() => setOpen(true)}>
+      <Button variant="contained" color="primary" sx={{ my: 2 }} onClick={() => handleOpen()}>
         Add
       </Button>
 
@@ -62,7 +104,7 @@ const FuelReminderIndex = () => {
           <Card>
             <Box sx={{ height: 'auto', width: '100%' }}>
               <DataGrid
-                rows={rows}
+                rows={loading ? [] : rows.map((row, index) => ({ ...row, sNo: index + 1 }))}
                 columns={columns}
                 pageSizeOptions={[5, 10]}
                 disableRowSelectionOnClick
@@ -76,13 +118,25 @@ const FuelReminderIndex = () => {
         </Grid>
       </Grid>
 
-      <Modal open={open} onClose={() => setOpen(false)} closeAfterTransition BackdropComponent={Backdrop} BackdropProps={{ timeout: 500 }}>
-        <Fade in={open}>
-          <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 500, bgcolor: 'background.paper', boxShadow: 24, p: 4, borderRadius: 2 }}>
-            <Typography variant="h4" sx={{ mb: 2 }}>Add Reminder</Typography>
-            <FuelReminderForm onSave={handleAddReminder} onCancel={() => setOpen(false)} />
-          </Box>
-        </Fade>
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 500,
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 2
+          }}
+        >
+          <Typography variant="h4" sx={{ mb: 2 }}>
+            Add Reminder
+          </Typography>
+          <FuelReminderForm onSave={handleClose} onCancel={handleClose} refreshData={refreshData} />
+        </Box>
       </Modal>
     </>
   );

@@ -1,77 +1,129 @@
-import React, { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { Grid, Button, TextField, Box, FormLabel, FormControl } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { Grid, Button, TextField, Box, FormLabel, FormControl, Select, MenuItem, Typography } from '@mui/material';
+import toast from 'react-hot-toast';
+import { postApi, getApi } from 'common/apiClient';
+import { urls } from 'common/urls';
 
-const AddFuelReminderForm = ({ onSave, onCancel, initialData }) => {
+const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
+  const [vehicles, setVehicles] = useState([]);
   const {
-    register,
+    control,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting }
   } = useForm({
     defaultValues: {
-      vehicle: '',
-      date: '',
-      message: '',
+      vehicleId: '',
+      reminderDate: '',
+      message: ''
     },
+    mode: 'all'
   });
 
   useEffect(() => {
-    if (initialData) {
-      reset(initialData);
-    }
-  }, [initialData, reset]);
+    const fetchVehicles = async () => {
+      try {
+        const response = await getApi(urls.vehicle.get);
+        setVehicles(response.data);
+      } catch (error) {
+        console.error('Error fetching vehicles:', error);
+      }
+    };
 
-  const onSubmit = (data) => {
-    onSave(data);
-    reset();
+    fetchVehicles();
+  }, []);
+
+  const onSubmit = async (data) => {
+    try {
+      const response = await postApi(urls.reminder.create, data);
+      toast.success('Reminder added successfully!');
+
+      onSave(response.data);
+      refreshData();
+      reset();
+    } catch (error) {
+      toast.error(error?.response?.data?.message || 'Something went wrong!');
+    }
   };
 
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Vehicle</FormLabel>
-          <TextField
-            fullWidth
-            size="small"
-            {...register('vehicle', { required: 'Vehicle is required' })}
-            error={!!errors.vehicle}
-            helperText={errors.vehicle?.message}
-          />
+          <FormControl fullWidth>
+            <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Vehicle*</FormLabel>
+            <Controller
+              name="vehicleId"
+              control={control}
+              rules={{ required: 'Vehicle is required' }}
+              render={({ field }) => (
+                <Select {...field} size="small" displayEmpty>
+                  <MenuItem value="" disabled>
+                    Select Vehicle
+                  </MenuItem>
+                  {vehicles.map((group) => (
+                    <MenuItem key={group.id} value={group.id}>
+                      {group.vehicleName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
+            />
+            {errors.vehicleId && <Typography color="error">{errors.vehicleId.message}</Typography>}
+          </FormControl>
         </Grid>
-        
+
         <Grid item xs={12}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Date</FormLabel>
-          <TextField
-            fullWidth
-            type="date"
-            size="small"
-            {...register('date', { required: 'Date is required' })}
-            error={!!errors.date}
-            helperText={errors.date?.message}
+          <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Date*</FormLabel>
+          <Controller
+            name="reminderDate"
+            control={control}
+            rules={{ required: 'Date is required' }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                fullWidth
+                type="date"
+                size="small"
+                value={field.value ? field.value.split('T')[0] : ''}
+                onChange={(e) => field.onChange(new Date(e.target.value).toISOString())}
+                error={!!errors.reminderDate}
+                helperText={errors.reminderDate?.message}
+              />
+            )}
           />
         </Grid>
 
         <Grid item xs={12}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Message</FormLabel>
-          <TextField
-            fullWidth
-            size="small"
-            multiline
-            rows={3}
-            {...register('message', { required: 'Message is required' })}
-            error={!!errors.message}
-            helperText={errors.message?.message}
+          <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Message*</FormLabel>
+          <Controller
+            name="message"
+            control={control}
+            rules={{
+              required: 'Message is required',
+              maxLength: { value: 200, message: 'Max 200 characters allowed' }
+            }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                fullWidth
+                size="small"
+                multiline
+                rows={3}
+                error={!!errors.message}
+                helperText={errors.message?.message}
+              />
+            )}
           />
         </Grid>
       </Grid>
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-        <Button type="submit" variant="contained">
-          Add Reminder
+        <Button type="submit" variant="contained" disabled={isSubmitting}>
+          {isSubmitting ? 'Saving...' : 'Add Reminder'}
         </Button>
-        <Button variant="outlined" onClick={onCancel}>
+        <Button variant="outlined" onClick={onCancel} disabled={isSubmitting}>
           Cancel
         </Button>
       </Box>

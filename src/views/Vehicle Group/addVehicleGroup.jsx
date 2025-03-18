@@ -20,19 +20,24 @@ const AddVehicleGroupModal = ({ open, handleClose, refreshData, editItem }) => {
   });
 
   useEffect(() => {
-    if (editItem) {
-      reset({
-        name: editItem.name || '',
-        description: editItem.description || ''
-      });
-    } else {
-      reset();
+    if (open) {
+      if (editItem) {
+        reset({
+          name: editItem.name || '',
+          description: editItem.description || ''
+        });
+      } else {
+        reset({
+          name: '',
+          description: ''
+        });
+      }
     }
   }, [editItem, open, reset]);
 
   const onSubmit = async (data) => {
     try {
-      if (editItem) {
+      if (editItem?.id) {
         await updateApiPatch(urls.vehicleGroup.update.replace(':id', editItem.id), data);
         toast.success('Vehicle group updated!');
       } else {
@@ -42,6 +47,7 @@ const AddVehicleGroupModal = ({ open, handleClose, refreshData, editItem }) => {
 
       handleClose();
       refreshData();
+      reset();
     } catch (error) {
       toast.error(error?.response?.data?.message || 'Something went wrong!');
     }
