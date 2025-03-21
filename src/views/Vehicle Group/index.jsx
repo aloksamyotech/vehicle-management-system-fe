@@ -1,19 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Box, Typography, Breadcrumbs, Link as MuiLink, Card, IconButton, Divider } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { BorderColor as BorderColorIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import AddVehicleGroupModal from './addVehicleGroup';
+import { getApi, deleteApi } from 'common/apiClient';
+import { urls } from 'common/urls';
+import toast from 'react-hot-toast';
 
 const NewComponent = () => {
   const [openModal, setOpenModal] = useState(false);
   const [editItem, setEditItem] = useState(null);
-  const [rows, setRows] = useState([
-    { id: 1, name: 'Group A', description: 'Description A', createdDate: '2025-01-01' },
-    { id: 2, name: 'Group B', description: 'Description B', createdDate: '2025-01-02' },
-    { id: 3, name: 'Group C', description: 'Description C', createdDate: '2025-01-03' }
-  ]);
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await getApi(urls.vehicleGroup.get);
+      const modifiedRows = response.data.map((item, index) => ({
+        ...item,
+        sno: index + 1
+      }));
+      setRows(modifiedRows);
+    } catch (error) {
+      toast.error('Failed to fetch data');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   const handleOpenModal = (item = null) => {
     setEditItem(item);
     setOpenModal(true);
@@ -24,54 +44,54 @@ const NewComponent = () => {
     setOpenModal(false);
   };
 
-  const handleSave = (name, description) => {
-    if (editItem) {
-      setRows(rows.map((row) => (row.id === editItem.id ? { ...row, name, description } : row)));
-    } else {
-      const newItem = {
-        id: rows.length + 1,
-        name,
-        description,
-        createdDate: new Date().toISOString().split('T')[0]
-      };
-      setRows([...rows, newItem]);
-    }
-    handleCloseModal();
+  const refreshData = () => {
+    fetchData();
   };
 
-  const handleDelete = (id) => {
-    setRows(rows.filter((row) => row.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      await deleteApi(urls.vehicleGroup.delete.replace(':id', id));
+      toast.success('Vehicle group deleted successfully');
+      fetchData();
+    } catch (error) {
+      toast.error('Failed to delete');
+    }
   };
 
   const columns = [
-    { field: 'id', headerName: 'S.No', width: 80 },
+    { field: 'sno', headerName: 'S.No', width: 80 },
     { field: 'name', headerName: 'Name', width: 180 },
     { field: 'description', headerName: 'Description', width: 350 },
-    { field: 'createdDate', headerName: 'Created Date', width: 180 },
+    {
+      field: 'createdAt',
+      headerName: 'Created Date',
+      width: 150,
+      renderCell: (params) => {
+        return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
+      }
+    },
     {
       field: 'actions',
       headerName: 'Action',
-      width: 120,
+      width: 100,
       sortable: false,
       renderCell: (params) => (
-        <>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <IconButton sx={{ color: '#17a2b8' }} onClick={() => handleOpenModal(params.row)}>
-              <BorderColorIcon />
-            </IconButton>
-            <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5, alignSelf: 'center' }} />
-            <IconButton color="error" onClick={() => handleDelete(params.row.id)}>
-              <DeleteIcon />
-            </IconButton>
-          </Box>
-        </>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <IconButton sx={{ color: '#17a2b8' }} onClick={() => handleOpenModal(params.row)}>
+            <BorderColorIcon />
+          </IconButton>
+          <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5 }} />
+          <IconButton color="error" onClick={() => handleDelete(params.row.id)}>
+            <DeleteIcon />
+          </IconButton>
+        </Box>
       )
     }
   ];
 
   return (
     <>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h3">Vehicle Group</Typography>
         <Breadcrumbs separator="/" aria-label="breadcrumb">
           <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
@@ -80,9 +100,11 @@ const NewComponent = () => {
           <Typography color="text.primary">Vehicle Group</Typography>
         </Breadcrumbs>
       </Box>
+
       <Button variant="contained" color="primary" sx={{ my: 2 }} onClick={() => handleOpenModal()}>
         Add
       </Button>
+
       <Card>
         <Box sx={{ height: 'auto', width: '100%' }}>
           <DataGrid
@@ -90,6 +112,7 @@ const NewComponent = () => {
             columns={columns}
             pageSizeOptions={[5, 10]}
             disableRowSelectionOnClick
+            loading={loading}
             sx={{
               '.MuiDataGrid-columnHeaderTitle': { fontWeight: 'bold', fontSize: '16px' },
               '.MuiDataGrid-cell': { fontSize: '16px' }
@@ -97,7 +120,8 @@ const NewComponent = () => {
           />
         </Box>
       </Card>
-      <AddVehicleGroupModal open={openModal} handleClose={handleCloseModal} handleSave={handleSave} editItem={editItem} />
+
+      <AddVehicleGroupModal open={openModal} handleClose={handleCloseModal} refreshData={refreshData} editItem={editItem} />
     </>
   );
 };

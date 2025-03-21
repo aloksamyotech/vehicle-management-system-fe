@@ -46,6 +46,7 @@ export const updateApi = async (url, data, headers = {}) => {
     throw new Error(error.response ? error.response.data : error.message);
   }
 };
+
 export const updateApiPatch = async (url, data, headers = {}) => {
   try {
     const isFormData = data instanceof FormData;

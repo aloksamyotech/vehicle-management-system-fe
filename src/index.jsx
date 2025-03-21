@@ -13,6 +13,7 @@ import { Provider } from 'react-redux';
 import App from 'layout/App';
 import reducer from 'store/reducer';
 import * as serviceWorker from 'serviceWorker';
+import { Toaster } from 'react-hot-toast';
 
 const store = configureStore({ reducer });
 
@@ -22,6 +23,7 @@ const root = createRoot(document.getElementById('root'));
 
 root.render(
   <Provider store={store}>
+     <Toaster position="top-right" />
     <BrowserRouter basename={import.meta.env.VITE_APP_BASE_NAME}>
       <App />
     </BrowserRouter>

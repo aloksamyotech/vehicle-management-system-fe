@@ -4,13 +4,19 @@ import jsconfigPaths from 'vite-jsconfig-paths';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  const API_URL = env.VITE_APP_BASE_NAME || "/"; 
   const PORT = '3000';
 
   return {
     server: {
       open: true,
-      port: PORT
+      port: PORT,
+      proxy: {
+        '/api': {
+          target: 'http://localhost:7600',
+          changeOrigin: true,
+          secure: false,
+        }
+      }
     },
     define: {
       global: 'window'
@@ -20,7 +26,6 @@ export default defineConfig(({ mode }) => {
       open: true,
       port: PORT
     },
-    base: API_URL.startsWith("/") ? API_URL : `/${API_URL}`,
     plugins: [react(), jsconfigPaths()]
   };
 });
