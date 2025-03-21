@@ -46,5 +46,26 @@ export const urls = Object.freeze({
     update: `${baseUrl}/reminder/update/:id`,
     delete: `${baseUrl}/reminder/delete/:id`,
   },
+  fuel: {
+    create: `${baseUrl}/fuel/save`,
+    get: `${baseUrl}/fuel/fetch`,
+    getById: `${baseUrl}/fuel/getById/:id`,
+    update: `${baseUrl}/fuel/update/:id`,
+    delete: `${baseUrl}/fuel/delete/:id`,
+  },
+  incomeExpense: {
+    create: `${baseUrl}/income-expense/save`,
+    get: `${baseUrl}/income-expense/fetch`,
+    getById: `${baseUrl}/income-expense/getById/:id`,
+    update: `${baseUrl}/income-expense/update/:id`,
+    delete: `${baseUrl}/income-expense/delete/:id`,
+  },
+  maintenance: {
+    create: `${baseUrl}/maintenance/save`,
+    get: `${baseUrl}/maintenance/fetch`,
+    getById: `${baseUrl}/maintenance/getById/:id`,
+    updateStatus: `${baseUrl}/maintenance/updateStatus/:id`,
+    delete: `${baseUrl}/maintenance/delete/:id`,
+  },
 
 });

@@ -54,6 +54,7 @@ const CustomerManagementPage = () => {
             color: 'white',
             fontWeight: 700,
             fontSize: '10px',
+            width: 'auto',
             padding: '0'
           }}
         >
@@ -177,7 +178,7 @@ const CustomerManagementPage = () => {
           }}
         >
           <Typography variant="h4" sx={{ mb: 2 }}>
-            {editCustomer ? 'Edit Customer' : 'Add Customer'}
+            {editCustomer?.id ? 'Edit Customer' : 'Add Customer'}
           </Typography>
           <AddCustomerForm initialData={editCustomer} onSave={handleClose} onCancel={handleClose} refreshData={refreshData} />
         </Box>

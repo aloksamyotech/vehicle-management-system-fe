@@ -89,7 +89,7 @@ const DriverForm = () => {
                 { label: 'Trip Status*', name: 'tripStatus', type: 'select', options: ['Scheduled', 'Ongoing', 'Completed', 'Cancelled'] }
               ].map(({ label, name, type, options, ...rest }) => (
                 <Grid item xs={12} sm={4} md={3} key={name}>
-                  <FormLabel sx={{ fontSize: '16px', fontWeight: 700 }}>{label}</FormLabel>
+                  <FormLabel sx={{ fontSize: '14px', fontWeight: 700 }}>{label}</FormLabel>
                   {type === 'select' ? (
                     <FormControl fullWidth size="small">
                       <Select {...register(name)} defaultValue="">

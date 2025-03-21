@@ -62,21 +62,17 @@ const DriverForm = () => {
 
   const onSubmit = async (data) => {
     const { sNo, ...filteredData } = data;
-    try {
-      let response;
-      if (id) {
-        response = await updateApiPatch(urls.driver.update.replace(':id', id), filteredData);
-        toast.success('Driver updated successfully');
-      } else {
-        response = await postApi(urls.driver.create, filteredData);
-        toast.success('Driver added successfully');
-      }
-
-      reset();
-      navigate('/drivers');
-    } catch (error) {
-      toast.error('Error: ' + (error.response?.data?.error || 'Something went wrong!'));
+    let response;
+    if (id) {
+      response = await updateApiPatch(urls.driver.update.replace(':id', id), filteredData);
+      toast.success('Driver updated successfully');
+    } else {
+      response = await postApi(urls.driver.create, filteredData);
+      toast.success('Driver added successfully');
     }
+
+    reset();
+    navigate('/drivers');
   };
 
   return (
@@ -87,6 +83,9 @@ const DriverForm = () => {
           <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
             <Typography color="#17a2b8">Dashboard</Typography>
           </MuiLink>
+          <MuiLink component={Link} to="/drivers" color="inherit" underline="none">
+            <Typography color="#17a2b8">Driver</Typography>
+          </MuiLink>
           <Typography color="text.primary">{id ? 'Edit Driver' : 'Add Driver'}</Typography>
         </Breadcrumbs>
       </Box>
@@ -96,31 +95,84 @@ const DriverForm = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <Grid container spacing={gridSpacing}>
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Driver Name*</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  Driver Name
+                </FormLabel>
                 <Controller
                   name="name"
                   control={control}
-                  rules={{ required: 'Driver Name is required' }}
+                  rules={{
+                    required: 'Driver Name is required',
+                    minLength: { value: 3, message: 'At least 3 characters required' },
+                    maxLength: { value: 50, message: 'Max 50 characters allowed' },
+                    pattern: {
+                      value: /^[A-Za-z\s]+$/,
+                      message: 'Only alphabets are allowed (A-Z, a-z)'
+                    }
+                  }}
                   render={({ field }) => (
-                    <TextField {...field} fullWidth size="small" error={!!errors.name} helperText={errors.name?.message} />
+                    <TextField
+                      {...field}
+                      fullWidth
+                      size="small"
+                      error={!!errors.name}
+                      helperText={errors.name?.message}
+                      onChange={(e) => {
+                        const alphabeticValue = e.target.value.replace(/[^A-Za-z\s]/g, '');
+                        field.onChange(alphabeticValue);
+                      }}
+                      onKeyPress={(e) => {
+                        if (!/[A-Za-z\s]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
                   )}
                 />
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Mobile*</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  Mobile
+                </FormLabel>
                 <Controller
                   name="mobileNo"
                   control={control}
-                  rules={{ required: 'Mobile is required' }}
+                  rules={{
+                    required: 'Mobile is required',
+                    minLength: { value: 10, message: 'Must be at least 10 digits' },
+                    maxLength: { value: 12, message: 'Cannot exceed 12 digits' },
+                    pattern: {
+                      value: /^[0-9]+$/,
+                      message: 'Only numbers are allowed'
+                    }
+                  }}
                   render={({ field }) => (
-                    <TextField {...field} fullWidth size="small" error={!!errors.mobileNo} helperText={errors.mobileNo?.message} />
+                    <TextField
+                      {...field}
+                      fullWidth
+                      size="small"
+                      error={!!errors.mobileNo}
+                      helperText={errors.mobileNo?.message}
+                      inputProps={{ maxLength: 12 }}
+                      onChange={(e) => {
+                        const numericValue = e.target.value.replace(/\D/g, '');
+                        field.onChange(numericValue);
+                      }}
+                      onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
                   )}
                 />
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Age*</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  Age
+                </FormLabel>
                 <Controller
                   name="age"
                   control={control}
@@ -139,29 +191,68 @@ const DriverForm = () => {
                       error={!!errors.age}
                       helperText={errors.age?.message}
                       onChange={(e) => field.onChange(Number(e.target.value))}
+                      onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                     />
                   )}
                 />
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>License No*</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  License No
+                </FormLabel>
                 <Controller
                   name="licenseNo"
                   control={control}
-                  rules={{ required: 'License No is required' }}
+                  rules={{
+                    required: 'License No is required',
+                    minLength: { value: 6, message: 'At least 6 characters required' },
+                    maxLength: { value: 14, message: 'Cannot exceed 14 characters' },
+                    pattern: {
+                      value: /^[A-Za-z0-9]+$/,
+                      message: 'Only alphabets and numbers are allowed'
+                    }
+                  }}
                   render={({ field }) => (
-                    <TextField {...field} fullWidth size="small" error={!!errors.licenseNo} helperText={errors.licenseNo?.message} />
+                    <TextField
+                      {...field}
+                      fullWidth
+                      size="small"
+                      error={!!errors.licenseNo}
+                      helperText={errors.licenseNo?.message}
+                      onChange={(e) => {
+                        const alphanumericValue = e.target.value.replace(/[^A-Za-z0-9]/g, '');
+                        field.onChange(alphanumericValue);
+                      }}
+                      onKeyPress={(e) => {
+                        if (!/[A-Za-z0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
                   )}
                 />
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>License Expiry Date*</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>License Expiry Date</FormLabel>
                 <Controller
                   name="licenseExpiry"
                   control={control}
-                  rules={{ required: 'License Expiry Date is required' }}
+                  rules={{
+                    required: 'License Expiry Date is required',
+                    validate: (value) => {
+                      if (!value) return 'License Expiry Date is required';
+                      const selectedDate = new Date(value);
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      return selectedDate >= today || 'Expiry date must be in the future';
+                    }
+                  }}
                   render={({ field }) => (
                     <TextField
                       {...field}
@@ -172,17 +263,24 @@ const DriverForm = () => {
                       onChange={(e) => field.onChange(new Date(e.target.value).toISOString())}
                       error={!!errors.licenseExpiry}
                       helperText={errors.licenseExpiry?.message}
+                      inputProps={{
+                        min: new Date().toISOString().split('T')[0]
+                      }}
                     />
                   )}
                 />
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Total Experience*</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Total Experience</FormLabel>
                 <Controller
                   name="totalExp"
                   control={control}
-                  rules={{ required: 'Total Experience is required' }}
+                  rules={{
+                    required: 'Total Experience is required',
+                    min: { value: 1, message: 'At least 1 year exp is required' },
+                    max: { value: 40, message: 'Max 40 years exp is allowed' }
+                  }}
                   render={({ field }) => (
                     <TextField
                       {...field}
@@ -191,14 +289,23 @@ const DriverForm = () => {
                       type="number"
                       error={!!errors.totalExp}
                       helperText={errors.totalExp?.message}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      inputProps={{
+                        min: 1,
+                        max: 40
+                      }}
+                      onChange={(e) => {
+                        let value = Number(e.target.value);
+                        if (value > 40) value = 40; 
+                        if (value < 1) value = 1; 
+                        field.onChange(value);
+                      }}
                     />
                   )}
                 />
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Date of Joining*</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Date of Joining</FormLabel>
                 <Controller
                   name="dateOfJoining"
                   control={control}
@@ -219,34 +326,66 @@ const DriverForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Reference/Notes*</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Reference/Notes</FormLabel>
                 <Controller
                   name="notes"
                   control={control}
-                  rules={{ required: 'Notes is required' }}
+                  rules={{
+                    pattern: {
+                      value: /^[A-Za-z\s]+$/,
+                      message: 'Only alphabets are allowed (A-Z, a-z)'
+                    }
+                  }}
                   render={({ field }) => (
-                    <TextField {...field} fullWidth size="small" error={!!errors.notes} helperText={errors.notes?.message} />
+                    <TextField
+                      {...field}
+                      fullWidth
+                      size="small"
+                      error={!!errors.notes}
+                      helperText={errors.notes?.message}
+                      onChange={(e) => {
+                        const alphabeticValue = e.target.value.replace(/[^A-Za-z\s]/g, '');
+                        field.onChange(alphabeticValue);
+                      }}
+                      onKeyPress={(e) => {
+                        if (!/[A-Za-z\s]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
                   )}
                 />
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Address*</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  Address
+                </FormLabel>
                 <Controller
                   name="address"
-                  multiline
-                  rows={2}
                   control={control}
-                  rules={{ required: 'Address is required' }}
+                  rules={{
+                    required: 'Address is required',
+                    minLength: { value: 5, message: 'Address must be at least 5 characters' },
+                    maxLength: { value: 100, message: 'Address cannot exceed 100 characters' }
+                  }}
                   render={({ field }) => (
-                    <TextField {...field} fullWidth size="small" error={!!errors.address} helperText={errors.address?.message} />
+                    <TextField
+                      {...field}
+                      fullWidth
+                      size="small"
+                      multiline
+                      rows={2}
+                      error={!!errors.address}
+                      helperText={errors.address?.message}
+                    />
                   )}
                 />
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth size="small">
-                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Driver Status</FormLabel>
+                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Driver Status</FormLabel>
                   <Controller
                     name="status"
                     control={control}
@@ -263,7 +402,7 @@ const DriverForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Driver Photo</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Driver Photo</FormLabel>
                 <Controller
                   name="image"
                   control={control}
@@ -280,7 +419,7 @@ const DriverForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Driver Document</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Driver Document</FormLabel>
                 <Controller
                   name="doc"
                   control={control}

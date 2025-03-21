@@ -23,7 +23,7 @@ const root = createRoot(document.getElementById('root'));
 
 root.render(
   <Provider store={store}>
-     <Toaster position="top-right" />
+     <Toaster position="top-center" />
     <BrowserRouter basename={import.meta.env.VITE_APP_BASE_NAME}>
       <App />
     </BrowserRouter>

@@ -47,7 +47,6 @@ const DriverManagementPage = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this driver?')) {
       try {
         await deleteApi(urls.driver.delete.replace(':id', id));
         toast.success('Driver deleted successfully');
@@ -55,7 +54,6 @@ const DriverManagementPage = () => {
       } catch (error) {
         toast.error('Failed to delete driver');
       }
-    }
   };
 
   const columns = [

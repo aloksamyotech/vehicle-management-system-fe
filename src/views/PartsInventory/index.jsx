@@ -154,7 +154,7 @@ const PartsInventory = () => {
           }}
         >
           <Typography variant="h4" sx={{ mb: 2 }}>
-            {editData ? 'Edit Part' : 'Add Part'}
+            {editData?.id ? 'Edit Part' : 'Add Part'}
           </Typography>
           <AddPartForm initialData={editData} onSave={handleClose} onCancel={handleClose} refreshData={refreshData} />
         </Box>

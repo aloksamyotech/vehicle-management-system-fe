@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Grid,
   Button,
@@ -17,44 +17,116 @@ import {
 } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
-import { useForm, useFieldArray } from 'react-hook-form';
-import { gridSpacing } from 'config';
-import { Link } from 'react-router-dom';
-
-const partsList = ["Part 1", "Part 2", "Part 3", "Part 4"];
+import { useForm, useFieldArray, Controller } from 'react-hook-form';
+import { Link, useNavigate } from 'react-router-dom';
+import { gridSpacing } from 'config.js';
+import { urls } from 'common/urls';
+import { postApi, getApi } from 'common/apiClient';
+import toast from 'react-hot-toast';
 
 const AddMaintenanceForm = () => {
-  const { register, handleSubmit, control, setValue, watch } = useForm({
+  const navigate = useNavigate();
+  const [vehicles, setVehicles] = useState([]);
+  const [partsList, setPartsList] = useState([]);
+  const [minEndDate, setMinEndDate] = useState('');
+  const {
+    register,
+    handleSubmit,
+    control,
+    getValues,
+    reset,
+    watch,
+    formState: { errors }
+  } = useForm({
     defaultValues: {
-      vehicle: '',
+      vehicleId: '',
       startDate: '',
       endDate: '',
-      serviceDetails: '',
+      details: '',
       totalCost: '',
       vendorName: '',
       status: '',
-      parts: [{ partsName: '', qty: 1 }]
-    }
+      parts: [{ partsInventoryId: '', quantity: 1 }]
+    },
+    mode: 'all'
   });
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "parts"
+    name: 'parts'
   });
 
-  const onSubmit = (data) => {
-    console.log('Submitted Data:', data);
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      try {
+        const response = await getApi(urls.vehicle.get);
+        setVehicles(response.data);
+      } catch (error) {
+        console.error('Error fetching vehicles:', error);
+      }
+    };
+
+    fetchVehicles();
+  }, []);
+
+  useEffect(() => {
+    const fetchParts = async () => {
+      try {
+        const response = await getApi(urls.partsInventory.get);
+        setPartsList(response.data);
+      } catch (error) {
+        console.error('Error fetching parts:', error);
+      }
+    };
+
+    fetchParts();
+  }, []);
+
+  const onSubmit = async (data) => {
+    const formattedParts = data.parts
+      .map((part) => {
+        const selectedPart = partsList.find((p) => p.name === part.partsName);
+
+        if (!selectedPart) return null;
+
+        return {
+          partsInventoryId: selectedPart.id,
+          quantity: part.qty || 1
+        };
+      })
+      .filter((part) => part !== null);
+
+    if (formattedParts.length === 0) {
+      toast.error('Please select at least one valid part.');
+      return;
+    }
+
+    const finalData = {
+      ...data,
+      parts: formattedParts
+    };
+
+    let response = await postApi(urls.maintenance.create, finalData);
+    toast.success('Maintenance added successfully');
+
+    reset();
+    navigate('/maintenance');
   };
 
-  const selectedParts = watch("parts").map((field) => field.partsName);
+  const selectedParts = watch('parts').map((field) => field.partsName);
 
   return (
     <>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 0, m: 0 }}>
-        <Typography variant="h3" sx={{ m: 0 }}>Add Maintenance</Typography>
+        <Typography variant="h3" sx={{ m: 0 }}>
+          Add Maintenance
+        </Typography>
         <Breadcrumbs separator="/" aria-label="breadcrumb">
           <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
             <Typography color="#17a2b8">Dashboard</Typography>
+          </MuiLink>
+          <MuiLink component={Link} to="/maintenance" color="inherit" underline="none">
+            <Typography color="#17a2b8">Maintenance</Typography>
           </MuiLink>
           <Typography color="text.primary">Add Maintenance</Typography>
         </Breadcrumbs>
@@ -65,64 +137,244 @@ const AddMaintenanceForm = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <Grid container spacing={gridSpacing}>
               <Grid item xs={12} sm={4} md={3}>
-                <FormControl fullWidth required>
-                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Select Vehicle</FormLabel>
-                  <Select {...register("vehicle")} defaultValue="" size="small">
-                    <MenuItem value="Vehicle 1">Vehicle 1</MenuItem>
-                    <MenuItem value="Vehicle 2">Vehicle 2</MenuItem>
-                  </Select>
+                <FormControl fullWidth>
+                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                    Vehicle
+                  </FormLabel>
+                  <Controller
+                    name="vehicleId"
+                    control={control}
+                    rules={{ required: 'Vehicle is required' }}
+                    render={({ field }) => (
+                      <Select {...field} size="small" displayEmpty>
+                        <MenuItem value="" disabled>
+                          Select Vehicle
+                        </MenuItem>
+                        {vehicles.map((group) => (
+                          <MenuItem key={group.id} value={group.id}>
+                            {group.vehicleName}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    )}
+                  />
+                  {errors.vehicleId && <Typography color="error">{errors.vehicleId.message}</Typography>}
                 </FormControl>
               </Grid>
+
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Maintenance Start Date*</FormLabel>
-                <TextField fullWidth type="date" {...register("startDate")} size="small" required />
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  Maintenance Start Date
+                </FormLabel>
+                <Controller
+                  name="startDate"
+                  control={control}
+                  rules={{ required: 'Start Date is required' }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      size="small"
+                      type="date"
+                      value={field.value ? field.value.split('T')[0] : ''}
+                      onChange={(e) => {
+                        const newStartDate = new Date(e.target.value).toISOString();
+                        field.onChange(newStartDate);
+                        setMinEndDate(e.target.value);
+                      }}
+                      error={!!errors.startDate}
+                      helperText={errors.startDate?.message}
+                    />
+                  )}
+                />
               </Grid>
+
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Maintenance End Date*</FormLabel>
-                <TextField fullWidth type="date" {...register("endDate")} size="small" required />
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  Maintenance End Date
+                </FormLabel>
+                <Controller
+                  name="endDate"
+                  control={control}
+                  rules={{
+                    required: 'End Date is required',
+                    validate: (value) => {
+                      const startDate = new Date(getValues('startDate'));
+                      const endDate = new Date(value);
+                      return endDate >= startDate || 'End Date must be after Start Date';
+                    }
+                  }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      size="small"
+                      type="date"
+                      inputProps={{ min: minEndDate }} 
+                      value={field.value ? field.value.split('T')[0] : ''}
+                      onChange={(e) => field.onChange(new Date(e.target.value).toISOString())}
+                      error={!!errors.endDate}
+                      helperText={errors.endDate?.message}
+                    />
+                  )}
+                />
               </Grid>
+
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Total Cost*</FormLabel>
-                <TextField fullWidth type="number" {...register("totalCost")} size="small" required />
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  Total Cost
+                </FormLabel>
+                <Controller
+                  name="totalCost"
+                  control={control}
+                  rules={{
+                    required: 'Cost is required',
+                    min: { value: 0.01, message: 'Cost must be greater than 0' },
+                    max: { value: 10000000, message: 'Cost cannot exceed 10,000,000' }
+                  }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      required
+                      type="number"
+                      size="small"
+                      inputProps={{ step: '0.01', min: 0.01, max: 10000000 }}
+                      onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                      error={!!errors.totalCost}
+                      helperText={errors.totalCost?.message}
+                    />
+                  )}
+                />
               </Grid>
+
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Vendor Name*</FormLabel>
-                <TextField fullWidth {...register("vendorName")} size="small" required />
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  Vendor Name
+                </FormLabel>
+                <Controller
+                  name="vendorName"
+                  control={control}
+                  rules={{
+                    required: 'Name is required',
+                    maxLength: { value: 30, message: 'Max 30 characters' },
+                    pattern: {
+                      value: /^[A-Za-z\s]+$/,
+                      message: 'Only alphabets are allowed'
+                    }
+                  }}
+                  render={({ field: { onChange, onBlur, value, ref } }) => (
+                    <TextField
+                      fullWidth
+                      size="small"
+                      inputRef={ref}
+                      value={value}
+                      onChange={(e) => {
+                        const alphabeticValue = e.target.value.replace(/[^A-Za-z\s]/g, '');
+                        onChange(alphabeticValue);
+                      }}
+                      onBlur={onBlur}
+                      error={!!errors.vendorName}
+                      helperText={errors.vendorName?.message}
+                      onKeyPress={(e) => {
+                        if (!/[A-Za-z\s]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
+                  )}
+                />
               </Grid>
+
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth required>
-                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Maintenance Status</FormLabel>
-                  <Select {...register("status")} defaultValue="" size="small">
+                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                    Maintenance Status
+                  </FormLabel>
+                  <Select {...register('status')} defaultValue="" size="small">
                     <MenuItem value="Pending">Pending</MenuItem>
                     <MenuItem value="In Progress">In Progress</MenuItem>
                     <MenuItem value="Completed">Completed</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
+
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Service Details*</FormLabel>
-                <TextField fullWidth {...register("serviceDetails")} size="small" required />
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Service Details</FormLabel>
+                <Controller
+                  name="details"
+                  control={control}
+                  rules={{maxLength: { value: 100, message: 'Max 100 characters' } }}
+                  render={({ field }) => (
+                    <TextField fullWidth size="small" {...field} error={!!errors.details} helperText={errors.details?.message} />
+                  )}
+                />
               </Grid>
+
               {fields.map((field, index) => (
                 <React.Fragment key={field.id}>
                   <Grid item xs={6} sm={3} md={3}>
                     <FormControl fullWidth required>
-                      <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Parts Name</FormLabel>
-                      <Select
-                        {...register(`parts.${index}.partsName`)}
-                        defaultValue=""
-                        size="small"
+                      <FormLabel
+                        sx={{
+                          fontWeight: 'bold',
+                          fontSize: '14px',
+                          color: 'black',
+                          '&.Mui-focused': { color: 'black' }
+                        }}
                       >
-                        {partsList.filter(part => !selectedParts.includes(part) || part === field.partsName).map(part => (
-                          <MenuItem key={part} value={part}>{part}</MenuItem>
-                        ))}
-                      </Select>
+                        Parts Name
+                      </FormLabel>
+
+                      <Controller
+                        name={`parts.${index}.partsName`}
+                        control={control}
+                        defaultValue=""
+                        render={({ field }) => (
+                          <Select {...field} size="small">
+                            {partsList
+                              .filter((part) => !selectedParts.includes(part.name) || part.name === field.value)
+                              .map((part) => (
+                                <MenuItem key={part._id} value={part.name}>
+                                  {part.name}
+                                </MenuItem>
+                              ))}
+                          </Select>
+                        )}
+                      />
                     </FormControl>
                   </Grid>
+
                   <Grid item xs={6} sm={2} md={2}>
-                    <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Qty*</FormLabel>
-                    <TextField fullWidth type="number" {...register(`parts.${index}.qty`)} size="small" required />
+                    <FormControl fullWidth required>
+                      <FormLabel
+                        sx={{
+                          fontWeight: 'bold',
+                          fontSize: '14px',
+                          color: 'black',
+                          '&.Mui-focused': { color: 'black' }
+                        }}
+                      >
+                        Qty
+                      </FormLabel>
+
+                      <Controller
+                        name={`parts.${index}.qty`}
+                        control={control}
+                        defaultValue={1}
+                        render={({ field }) => (
+                          <Select {...field} size="small">
+                            {[...Array(10)].map((_, i) => (
+                              <MenuItem key={i + 1} value={i + 1}>
+                                {i + 1}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        )}
+                      />
+                    </FormControl>
                   </Grid>
+
                   <Grid item xs={3} sm={1} md={1} sx={{ display: 'flex', alignItems: 'center' }}>
                     {index === 0 ? (
                       <IconButton color="primary" onClick={() => append({ partsName: '', qty: 1 })}>
@@ -138,7 +390,9 @@ const AddMaintenanceForm = () => {
               ))}
             </Grid>
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-              <Button type="submit" variant="contained" color="primary">Add Maintenance</Button>
+              <Button type="submit" variant="contained" color="primary">
+                Add Maintenance
+              </Button>
             </Box>
           </form>
         </CardContent>
@@ -148,5 +402,3 @@ const AddMaintenanceForm = () => {
 };
 
 export default AddMaintenanceForm;
-
- 

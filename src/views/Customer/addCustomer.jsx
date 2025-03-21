@@ -31,33 +31,29 @@ const AddCustomerForm = ({ initialData, onSave, refreshData, onCancel }) => {
       });
     }
   }, [initialData, reset]);
-
+  
   const onSubmit = async (data) => {
-    try {
       let response;
-      const customerData = { ...data };
+      const financeData = { ...data };
 
       if (initialData?.id) {
-        response = await updateApiPatch(urls.customer.update.replace(':id', initialData.id), customerData);
+        response = await updateApiPatch(urls.customer.update.replace(':id', initialData.id), financeData);
         toast.success('Customer updated successfully!');
       } else {
-        response = await postApi(urls.customer.create, customerData);
+        response = await postApi(urls.customer.create, financeData);
         toast.success('Customer added successfully!');
       }
 
       onSave(response.data);
       refreshData();
       reset();
-    } catch (error) {
-      toast.error(error?.response?.data?.message || 'Something went wrong!');
-    }
   };
 
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Name</FormLabel>
+          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Name</FormLabel>
           <Controller
             name="name"
             control={control}
@@ -65,7 +61,7 @@ const AddCustomerForm = ({ initialData, onSave, refreshData, onCancel }) => {
               required: 'Name is required',
               maxLength: { value: 30, message: 'Max 30 characters' },
               pattern: {
-                value: /^[A-Za-z\s]+$/, 
+                value: /^[A-Za-z\s]+$/,
                 message: 'Only alphabets are allowed'
               }
             }}
@@ -76,7 +72,7 @@ const AddCustomerForm = ({ initialData, onSave, refreshData, onCancel }) => {
                 inputRef={ref}
                 value={value}
                 onChange={(e) => {
-                  const alphabeticValue = e.target.value.replace(/[^A-Za-z\s]/g, ''); 
+                  const alphabeticValue = e.target.value.replace(/[^A-Za-z\s]/g, '');
                   onChange(alphabeticValue);
                 }}
                 onBlur={onBlur}
@@ -84,7 +80,7 @@ const AddCustomerForm = ({ initialData, onSave, refreshData, onCancel }) => {
                 helperText={errors.name?.message}
                 onKeyPress={(e) => {
                   if (!/[A-Za-z\s]/.test(e.key)) {
-                    e.preventDefault(); 
+                    e.preventDefault();
                   }
                 }}
               />
@@ -93,7 +89,7 @@ const AddCustomerForm = ({ initialData, onSave, refreshData, onCancel }) => {
         </Grid>
 
         <Grid item xs={12}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Email</FormLabel>
+          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Email</FormLabel>
           <Controller
             name="email"
             control={control}
@@ -108,7 +104,7 @@ const AddCustomerForm = ({ initialData, onSave, refreshData, onCancel }) => {
         </Grid>
 
         <Grid item xs={12}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Phone</FormLabel>
+          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Phone</FormLabel>
           <Controller
             name="mobileNo"
             control={control}
@@ -148,7 +144,7 @@ const AddCustomerForm = ({ initialData, onSave, refreshData, onCancel }) => {
         </Grid>
 
         <Grid item xs={12}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Address</FormLabel>
+          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Address</FormLabel>
           <Controller
             name="address"
             control={control}
