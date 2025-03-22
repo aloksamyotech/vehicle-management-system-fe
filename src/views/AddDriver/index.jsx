@@ -77,8 +77,17 @@ const DriverForm = () => {
 
   return (
     <>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 0, m: 0 }}>
-        <Typography variant="h3">{id ? 'Edit Driver' : 'Add Driver'}</Typography>
+      <Box 
+       sx={{
+        backgroundColor: '#ffff',
+        padding: '10px',
+        borderRadius: '8px',
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+      }}>
+        <Typography variant="h4">{id ? 'Edit Driver' : 'Add Driver'}</Typography>
         <Breadcrumbs separator="/" aria-label="breadcrumb">
           <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
             <Typography color="#17a2b8">Dashboard</Typography>

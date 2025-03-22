@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Button, Box, Typography, Breadcrumbs, Link as MuiLink, Card, IconButton, Divider } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
+import { Box,Card, IconButton, Divider } from '@mui/material';
+import { DataGrid} from '@mui/x-data-grid';
 import { BorderColor as BorderColorIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import AddVehicleGroupModal from './addVehicleGroup';
 import { getApi, deleteApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
+import CustomToolbar from 'common/customToolbar';
+import CustomBreadcrumbs from 'common/customBreadcrumbs';
 
 const NewComponent = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -33,7 +34,7 @@ const NewComponent = () => {
       setLoading(false);
     }
   };
-  
+
   const handleOpenModal = (item = null) => {
     setEditItem(item);
     setOpenModal(true);
@@ -91,31 +92,36 @@ const NewComponent = () => {
 
   return (
     <>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h3">Vehicle Group</Typography>
-        <Breadcrumbs separator="/" aria-label="breadcrumb">
-          <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
-            <Typography color="#17a2b8">Dashboard</Typography>
-          </MuiLink>
-          <Typography color="text.primary">Vehicle Group</Typography>
-        </Breadcrumbs>
-      </Box>
-
-      <Button variant="contained" color="primary" sx={{ my: 2 }} onClick={() => handleOpenModal()}>
-        Add
-      </Button>
+      <CustomBreadcrumbs title="Vehicle Group" links={[{ name: 'Vehicle Group', path: '/vehiclegroup' }]} />
 
       <Card>
         <Box sx={{ height: 'auto', width: '100%' }}>
           <DataGrid
             rows={rows}
             columns={columns}
-            pageSizeOptions={[5, 10]}
             disableRowSelectionOnClick
             loading={loading}
             sx={{
               '.MuiDataGrid-columnHeaderTitle': { fontWeight: 'bold', fontSize: '16px' },
               '.MuiDataGrid-cell': { fontSize: '16px' }
+            }}
+            initialState={{
+              pagination: {
+                paginationModel: {
+                  pageSize: 10
+                }
+              }
+            }}
+            pageSizeOptions={[10]}
+            disableColumnFilter
+            disableColumnSelector
+            disableDensitySelector
+            slots={{ toolbar: CustomToolbar }}
+            slotProps={{
+              toolbar: {
+                onAddClick: () => handleOpenModal(),
+                showExport: true
+              }
             }}
           />
         </Box>

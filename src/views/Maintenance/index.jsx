@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Card, Button, Box, Grid, Typography, IconButton, Link as MuiLink, Breadcrumbs, MenuItem, Select } from '@mui/material';
+import { Card, Box, Grid, IconButton, MenuItem, Select } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getApi, deleteApi, updateApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import CustomToolbar from 'common/customToolbar';
+import CustomBreadcrumbs from 'common/customBreadcrumbs';
 
 const MaintenanceIndex = () => {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ const MaintenanceIndex = () => {
         model: maintenance.model,
         startDate: maintenance.startDate,
         endDate: maintenance.endDate,
-        details: maintenance.details || "-",
+        details: maintenance.details || '-',
         status: maintenance.status,
         vehicleId: maintenance.vehicle.id,
         group: maintenance.vehicle?.vehicleName || 'N/A'
@@ -114,19 +115,7 @@ const MaintenanceIndex = () => {
 
   return (
     <>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant="h3">Maintenance Records</Typography>
-        <Breadcrumbs separator="/" aria-label="breadcrumb">
-          <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
-            <Typography color="#17a2b8">Dashboard</Typography>
-          </MuiLink>
-          <Typography color="text.primary">Maintenance Records</Typography>
-        </Breadcrumbs>
-      </Box>
-
-      <Button variant="contained" color="primary" sx={{ my: 2 }} onClick={() => navigate('/add-maintenance')}>
-        Add
-      </Button>
+      <CustomBreadcrumbs title="Maintenance Records" links={[{ name: 'Maintenance Records', path: '/maintenance' }]} />
 
       <Grid container spacing={2}>
         <Grid item xs={12}>
@@ -135,11 +124,28 @@ const MaintenanceIndex = () => {
               <DataGrid
                 rows={loading ? [] : showData.map((row, index) => ({ ...row, sNo: index + 1 }))}
                 columns={columns}
-                pageSizeOptions={[5, 10]}
                 disableRowSelectionOnClick
                 sx={{
                   '.MuiDataGrid-columnHeaderTitle': { fontWeight: 'bold', fontSize: '16px' },
                   '.MuiDataGrid-cell': { fontSize: '16px' }
+                }}
+                initialState={{
+                  pagination: {
+                    paginationModel: {
+                      pageSize: 10
+                    }
+                  }
+                }}
+                pageSizeOptions={[10]}
+                disableColumnFilter
+                disableColumnSelector
+                disableDensitySelector
+                slots={{ toolbar: CustomToolbar }}
+                slotProps={{
+                  toolbar: {
+                    onAddClick: () => navigate('/add-maintenance'),
+                    showExport: true
+                  }
                 }}
               />
             </Box>

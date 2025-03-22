@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Card, Button, Box, Grid, Typography, Breadcrumbs, IconButton, Link as MuiLink, Modal, Fade, Backdrop } from '@mui/material';
+import { Card,Box, Grid, Typography,IconButton,Modal } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FuelReminderForm from './addReminder.jsx';
 import { getApi, deleteApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
+import CustomToolbar from 'common/customToolbar';
+import CustomBreadcrumbs from 'common/customBreadcrumbs';
 
 const FuelReminderIndex = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -85,19 +86,7 @@ const FuelReminderIndex = () => {
 
   return (
     <>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant="h3">Reminder Info</Typography>
-        <Breadcrumbs separator="/" aria-label="breadcrumb">
-          <Link to="/dashboard/default" style={{ textDecoration: 'none', color: '#17a2b8' }}>
-            Dashboard
-          </Link>
-          <Typography color="text.primary">Reminders</Typography>
-        </Breadcrumbs>
-      </Box>
-
-      <Button variant="contained" color="primary" sx={{ my: 2 }} onClick={() => handleOpen()}>
-        Add
-      </Button>
+      <CustomBreadcrumbs title="Reminder Info" links={[{ name: 'Reminders', path: '/reminder' }]} />
 
       <Grid container spacing={2}>
         <Grid item xs={12}>
@@ -111,6 +100,13 @@ const FuelReminderIndex = () => {
                 sx={{
                   '.MuiDataGrid-columnHeaderTitle': { fontWeight: 'bold', fontSize: '16px' },
                   '.MuiDataGrid-cell': { fontSize: '16px' }
+                }}
+                slots={{ toolbar: CustomToolbar }}
+                slotProps={{
+                  toolbar: {
+                    onAddClick: () => handleOpen(),
+                    showExport: true
+                  }
                 }}
               />
             </Box>

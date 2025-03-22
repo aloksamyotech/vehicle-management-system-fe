@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Card, Button, Box, Grid, Typography, Divider, IconButton, Link as MuiLink, Breadcrumbs } from '@mui/material';
+import { Card, Button, Box, Grid, Typography, Divider, IconButton } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -8,6 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getApi, deleteApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import CustomToolbar from 'common/customToolbar';
+import CustomBreadcrumbs from 'common/customBreadcrumbs';
 
 const FuelRecords = () => {
   const navigate = useNavigate();
@@ -85,30 +86,18 @@ const FuelRecords = () => {
   ];
 
   const handleDelete = async (id) => {
-      try {
-        await deleteApi(urls.fuel.delete.replace(':id', id));
-        toast.success('Fuel deleted successfully');
-        fetchData();
-      } catch (error) {
-        toast.error('Failed to delete fuel');
-      }
+    try {
+      await deleteApi(urls.fuel.delete.replace(':id', id));
+      toast.success('Fuel deleted successfully');
+      fetchData();
+    } catch (error) {
+      toast.error('Failed to delete fuel');
+    }
   };
 
   return (
     <>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant="h3">Fuel Management</Typography>
-        <Breadcrumbs separator="/" aria-label="breadcrumb">
-          <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
-            <Typography color="#17a2b8">Dashboard</Typography>
-          </MuiLink>
-          <Typography color="text.primary">Fuel Management</Typography>
-        </Breadcrumbs>
-      </Box>
-
-      <Button variant="contained" color="primary" sx={{ my: 2 }} onClick={() => navigate('/add-fuel')}>
-        Add
-      </Button>
+      <CustomBreadcrumbs title="Fuel Management" links={[{ name: 'Fuel Management', path: '/fuel' }]} />
 
       <Grid container spacing={2}>
         <Grid item xs={12}>
@@ -117,11 +106,28 @@ const FuelRecords = () => {
               <DataGrid
                 rows={loading ? [] : rows.map((row, index) => ({ ...row, sNo: index + 1 }))}
                 columns={columns}
-                pageSizeOptions={[5, 10]}
                 disableRowSelectionOnClick
                 sx={{
                   '.MuiDataGrid-columnHeaderTitle': { fontWeight: 'bold', fontSize: '16px' },
                   '.MuiDataGrid-cell': { fontSize: '16px' }
+                }}
+                initialState={{
+                  pagination: {
+                    paginationModel: {
+                      pageSize: 10
+                    }
+                  }
+                }}
+                pageSizeOptions={[10]}
+                disableColumnFilter
+                disableColumnSelector
+                disableDensitySelector
+                slots={{ toolbar: CustomToolbar }}
+                slotProps={{
+                  toolbar: {
+                    onAddClick: () => navigate('/add-fuel'),
+                    showExport: true
+                  }
                 }}
               />
             </Box>

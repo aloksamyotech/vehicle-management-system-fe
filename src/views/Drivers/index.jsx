@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Card, Button, Box, Grid, Typography, Divider, IconButton, Link as MuiLink, Breadcrumbs } from '@mui/material';
+import { Card, Button, Box, Grid, Divider, IconButton } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { gridSpacing } from 'config.js';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
@@ -9,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getApi, deleteApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import CustomToolbar from 'common/customToolbar';
+import CustomBreadcrumbs from 'common/customBreadcrumbs';
 
 const DriverManagementPage = () => {
   const navigate = useNavigate();
@@ -47,13 +48,13 @@ const DriverManagementPage = () => {
   };
 
   const handleDelete = async (id) => {
-      try {
-        await deleteApi(urls.driver.delete.replace(':id', id));
-        toast.success('Driver deleted successfully');
-        fetchDrivers();
-      } catch (error) {
-        toast.error('Failed to delete driver');
-      }
+    try {
+      await deleteApi(urls.driver.delete.replace(':id', id));
+      toast.success('Driver deleted successfully');
+      fetchDrivers();
+    } catch (error) {
+      toast.error('Failed to delete driver');
+    }
   };
 
   const columns = [
@@ -131,29 +132,8 @@ const DriverManagementPage = () => {
 
   return (
     <>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          p: 0,
-          m: 0
-        }}
-      >
-        <Typography variant="h3" sx={{ m: 0 }}>
-          Driver Info
-        </Typography>
-        <Breadcrumbs separator="/" aria-label="breadcrumb">
-          <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
-            <Typography color="#17a2b8">Dashboard</Typography>
-          </MuiLink>
-          <Typography color="text.primary">Driver Info</Typography>
-        </Breadcrumbs>
-      </Box>
+      <CustomBreadcrumbs title="Driver Info" links={[{ name: 'Driver Management', path: '/driver' }]} />
 
-      <Button variant="contained" color="primary" sx={{ my: 2 }} onClick={() => navigate('/add-driver')}>
-        Add
-      </Button>
       <Grid container spacing={gridSpacing}>
         <Grid item xs={12}>
           <Card>
@@ -162,7 +142,6 @@ const DriverManagementPage = () => {
                 rows={loading ? [] : drivers.map((row, index) => ({ ...row, sNo: index + 1 }))}
                 columns={columns}
                 loading={loading}
-                pageSizeOptions={[5, 10]}
                 disableRowSelectionOnClick
                 sx={{
                   '.MuiDataGrid-columnHeaderTitle': {
@@ -171,6 +150,24 @@ const DriverManagementPage = () => {
                   },
                   '.MuiDataGrid-cell': {
                     fontSize: '16px'
+                  }
+                }}
+                initialState={{
+                  pagination: {
+                    paginationModel: {
+                      pageSize: 10
+                    }
+                  }
+                }}
+                pageSizeOptions={[10]}
+                disableColumnFilter
+                disableColumnSelector
+                disableDensitySelector
+                slots={{ toolbar: CustomToolbar }}
+                slotProps={{
+                  toolbar: {
+                    onAddClick: () => navigate('/add-driver'),
+                    showExport: true
                   }
                 }}
               />

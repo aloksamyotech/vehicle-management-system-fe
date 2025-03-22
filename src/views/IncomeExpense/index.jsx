@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Card, Button, Box, Grid, Typography, Breadcrumbs, IconButton, Divider, Modal, Fade, Backdrop } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
+import { Card, Button, Box, Grid, Typography, IconButton, Divider, Modal } from '@mui/material';
+import { DataGrid} from '@mui/x-data-grid';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IncomeExpenseForm from './addFinance.jsx';
 import { getApi, deleteApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
+import CustomToolbar from 'common/customToolbar';
+import CustomBreadcrumbs from 'common/customBreadcrumbs';
 
 const FinanceIndex = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -128,19 +129,7 @@ const FinanceIndex = () => {
 
   return (
     <>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant="h3">Finance Records</Typography>
-        <Breadcrumbs separator="/" aria-label="breadcrumb">
-          <Link to="/dashboard/default" style={{ textDecoration: 'none', color: '#17a2b8' }}>
-            Dashboard
-          </Link>
-          <Typography color="text.primary">Finance</Typography>
-        </Breadcrumbs>
-      </Box>
-
-      <Button variant="contained" color="primary" sx={{ my: 2 }} onClick={() => handleOpen(true)}>
-        Add
-      </Button>
+      <CustomBreadcrumbs title="Income & Expense" links={[{ name: 'Income & Expense', path: '/finance' }]} />
 
       <Grid container spacing={2}>
         <Grid item xs={12}>
@@ -149,11 +138,28 @@ const FinanceIndex = () => {
               <DataGrid
                 rows={loading ? [] : rows.map((row, index) => ({ ...row, sNo: index + 1 }))}
                 columns={columns}
-                pageSizeOptions={[5, 10]}
                 disableRowSelectionOnClick
                 sx={{
                   '.MuiDataGrid-columnHeaderTitle': { fontWeight: 'bold', fontSize: '16px' },
                   '.MuiDataGrid-cell': { fontSize: '16px' }
+                }}
+                initialState={{
+                  pagination: {
+                    paginationModel: {
+                      pageSize: 10
+                    }
+                  }
+                }}
+                pageSizeOptions={[10]}
+                disableColumnFilter
+                disableColumnSelector
+                disableDensitySelector
+                slots={{ toolbar: CustomToolbar }}
+                slotProps={{
+                  toolbar: {
+                    onAddClick: () => handleOpen(true),
+                    showExport: true
+                  }
                 }}
               />
             </Box>

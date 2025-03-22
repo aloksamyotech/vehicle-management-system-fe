@@ -67,5 +67,11 @@ export const urls = Object.freeze({
     updateStatus: `${baseUrl}/maintenance/updateStatus/:id`,
     delete: `${baseUrl}/maintenance/delete/:id`,
   },
-
+  booking: {
+    create: `${baseUrl}/booking/save`,
+    get: `${baseUrl}/booking/fetch`,
+    getById: `${baseUrl}/booking/getById/:id`,
+    update: `${baseUrl}/booking/update/:id`,
+    delete: `${baseUrl}/booking/delete/:id`,
+  },
 });

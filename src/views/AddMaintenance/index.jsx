@@ -117,8 +117,17 @@ const AddMaintenanceForm = () => {
 
   return (
     <>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 0, m: 0 }}>
-        <Typography variant="h3" sx={{ m: 0 }}>
+      <Box 
+       sx={{
+        backgroundColor: '#ffff',
+        padding: '10px',
+        borderRadius: '8px',
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+      }}>
+        <Typography variant="h4" sx={{ m: 0 }}>
           Add Maintenance
         </Typography>
         <Breadcrumbs separator="/" aria-label="breadcrumb">
