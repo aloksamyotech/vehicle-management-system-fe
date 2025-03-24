@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Card, Divider, Box, Grid, Typography, IconButton, Button, Breadcrumbs, Link as MuiLink } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
+import { Card, Divider, Box, Grid, IconButton, Button } from '@mui/material';
+import { DataGrid} from '@mui/x-data-grid';
 import { gridSpacing } from 'config.js';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
@@ -10,6 +9,8 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getApi, deleteApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import CustomToolbar from 'common/customToolbar';
+import CustomBreadcrumbs from 'common/customBreadcrumbs';
 
 const VehiclePage = () => {
   const navigate = useNavigate();
@@ -80,7 +81,7 @@ const VehiclePage = () => {
     {
       field: 'actions',
       headerName: 'Action',
-      width: 100,
+      width: 150,
       sortable: false,
       renderCell: (params) => {
         const navigate = useNavigate();
@@ -121,37 +122,7 @@ const VehiclePage = () => {
 
   return (
     <>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          p: 0,
-          m: 0
-        }}
-      >
-        <Typography variant="h3" sx={{ m: 0 }}>
-          Vehicle Info
-        </Typography>
-        <Breadcrumbs
-          separator="/"
-          aria-label="breadcrumb"
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            p: 0,
-            m: 0
-          }}
-        >
-          <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
-            <Typography color="#17a2b8">Dashboard</Typography>
-          </MuiLink>
-          <Typography color="text.primary">Vehicle Management</Typography>
-        </Breadcrumbs>
-      </Box>
-      <Button variant="contained" color="primary" sx={{ my: 2 }} onClick={() => navigate('/add-vehicle')}>
-        Add
-      </Button>
+      <CustomBreadcrumbs title="Vehicle Info" links={[{ name: 'Vehicle Management', path: '/vehicle' }]} />
 
       <Grid container spacing={gridSpacing}>
         <Grid item xs={12}>
@@ -160,7 +131,6 @@ const VehiclePage = () => {
               <DataGrid
                 rows={loading ? [] : vehicles.map((row, index) => ({ ...row, sNo: index + 1 }))}
                 columns={columns}
-                pageSizeOptions={[5, 10]}
                 disableRowSelectionOnClick
                 sx={{
                   '.MuiDataGrid-columnHeaderTitle': {
@@ -169,6 +139,24 @@ const VehiclePage = () => {
                   },
                   '.MuiDataGrid-cell': {
                     fontSize: '16px'
+                  }
+                }}
+                initialState={{
+                  pagination: {
+                    paginationModel: {
+                      pageSize: 10
+                    }
+                  }
+                }}
+                pageSizeOptions={[10]}
+                disableColumnFilter
+                disableColumnSelector
+                disableDensitySelector
+                slots={{ toolbar: CustomToolbar }}
+                slotProps={{
+                  toolbar: {
+                    onAddClick: () => navigate('/add-vehicle'),
+                    showExport: true
                   }
                 }}
               />

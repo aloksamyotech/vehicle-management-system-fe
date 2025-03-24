@@ -34,7 +34,6 @@ const AddPartForm = ({ initialData, onSave, refreshData, onCancel }) => {
   }, [initialData, reset]);
 
   const onSubmit = async (data) => {
-    try {
       let response;
       const inventoryData = { ...data };
 
@@ -49,16 +48,13 @@ const AddPartForm = ({ initialData, onSave, refreshData, onCancel }) => {
       onSave(response.data);
       refreshData();
       reset();
-    } catch (error) {
-      toast.error(error?.response?.data?.message || 'Something went wrong!');
-    }
   };
 
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Name</FormLabel>
+          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Name</FormLabel>
           <Controller
             name="name"
             control={control}
@@ -94,11 +90,14 @@ const AddPartForm = ({ initialData, onSave, refreshData, onCancel }) => {
         </Grid>
 
         <Grid item xs={12}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Stock</FormLabel>
+          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Stock</FormLabel>
           <Controller
             name="stock"
             control={control}
-            rules={{ required: 'Stock is required', max: { value: 1000, message: 'Stock must be below 1000' } }}
+            rules={{ required: 'Stock is required',
+            min: { value: 1, message: 'At least 1 stock is required' },
+            max: { value: 1000, message: 'Stock must be below 1000'  }
+          }}
             render={({ field }) => (
               <TextField
                 {...field}
@@ -108,14 +107,19 @@ const AddPartForm = ({ initialData, onSave, refreshData, onCancel }) => {
                 inputProps={{ min: 1, max: 1000 }}
                 error={!!errors.stock}
                 helperText={errors.stock?.message}
-                onChange={(e) => field.onChange(Number(e.target.value))}
+                onChange={(e) => {
+                  let value = Number(e.target.value);
+                  if (value > 1000) value = 1000; 
+                  if (value < 1) value = 1; 
+                  field.onChange(value);
+                }}
               />
             )}
           />
         </Grid>
 
         <Grid item xs={12}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Status</FormLabel>
+          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Status</FormLabel>
           <FormControl fullWidth>
             <Controller
               name="status"
@@ -131,7 +135,7 @@ const AddPartForm = ({ initialData, onSave, refreshData, onCancel }) => {
         </Grid>
 
         <Grid item xs={12}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Parts Description</FormLabel>
+          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Parts Description</FormLabel>
           <Controller
             name="description"
             control={control}
@@ -168,7 +172,7 @@ const AddPartForm = ({ initialData, onSave, refreshData, onCancel }) => {
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
         <Button variant="contained" type="submit" disabled={isSubmitting}>
-          {initialData ? 'Update Parts' : 'Add Parts'}
+          {initialData?.id ? 'Update Parts' : 'Add Parts'}
         </Button>
         <Button variant="outlined" onClick={onCancel}>
           Cancel

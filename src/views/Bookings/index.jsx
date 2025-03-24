@@ -1,133 +1,155 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Card, Divider, Box, Grid, Typography, IconButton, Button, Breadcrumbs, Link as MuiLink } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
-import { gridSpacing } from 'config.js';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import React, { useState, useEffect } from 'react';
+import { Card, Button, Box, Grid, Typography, Divider, IconButton } from '@mui/material';
+import { DataGrid} from '@mui/x-data-grid';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import DeleteIcon from '@mui/icons-material/Delete';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useNavigate } from 'react-router-dom';
-
-const columns = [
-  { field: 'id', headerName: 'S.No', width: 80 },
-  { field: 'customer', headerName: 'Customer', width: 150 },
-  { field: 'vehicle', headerName: 'Vehicle', width: 150, editable: true },
-  { field: 'date', headerName: 'Date', width: 150 },
-  { field: 'type', headerName: 'Type', width: 120 },
-  { field: 'driver', headerName: 'Driver', width: 150 },
-  {
-    field: 'tripStatus',
-    headerName: 'Trip Status',
-    width: 120,
-    renderCell: (params) => {
-      const status = params.row.tripStatus;
-      const statusColors = {
-        Cancelled: '#dc3545',
-        Ongoing: '#17a2b8',
-        Completed: '#30aa4c',
-        'Yet to start': '#ffc107'
-      };
-
-      return (
-        <Button
-          variant="contained"
-          style={{
-            backgroundColor: statusColors[status] || '#6c757d',
-            color: 'white',
-            fontWeight: 700,
-            fontSize: '10px',
-            width: 'auto',
-            padding: '0'
-          }}
-        >
-          {status}
-        </Button>
-      );
-    }
-  },
-  {
-    field: 'actions',
-    headerName: 'Action',
-    width: 150,
-    sortable: false,
-    renderCell: (params) => {
-      const navigate = useNavigate();
-      return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <IconButton color="primary" sx={{ py: 2 }} onClick={() => navigate(`/view-booking/${params.row.id}`)}>
-            <VisibilityIcon />
-          </IconButton>
-          <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5, alignSelf: 'center' }} />
-          <IconButton sx={{ color: '#17a2b8', py: 2 }} onClick={() => navigate(`/add-booking/${params.row.id}`)}>
-            <BorderColorIcon />
-          </IconButton>
-          <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5, alignSelf: 'center' }} />
-          <IconButton color="error" sx={{ py: 2 }} onClick={() => alert(`Deleting ${params.row.vehicle}`)}>
-            <DeleteIcon />
-          </IconButton>
-        </Box>
-      );
-    }
-  }
-];
-
-const rows = [
-  { id: 1, customer: 'John Doe', vehicle: 'Truck A', date: '2025-02-14', type: 'Cargo', driver: 'Mike', tripStatus: 'Completed' },
-  { id: 2, customer: 'Jane Smith', vehicle: 'Van B', date: '2025-02-13', type: 'Passenger', driver: 'Alex', tripStatus: 'Cancelled' },
-  { id: 3, customer: 'Mark Wilson', vehicle: 'Bus C', date: '2025-02-12', type: 'Tourist', driver: 'John', tripStatus: 'Yet to start' },
-  { id: 4, customer: 'Emma Brown', vehicle: 'Car D', date: '2025-02-11', type: 'Private', driver: 'Steve', tripStatus: 'Ongoing' }
-];
+import toast from 'react-hot-toast';
+import { getApi, deleteApi } from 'common/apiClient';
+import { urls } from 'common/urls';
+import { gridSpacing } from 'config';
+import dayjs from 'dayjs';
+import CustomToolbar from 'common/customToolbar';
+import CustomBreadcrumbs from 'common/customBreadcrumbs';
 
 const BookingPage = () => {
   const navigate = useNavigate();
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleOpenModal = () => {
-    navigate('/add-booking');
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await getApi(urls.booking.get);
+      const formattedData = response.data.map((booking, index) => ({
+        id: booking.id,
+        tripStartDate: booking.tripStartDate,
+        tripEndDate: booking.tripEndDate,
+        tripStartLoc: booking.tripStartLoc,
+        tripEndLoc: booking.tripEndLoc,
+        totalKm: booking.totalKm,
+        totalAmt: booking.totalAmt,
+        tripType: booking.tripType,
+        tripStatus: booking.tripStatus,
+        customerId: booking.customer.id,
+        customer: booking.customer?.name || 'N/A',
+        vehicleId: booking.vehicle.id,
+        vehicle: booking.vehicle?.vehicleName || 'N/A',
+        driverId: booking.driver.id,
+        driver: booking.driver?.name || 'N/A'
+      }));
+      setRows(formattedData);
+    } catch (error) {
+      toast.error('Failed to fetch booking data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const columns = [
+    { field: 'sNo', headerName: 'S.No', width: 80 },
+    { field: 'customer', headerName: 'Customer', width: 150 },
+    { field: 'vehicle', headerName: 'Vehicle', width: 150, editable: true },
+    {
+      field: 'tripDates',
+      headerName: 'Date',
+      width: 200,
+      renderCell: (params) => (
+        <Box>
+          <Typography>{params.row.tripStartDate ? dayjs(params.row.tripStartDate).format('YYYY-MM-DD HH:mm') : 'N/A'}</Typography>
+          <Typography>to</Typography>
+          <Typography>{params.row.tripEndDate ? dayjs(params.row.tripEndDate).format('YYYY-MM-DD HH:mm') : 'N/A'}</Typography>
+        </Box>
+      )
+    },
+    { field: 'tripType', headerName: 'Type', width: 120 },
+    { field: 'driver', headerName: 'Driver', width: 150 },
+    {
+      field: 'tripStatus',
+      headerName: 'Trip Status',
+      width: 120,
+      renderCell: (params) => {
+        const status = params.row.tripStatus;
+        const statusColors = {
+          Cancelled: '#dc3545',
+          Ongoing: '#17a2b8',
+          Completed: '#30aa4c',
+          YetToStart: '#ffc107'
+        };
+
+        return (
+          <Button
+            variant="contained"
+            style={{
+              backgroundColor: statusColors[status] || '#6c757d',
+              color: status === 'YetToStart' ? '#000' : 'white',
+              fontWeight: 700,
+              fontSize: '10px',
+              width: 'auto',
+              padding: '0'
+            }}
+          >
+            {status === 'YetToStart' ? 'Yet to start' : status}
+          </Button>
+        );
+      }
+    },
+    {
+      field: 'actions',
+      headerName: 'Action',
+      width: 150,
+      sortable: false,
+      renderCell: (params) => {
+        const navigate = useNavigate();
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <IconButton color="primary" sx={{ py: 2 }} onClick={() => navigate(`/view-booking/${params.row.id}`)}>
+              <VisibilityIcon />
+            </IconButton>
+            <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5, alignSelf: 'center' }} />
+            <IconButton
+              sx={{ color: '#17a2b8', py: 2 }}
+              onClick={() => navigate(`/add-booking/${params.row.id}`, { state: { ...params.row } })}
+            >
+              <BorderColorIcon />
+            </IconButton>
+            <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5, alignSelf: 'center' }} />
+            <IconButton color="error" sx={{ py: 2 }} onClick={() => handleDelete(params.row.id)}>
+              <DeleteIcon />
+            </IconButton>
+          </Box>
+        );
+      }
+    }
+  ];
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteApi(urls.booking.delete.replace(':id', id));
+      toast.success('Booking deleted successfully');
+      fetchData();
+    } catch (error) {
+      toast.error('Booking to delete fuel');
+    }
   };
 
   return (
     <>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          p: 0,
-          m: 0
-        }}
-      >
-        <Typography variant="h3" sx={{ m: 0 }}>
-          Booking Info
-        </Typography>
-        <Breadcrumbs
-          separator="/"
-          aria-label="breadcrumb"
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            p: 0,
-            m: 0
-          }}
-        >
-          <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
-            <Typography color="#17a2b8">Dashboard</Typography>
-          </MuiLink>
-          <Typography color="text.primary">Bookings</Typography>
-        </Breadcrumbs>
-      </Box>
-
-      <Button variant="contained" color="primary" sx={{ my: 2 }} onClick={handleOpenModal}>
-        Add
-      </Button>
+     <CustomBreadcrumbs title="Bookings" links={[{ name: 'Bookings', path: '/booking' }]} />
 
       <Grid container spacing={gridSpacing}>
         <Grid item xs={12}>
           <Card>
             <Box sx={{ height: 'auto', width: '100%' }}>
               <DataGrid
-                rows={rows}
+                rows={loading ? [] : rows.map((row, index) => ({ ...row, sNo: index + 1 }))}
                 columns={columns}
-                pageSizeOptions={[5, 10]}
+                getRowHeight={() => 75}
                 disableRowSelectionOnClick
                 sx={{
                   '.MuiDataGrid-columnHeaderTitle': {
@@ -136,6 +158,24 @@ const BookingPage = () => {
                   },
                   '.MuiDataGrid-cell': {
                     fontSize: '16px'
+                  }
+                }}
+                initialState={{
+                  pagination: {
+                    paginationModel: {
+                      pageSize: 10
+                    }
+                  }
+                }}
+                pageSizeOptions={[10]}
+                disableColumnFilter
+                disableColumnSelector
+                disableDensitySelector
+                slots={{ toolbar: CustomToolbar }}
+                slotProps={{
+                  toolbar: {
+                    onAddClick: () => navigate('/add-booking'),
+                    showExport: true
                   }
                 }}
               />

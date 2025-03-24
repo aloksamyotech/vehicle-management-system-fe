@@ -36,21 +36,17 @@ const AddVehicleGroupModal = ({ open, handleClose, refreshData, editItem }) => {
   }, [editItem, open, reset]);
 
   const onSubmit = async (data) => {
-    try {
-      if (editItem?.id) {
-        await updateApiPatch(urls.vehicleGroup.update.replace(':id', editItem.id), data);
-        toast.success('Vehicle group updated!');
-      } else {
-        await postApi(urls.vehicleGroup.create, data);
-        toast.success('Vehicle group added!');
-      }
-
-      handleClose();
-      refreshData();
-      reset();
-    } catch (error) {
-      toast.error(error?.response?.data?.message || 'Something went wrong!');
+    if (editItem?.id) {
+      await updateApiPatch(urls.vehicleGroup.update.replace(':id', editItem.id), data);
+      toast.success('Vehicle group updated!');
+    } else {
+      await postApi(urls.vehicleGroup.create, data);
+      toast.success('Vehicle group added!');
     }
+
+    handleClose();
+    refreshData();
+    reset();
   };
 
   return (
@@ -74,7 +70,7 @@ const AddVehicleGroupModal = ({ open, handleClose, refreshData, editItem }) => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Name</FormLabel>
+              <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Name</FormLabel>
               <Controller
                 name="name"
                 control={control}
@@ -110,7 +106,7 @@ const AddVehicleGroupModal = ({ open, handleClose, refreshData, editItem }) => {
             </Grid>
 
             <Grid item xs={12}>
-              <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Description</FormLabel>
+              <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Description</FormLabel>
               <Controller
                 name="description"
                 control={control}

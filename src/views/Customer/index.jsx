@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Card, Box, Grid, Typography, IconButton, Button, Breadcrumbs, Divider, Link as MuiLink, Modal } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
+import { Card, Box, Grid, Typography, IconButton, Button, Divider, Modal } from '@mui/material';
+import { DataGrid} from '@mui/x-data-grid';
 import { gridSpacing } from 'config.js';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -9,6 +8,8 @@ import AddCustomerForm from './addCustomer.jsx';
 import { getApi, deleteApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
+import CustomToolbar from 'common/customToolbar';
+import CustomBreadcrumbs from 'common/customBreadcrumbs';
 
 const CustomerManagementPage = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -54,6 +55,7 @@ const CustomerManagementPage = () => {
             color: 'white',
             fontWeight: 700,
             fontSize: '10px',
+            width: 'auto',
             padding: '0'
           }}
         >
@@ -105,38 +107,7 @@ const CustomerManagementPage = () => {
 
   return (
     <>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          p: 0,
-          m: 0
-        }}
-      >
-        <Typography variant="h3" sx={{ m: 0 }}>
-          Customer Info
-        </Typography>
-        <Breadcrumbs
-          separator="/"
-          aria-label="breadcrumb"
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            p: 0,
-            m: 0
-          }}
-        >
-          <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
-            <Typography color="#17a2b8">Dashboard</Typography>
-          </MuiLink>
-          <Typography color="text.primary">Customer Management</Typography>
-        </Breadcrumbs>
-      </Box>
-
-      <Button variant="contained" color="primary" sx={{ my: 2 }} onClick={() => handleOpen()}>
-        Add
-      </Button>
+       <CustomBreadcrumbs title="Customer Info" links={[{ name: 'Customer Management', path: '/customer' }]} />
 
       <Grid container spacing={gridSpacing}>
         <Grid item xs={12}>
@@ -145,7 +116,6 @@ const CustomerManagementPage = () => {
               <DataGrid
                 rows={rows}
                 columns={columns}
-                pageSizeOptions={[5, 10]}
                 disableRowSelectionOnClick
                 sx={{
                   '.MuiDataGrid-columnHeaderTitle': {
@@ -154,6 +124,24 @@ const CustomerManagementPage = () => {
                   },
                   '.MuiDataGrid-cell': {
                     fontSize: '16px'
+                  }
+                }}
+                initialState={{
+                  pagination: {
+                    paginationModel: {
+                      pageSize: 10
+                    }
+                  }
+                }}
+                pageSizeOptions={[10]}
+                disableColumnFilter
+                disableColumnSelector
+                disableDensitySelector
+                slots={{ toolbar: CustomToolbar }}
+                slotProps={{
+                  toolbar: {
+                    onAddClick: () => handleOpen(),
+                    showExport: true
                   }
                 }}
               />
@@ -177,7 +165,7 @@ const CustomerManagementPage = () => {
           }}
         >
           <Typography variant="h4" sx={{ mb: 2 }}>
-            {editCustomer ? 'Edit Customer' : 'Add Customer'}
+            {editCustomer?.id ? 'Edit Customer' : 'Add Customer'}
           </Typography>
           <AddCustomerForm initialData={editCustomer} onSave={handleClose} onCancel={handleClose} refreshData={refreshData} />
         </Box>

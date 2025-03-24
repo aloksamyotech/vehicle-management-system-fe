@@ -35,16 +35,12 @@ const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
   }, []);
 
   const onSubmit = async (data) => {
-    try {
       const response = await postApi(urls.reminder.create, data);
       toast.success('Reminder added successfully!');
 
       onSave(response.data);
       refreshData();
       reset();
-    } catch (error) {
-      toast.error(error?.response?.data?.message || 'Something went wrong!');
-    }
   };
 
   return (
@@ -52,7 +48,9 @@ const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <FormControl fullWidth>
-            <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Vehicle*</FormLabel>
+            <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+              Vehicle
+            </FormLabel>
             <Controller
               name="vehicleId"
               control={control}
@@ -75,7 +73,7 @@ const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
         </Grid>
 
         <Grid item xs={12}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Date*</FormLabel>
+          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Date*</FormLabel>
           <Controller
             name="reminderDate"
             control={control}
@@ -87,6 +85,7 @@ const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
                 type="date"
                 size="small"
                 value={field.value ? field.value.split('T')[0] : ''}
+                inputProps={{ min: new Date().toISOString().split('T')[0] }} 
                 onChange={(e) => field.onChange(new Date(e.target.value).toISOString())}
                 error={!!errors.reminderDate}
                 helperText={errors.reminderDate?.message}
@@ -96,7 +95,7 @@ const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
         </Grid>
 
         <Grid item xs={12}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '16px' }}>Message*</FormLabel>
+          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Message</FormLabel>
           <Controller
             name="message"
             control={control}
