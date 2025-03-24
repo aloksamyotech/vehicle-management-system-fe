@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Card, Button, Box, Grid, Typography, Breadcrumbs, IconButton, Divider, Link as MuiLink, Modal, Fade, Backdrop } from '@mui/material';
+import { Card, Button, Box, Grid, Typography, IconButton, Divider, Modal, Fade, Backdrop } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import DeleteIcon from '@mui/icons-material/Delete';
 import UserForm from './addUser.jsx';
+import CustomBreadcrumbs from 'common/customBreadcrumbs';
 
 const initialUsers = [{ id: 1, name: 'test1', mobile: '1234567890', email: 'test1@gmail.com', status: 'Active' }];
 
@@ -86,15 +86,7 @@ const UserIndex = () => {
 
   return (
     <>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant="h3">User's Info</Typography>
-        <Breadcrumbs separator="/" aria-label="breadcrumb">
-          <Link to="/dashboard/default" style={{ textDecoration: 'none', color: '#17a2b8' }}>
-            Dashboard
-          </Link>
-          <Typography color="text.primary">Users</Typography>
-        </Breadcrumbs>
-      </Box>
+      <CustomBreadcrumbs title="User's Info" links={[{ name: 'Users List', path: '/users' }]} />
 
       <Button variant="contained" color="primary" sx={{ my: 2 }} onClick={() => setOpen(true)}>
         Add

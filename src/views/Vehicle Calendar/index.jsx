@@ -3,73 +3,83 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { Link } from 'react-router-dom';
-import { Box, Typography, Breadcrumbs, Link as MuiLink, Card } from '@mui/material';
+import { Box, Card } from '@mui/material';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import CustomBreadcrumbs from 'common/customBreadcrumbs';
 
 const VehicleAvailability = () => {
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    const fetchMaintenanceData = async () => {
-        const response = await getApi(urls.maintenance.get);
-        const maintenanceData = response.data;
+    const fetchData = async () => {
+      try {
+        const [bookingResponse, maintenanceResponse] = await Promise.all([getApi(urls.booking.get), getApi(urls.maintenance.get)]);
 
-        const formattedEvents = maintenanceData.map((item) => ({
+        const bookingData = bookingResponse.data;
+        const maintenanceData = maintenanceResponse.data;
+
+        const bookingEvents = bookingData.map((item) => ({
+          id: `booking-${item._id}`,
+          title: `${item.vehicle.registrationNo} - ${item.vehicle.vehicleName} [${item.tripStartLoc} to ${item.tripEndLoc}]`,
+          start: item.tripStartDate,
+          end: item.tripEndDate,
+          backgroundColor: '#28a745',
+          textColor: 'white'
+        }));
+
+        const maintenanceEvents = maintenanceData.map((item) => ({
+          id: `maintenance-${item._id}`,
           title: `Maintenance: ${item.vehicle.registrationNo} - ${item.vehicle.vehicleName} [${item.details}]`,
           start: item.startDate,
           end: item.endDate,
-          backgroundColor: '#ff0000', 
-          textColor: 'white',
+          backgroundColor: '#dc3545',
+          textColor: 'white'
         }));
 
-        setEvents(formattedEvents);
+        setEvents([...bookingEvents, ...maintenanceEvents]);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
     };
 
-    fetchMaintenanceData();
+    fetchData();
   }, []);
 
   return (
     <>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 0, m: 0 }}>
-        <Typography variant="h3" sx={{ m: 0 }}>Vehicle Calendar</Typography>
-        <Breadcrumbs separator="/" aria-label="breadcrumb">
-          <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
-            <Typography color="#17a2b8">Dashboard</Typography>
-          </MuiLink>
-          <Typography color="text.primary">Vehicle Calendar</Typography>
-        </Breadcrumbs>
-      </Box>
-
+     <CustomBreadcrumbs title=" Vehicle Calendar" links={[{ name: 'Vehicle Calendar', path: '/vehicleavailability' }]} />
+    
       <Card style={{ height: 'auto', marginTop: '20px' }}>
-        <Box sx={{ padding: '10px 20px' }}>
+        <Box sx={{ padding: '10px 10px' }}>
           <FullCalendar
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             initialView="dayGridMonth"
+            width="100%"
             events={events}
-            selectable={true}
-            editable={true}
-            eventClick={(info) => alert(`Vehicle: ${info.event.title}`)}
             height="auto"
             headerToolbar={{
               left: 'prev,today,next',
               center: 'title',
-              right: 'dayGridMonth,timeGridWeek,timeGridDay',
+              right: 'dayGridMonth,timeGridWeek,timeGridDay'
             }}
             buttonText={{
               today: 'Today',
               month: 'Month',
               week: 'Week',
-              day: 'Day',
+              day: 'Day'
             }}
             eventContent={(eventInfo) => (
-              <div style={{
-                backgroundColor: eventInfo.event.backgroundColor,
-                color: eventInfo.event.textColor,
-                padding: '1px',
-                borderRadius: '5px',
-              }}>
+              <div
+                style={{
+                  backgroundColor: eventInfo.event.backgroundColor,
+                  color: eventInfo.event.textColor,
+                  padding: '1px',
+                  borderRadius: '5px',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden', 
+                }}
+              >
                 {eventInfo.event.title}
               </div>
             )}

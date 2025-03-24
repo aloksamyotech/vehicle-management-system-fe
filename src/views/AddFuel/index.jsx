@@ -7,22 +7,20 @@ import {
   Box,
   Checkbox,
   FormLabel,
-  Breadcrumbs,
   FormControlLabel,
-  FormHelperText,
   MenuItem,
-  Link as MuiLink,
   Card,
   CardContent,
   Typography,
   Select,
   FormControl
 } from '@mui/material';
-import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { gridSpacing } from 'config.js';
 import { urls } from 'common/urls';
 import { postApi, getApi, updateApiPatch } from 'common/apiClient';
 import toast from 'react-hot-toast';
+import CustomBreadcrumbs from 'common/customBreadcrumbs';
 
 const FuelExpenseForm = () => {
   const { id } = useParams();
@@ -43,10 +41,6 @@ const FuelExpenseForm = () => {
       }
     };
 
-    fetchVehicles();
-  }, []);
-
-  useEffect(() => {
     const fetchDriver = async () => {
       try {
         const response = await getApi(urls.driver.get);
@@ -55,6 +49,8 @@ const FuelExpenseForm = () => {
         console.error('Error fetching drivers:', error);
       }
     };
+
+    fetchVehicles();
 
     fetchDriver();
   }, []);
@@ -85,7 +81,6 @@ const FuelExpenseForm = () => {
 
   useEffect(() => {
     if (initialData) {
-      console.log(initialData);
       Object.keys(initialData).forEach((key) => setValue(key, initialData[key]));
     }
   }, [initialData, setValue]);
@@ -107,29 +102,13 @@ const FuelExpenseForm = () => {
 
   return (
     <>
-      <Box 
-       sx={{
-        backgroundColor: '#ffff',
-        padding: '10px',
-        borderRadius: '8px',
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-      }}>
-        <Typography variant="h4" sx={{ m: 0 }}>
-          {id ? 'Edit Fuel' : 'Add Fuel'}
-        </Typography>
-        <Breadcrumbs separator="/" aria-label="breadcrumb">
-          <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
-            <Typography color="#17a2b8">Dashboard</Typography>
-          </MuiLink>
-          <MuiLink component={Link} to="/fuel" color="inherit" underline="none">
-            <Typography color="#17a2b8">Fuel</Typography>
-          </MuiLink>
-          <Typography color="text.primary">{id ? 'Edit Fuel' : 'Add Fuel'}</Typography>
-        </Breadcrumbs>
-      </Box>
+      <CustomBreadcrumbs
+        title={id ? 'Edit Fuel' : 'Add Fuel'}
+        links={[
+          { name: 'Fuel', path: '/fuel' },
+          { name: id ? 'Edit Fuel' : 'Add Fuel', path: '' }
+        ]}
+      />
 
       <Card sx={{ maxWidth: 'auto', mt: 3, padding: 1 }}>
         <CardContent>

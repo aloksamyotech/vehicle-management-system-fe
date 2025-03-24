@@ -5,8 +5,6 @@ import {
   TextField,
   Box,
   FormLabel,
-  Breadcrumbs,
-  Link as MuiLink,
   Card,
   CardContent,
   Typography,
@@ -18,11 +16,12 @@ import {
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { gridSpacing } from 'config.js';
 import { urls } from 'common/urls';
 import { postApi, getApi } from 'common/apiClient';
 import toast from 'react-hot-toast';
+import CustomBreadcrumbs from 'common/customBreadcrumbs';
 
 const AddMaintenanceForm = () => {
   const navigate = useNavigate();
@@ -66,10 +65,6 @@ const AddMaintenanceForm = () => {
       }
     };
 
-    fetchVehicles();
-  }, []);
-
-  useEffect(() => {
     const fetchParts = async () => {
       try {
         const response = await getApi(urls.partsInventory.get);
@@ -79,6 +74,7 @@ const AddMaintenanceForm = () => {
       }
     };
 
+    fetchVehicles();
     fetchParts();
   }, []);
 
@@ -117,29 +113,13 @@ const AddMaintenanceForm = () => {
 
   return (
     <>
-      <Box 
-       sx={{
-        backgroundColor: '#ffff',
-        padding: '10px',
-        borderRadius: '8px',
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-      }}>
-        <Typography variant="h4" sx={{ m: 0 }}>
-          Add Maintenance
-        </Typography>
-        <Breadcrumbs separator="/" aria-label="breadcrumb">
-          <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
-            <Typography color="#17a2b8">Dashboard</Typography>
-          </MuiLink>
-          <MuiLink component={Link} to="/maintenance" color="inherit" underline="none">
-            <Typography color="#17a2b8">Maintenance</Typography>
-          </MuiLink>
-          <Typography color="text.primary">Add Maintenance</Typography>
-        </Breadcrumbs>
-      </Box>
+      <CustomBreadcrumbs
+        title="Add Maintenance"
+        links={[
+          { name: 'Maintenance', path: '/maintenance' },
+          { name: 'Add Maintenance', path: '' }
+        ]}
+      />
 
       <Card sx={{ maxWidth: 'auto', mt: 3, padding: 1 }}>
         <CardContent>
@@ -219,7 +199,7 @@ const AddMaintenanceForm = () => {
                       fullWidth
                       size="small"
                       type="date"
-                      inputProps={{ min: minEndDate }} 
+                      inputProps={{ min: minEndDate }}
                       value={field.value ? field.value.split('T')[0] : ''}
                       onChange={(e) => field.onChange(new Date(e.target.value).toISOString())}
                       error={!!errors.endDate}
@@ -313,7 +293,7 @@ const AddMaintenanceForm = () => {
                 <Controller
                   name="details"
                   control={control}
-                  rules={{maxLength: { value: 100, message: 'Max 100 characters' } }}
+                  rules={{ maxLength: { value: 100, message: 'Max 100 characters' } }}
                   render={({ field }) => (
                     <TextField fullWidth size="small" {...field} error={!!errors.details} helperText={errors.details?.message} />
                   )}

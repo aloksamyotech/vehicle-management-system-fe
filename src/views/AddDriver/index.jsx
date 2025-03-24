@@ -1,25 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import {
-  Grid,
-  Button,
-  TextField,
-  FormControl,
-  Select,
-  MenuItem,
-  FormLabel,
-  Box,
-  Typography,
-  Breadcrumbs,
-  Link as MuiLink,
-  Card,
-  CardContent
-} from '@mui/material';
-import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
+import { Grid, Button, TextField, FormControl, Select, MenuItem, FormLabel, Box, Typography, Card, CardContent } from '@mui/material';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { gridSpacing } from 'config.js';
 import { urls } from 'common/urls';
 import { postApi, updateApiPatch } from 'common/apiClient';
 import toast from 'react-hot-toast';
+import CustomBreadcrumbs from 'common/customBreadcrumbs';
 
 const DriverForm = () => {
   const { id } = useParams();
@@ -77,27 +64,13 @@ const DriverForm = () => {
 
   return (
     <>
-      <Box 
-       sx={{
-        backgroundColor: '#ffff',
-        padding: '10px',
-        borderRadius: '8px',
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-      }}>
-        <Typography variant="h4">{id ? 'Edit Driver' : 'Add Driver'}</Typography>
-        <Breadcrumbs separator="/" aria-label="breadcrumb">
-          <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
-            <Typography color="#17a2b8">Dashboard</Typography>
-          </MuiLink>
-          <MuiLink component={Link} to="/drivers" color="inherit" underline="none">
-            <Typography color="#17a2b8">Driver</Typography>
-          </MuiLink>
-          <Typography color="text.primary">{id ? 'Edit Driver' : 'Add Driver'}</Typography>
-        </Breadcrumbs>
-      </Box>
+      <CustomBreadcrumbs
+        title={id ? 'Edit Driver' : 'Add Driver'}
+        links={[
+          { name: 'Driver', path: '/drivers' },
+          { name: id ? 'Edit Driver' : 'Add Driver', path: '' }
+        ]}
+      />
 
       <Card sx={{ maxWidth: 'auto', mt: 3, padding: 1 }}>
         <CardContent>
@@ -248,7 +221,9 @@ const DriverForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>License Expiry Date</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  License Expiry Date
+                </FormLabel>
                 <Controller
                   name="licenseExpiry"
                   control={control}
@@ -281,7 +256,9 @@ const DriverForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Total Experience</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  Total Experience
+                </FormLabel>
                 <Controller
                   name="totalExp"
                   control={control}
@@ -304,8 +281,8 @@ const DriverForm = () => {
                       }}
                       onChange={(e) => {
                         let value = Number(e.target.value);
-                        if (value > 40) value = 40; 
-                        if (value < 1) value = 1; 
+                        if (value > 40) value = 40;
+                        if (value < 1) value = 1;
                         field.onChange(value);
                       }}
                     />
@@ -314,7 +291,9 @@ const DriverForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Date of Joining</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  Date of Joining
+                </FormLabel>
                 <Controller
                   name="dateOfJoining"
                   control={control}

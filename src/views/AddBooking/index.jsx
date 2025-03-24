@@ -7,20 +7,19 @@ import {
   Box,
   Checkbox,
   FormLabel,
-  Breadcrumbs,
   MenuItem,
-  Link as MuiLink,
   Card,
   CardContent,
   Typography,
   Select,
   FormControl
 } from '@mui/material';
-import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { gridSpacing } from 'config.js';
 import { urls } from 'common/urls';
 import { postApi, getApi, updateApiPatch } from 'common/apiClient';
 import toast from 'react-hot-toast';
+import CustomBreadcrumbs from 'common/customBreadcrumbs';
 
 const DriverForm = () => {
   const { id } = useParams();
@@ -43,10 +42,6 @@ const DriverForm = () => {
       }
     };
 
-    fetchVehicles();
-  }, []);
-
-  useEffect(() => {
     const fetchDriver = async () => {
       try {
         const response = await getApi(urls.driver.get);
@@ -56,10 +51,6 @@ const DriverForm = () => {
       }
     };
 
-    fetchDriver();
-  }, []);
-
-  useEffect(() => {
     const fetchCustomer = async () => {
       try {
         const response = await getApi(urls.customer.get);
@@ -69,6 +60,8 @@ const DriverForm = () => {
       }
     };
 
+    fetchVehicles();
+    fetchDriver();
     fetchCustomer();
   }, []);
 
@@ -97,7 +90,6 @@ const DriverForm = () => {
   });
   useEffect(() => {
     if (initialData) {
-      console.log('hjchjdhjdjk::', initialData);
       Object.keys(initialData).forEach((key) => setValue(key, initialData[key]));
     }
   }, [initialData, setValue]);
@@ -110,7 +102,6 @@ const DriverForm = () => {
       toast.success('Booking updated successfully');
     } else {
       response = await postApi(urls.booking.create, filteredData);
-      console.log(response);
       toast.success('Booking added successfully');
     }
 
@@ -120,29 +111,13 @@ const DriverForm = () => {
 
   return (
     <>
-      <Box
-        sx={{
-          backgroundColor: '#ffff',
-          padding: '10px',
-          borderRadius: '8px',
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}
-      >
-        <Typography variant="h4">{id ? 'Edit Booking' : 'Add Booking'}</Typography>
-        <Breadcrumbs separator="/" aria-label="breadcrumb" sx={{ display: 'flex', alignItems: 'center', p: 0, m: 0 }}>
-          <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
-            <Typography color="#17a2b8">Dashboard</Typography>
-          </MuiLink>
-          <MuiLink component={Link} to="/booking" color="inherit" underline="none">
-            <Typography color="#17a2b8">Bookings</Typography>
-          </MuiLink>
-          <Typography color="text.primary">{id ? 'Edit Booking' : 'Add Booking'}</Typography>
-        </Breadcrumbs>
-      </Box>
-
+      <CustomBreadcrumbs
+        title={id ? 'Edit Booking' : 'Add Booking'}
+        links={[
+          { name: 'Bookings', path: '/booking' },
+          { name: id ? 'Edit Booking' : 'Add Booking', path: '' }
+        ]}
+      />
       <Card sx={{ maxWidth: 'auto', mt: 3, padding: 1 }}>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>

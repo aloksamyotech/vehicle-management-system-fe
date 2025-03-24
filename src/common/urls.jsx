@@ -31,6 +31,7 @@ export const urls = Object.freeze({
     getById: `${baseUrl}/driver/getById/:id`,
     update: `${baseUrl}/driver/update/:id`,
     delete: `${baseUrl}/driver/delete/:id`,
+    report: `${baseUrl}/driver/report`
   },
   partsInventory: {
     create: `${baseUrl}/parts/save`,
@@ -52,6 +53,7 @@ export const urls = Object.freeze({
     getById: `${baseUrl}/fuel/getById/:id`,
     update: `${baseUrl}/fuel/update/:id`,
     delete: `${baseUrl}/fuel/delete/:id`,
+    report: `${baseUrl}/fuel/report`
   },
   incomeExpense: {
     create: `${baseUrl}/income-expense/save`,
@@ -59,6 +61,7 @@ export const urls = Object.freeze({
     getById: `${baseUrl}/income-expense/getById/:id`,
     update: `${baseUrl}/income-expense/update/:id`,
     delete: `${baseUrl}/income-expense/delete/:id`,
+    report: `${baseUrl}/income-expense/report`
   },
   maintenance: {
     create: `${baseUrl}/maintenance/save`,
@@ -73,5 +76,6 @@ export const urls = Object.freeze({
     getById: `${baseUrl}/booking/getById/:id`,
     update: `${baseUrl}/booking/update/:id`,
     delete: `${baseUrl}/booking/delete/:id`,
+    report: `${baseUrl}/booking/report`
   },
 });

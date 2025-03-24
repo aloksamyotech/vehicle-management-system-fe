@@ -7,21 +7,19 @@ import {
   MenuItem,
   Select,
   FormControl,
-  FormHelperText,
   Box,
   FormLabel,
   Typography,
   Divider,
-  Breadcrumbs,
-  Link as MuiLink,
   Card,
   CardContent
 } from '@mui/material';
-import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { gridSpacing } from 'config.js';
 import { urls } from 'common/urls';
 import { postApi, getApi, updateApiPatch } from 'common/apiClient';
 import toast from 'react-hot-toast';
+import CustomBreadcrumbs from 'common/customBreadcrumbs';
 
 const VehicleForm = () => {
   const { id } = useParams();
@@ -99,34 +97,22 @@ const VehicleForm = () => {
 
   return (
     <>
-      <Box 
-       sx={{
-        backgroundColor: '#ffff',
-        padding: '10px',
-        borderRadius: '8px',
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-      }}>
-        <Typography variant="h4">{id ? 'Edit Vehicle' : 'Add Vehicle'}</Typography>
-        <Breadcrumbs separator="/" aria-label="breadcrumb">
-          <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
-            <Typography color="#17a2b8">Dashboard</Typography>
-          </MuiLink>
-          <MuiLink component={Link} to="/vehicles" color="inherit" underline="none">
-            <Typography color="#17a2b8">Vehicles</Typography>
-          </MuiLink>
-          <Typography color="text.primary">{id ? 'Edit Vehicle' : 'Add Vehicle'}</Typography>
-        </Breadcrumbs>
-      </Box>
+      <CustomBreadcrumbs
+        title={id ? 'Edit Vehicle' : 'Add Vehicle'}
+        links={[
+          { name: 'Vehicles', path: '/vehicles' },
+          { name: id ? 'Edit Vehicle' : 'Add Vehicle', path: '' }
+        ]}
+      />
 
       <Card sx={{ mt: 3, padding: 1 }}>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Grid container spacing={gridSpacing}>
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Registration Number</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  Registration Number
+                </FormLabel>
                 <Controller
                   name="registrationNo"
                   control={control}
@@ -152,7 +138,9 @@ const VehicleForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Vehicle Name</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  Vehicle Name
+                </FormLabel>
                 <Controller
                   name="vehicleName"
                   control={control}
@@ -187,7 +175,9 @@ const VehicleForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Model</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  Model
+                </FormLabel>
                 <Controller
                   name="model"
                   control={control}
@@ -207,7 +197,9 @@ const VehicleForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Chassis No</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  Chassis No
+                </FormLabel>
                 <Controller
                   name="chasisNo"
                   control={control}
@@ -227,7 +219,9 @@ const VehicleForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Engine No</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  Engine No
+                </FormLabel>
                 <Controller
                   name="engineNo"
                   control={control}
@@ -247,7 +241,9 @@ const VehicleForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Manufactured By</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  Manufactured By
+                </FormLabel>
                 <Controller
                   name="manufacturedBy"
                   control={control}
@@ -274,7 +270,9 @@ const VehicleForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth>
-                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Vehicle Type</FormLabel>
+                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                    Vehicle Type
+                  </FormLabel>
                   <Controller
                     name="vehicleType"
                     control={control}
@@ -312,7 +310,9 @@ const VehicleForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Registration Expiry Date</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  Registration Expiry Date
+                </FormLabel>
                 <Controller
                   name="registrationExpiry"
                   control={control}
