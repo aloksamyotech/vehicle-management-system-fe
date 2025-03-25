@@ -13,7 +13,6 @@ export const postApi = async (url, data, headers = {}) => {
   } catch (error) {
     const errorMessage = error.response?.data?.message || 'Something went wrong!';
     toast.error(errorMessage);
-
     throw error;
   }
 };
@@ -30,8 +29,9 @@ export const getApi = async (url, params = {}, headers = {}) => {
     });
     return response.data;
   } catch (error) {
-    console.error('API Error:', error.response || error.message);
-    throw new Error(error.response ? error.response.data : error.message);
+    const errorMessage = error.response?.data?.message || 'Something went wrong!';
+    toast.error(errorMessage);
+    throw error;
   }
 };
 

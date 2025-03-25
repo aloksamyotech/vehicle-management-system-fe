@@ -20,6 +20,7 @@ import { urls } from 'common/urls';
 import { postApi, getApi, updateApiPatch } from 'common/apiClient';
 import toast from 'react-hot-toast';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
+import { text } from 'common/constant';
 
 const DriverForm = () => {
   const { id } = useParams();
@@ -34,30 +35,18 @@ const DriverForm = () => {
 
   useEffect(() => {
     const fetchVehicles = async () => {
-      try {
-        const response = await getApi(urls.vehicle.get);
-        setVehicles(response.data);
-      } catch (error) {
-        console.error('Error fetching vehicles:', error);
-      }
+      const response = await getApi(urls.vehicle.get);
+      setVehicles(response.data);
     };
 
     const fetchDriver = async () => {
-      try {
-        const response = await getApi(urls.driver.get);
-        setDrivers(response.data);
-      } catch (error) {
-        console.error('Error fetching drivers:', error);
-      }
+      const response = await getApi(urls.driver.get);
+      setDrivers(response.data);
     };
 
     const fetchCustomer = async () => {
-      try {
-        const response = await getApi(urls.customer.get);
-        setCustomers(response.data);
-      } catch (error) {
-        console.error('Error fetching customers:', error);
-      }
+      const response = await getApi(urls.customer.get);
+      setCustomers(response.data);
     };
 
     fetchVehicles();
@@ -99,10 +88,10 @@ const DriverForm = () => {
     let response;
     if (id) {
       response = await updateApiPatch(urls.booking.update.replace(':id', id), filteredData);
-      toast.success('Booking updated successfully');
+      toast.success(text.BOOKING_UPDATED);
     } else {
       response = await postApi(urls.booking.create, filteredData);
-      toast.success('Booking added successfully');
+      toast.success(text.BOOKING_ADDED);
     }
 
     reset();
@@ -112,10 +101,10 @@ const DriverForm = () => {
   return (
     <>
       <CustomBreadcrumbs
-        title={id ? 'Edit Booking' : 'Add Booking'}
+        title={id ? text.EDIT_BOOKING : text.ADD_BOOKING}
         links={[
-          { name: 'Bookings', path: '/booking' },
-          { name: id ? 'Edit Booking' : 'Add Booking', path: '' }
+          { name: text.BOOKINGS, path: '/booking' },
+          { name: id ? text.EDIT_BOOKING : text.ADD_BOOKING, path: '' }
         ]}
       />
       <Card sx={{ maxWidth: 'auto', mt: 3, padding: 1 }}>
@@ -125,16 +114,16 @@ const DriverForm = () => {
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth>
                   <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                    Customer Name
+                   {text.CUSTOMER}
                   </FormLabel>
                   <Controller
                     name="customerId"
                     control={control}
-                    rules={{ required: 'Customer is required' }}
+                    rules={{ required: text.CUSTOMER_REQUIRED }}
                     render={({ field }) => (
                       <Select {...field} size="small" displayEmpty>
                         <MenuItem value="" disabled>
-                          Select Customer
+                          {text.SELECT_CUSTOMER}
                         </MenuItem>
                         {customers.map((group) => (
                           <MenuItem key={group.id} value={group.id}>
@@ -155,16 +144,16 @@ const DriverForm = () => {
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth>
                   <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                    Vehicle
+                   {text.VEHICLE}
                   </FormLabel>
                   <Controller
                     name="vehicleId"
                     control={control}
-                    rules={{ required: 'Vehicle is required' }}
+                    rules={{ required: text.VEHICLE_REQUIRED }}
                     render={({ field }) => (
                       <Select {...field} size="small" displayEmpty>
                         <MenuItem value="" disabled>
-                          Select Vehicle
+                        {text.SELECT_VEHICLE}
                         </MenuItem>
                         {vehicles.map((group) => (
                           <MenuItem key={group.id} value={group.id}>
@@ -185,7 +174,7 @@ const DriverForm = () => {
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth>
                   <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                    Driver
+                 {text.DRIVER}
                   </FormLabel>
                   <Controller
                     name="driverId"
@@ -214,14 +203,14 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth required>
-                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Trip Type</FormLabel>
+                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.TRIP_TYPE}</FormLabel>
                   <Controller
                     name="tripType"
                     control={control}
                     render={({ field }) => (
                       <Select {...field} size="small">
-                        <MenuItem value="Single Trip">Single Trip</MenuItem>
-                        <MenuItem value="Round Trip">Round Trip</MenuItem>
+                        <MenuItem value="Single Trip">{text.SINGLE_TRIP}</MenuItem>
+                        <MenuItem value="Round Trip">{text.ROUND_TRIP}</MenuItem>
                       </Select>
                     )}
                   />
@@ -230,18 +219,18 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  Trip Start Location
+                  {text.TRIP_START_LOC}
                 </FormLabel>
                 <Controller
                   name="tripStartLoc"
                   control={control}
-                  rules={{ required: 'Trip Start Location is required' }}
+                  rules={{ required: text.START_LOC_REQUIRED }}
                   render={({ field }) => (
                     <TextField
                       {...field}
                       fullWidth
                       size="small"
-                      placeholder="Enter Start Location"
+                      placeholder= {text.START_LOC}
                       error={!!errors.tripStartLoc}
                       helperText={errors.tripStartLoc?.message}
                     />
@@ -251,18 +240,18 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  Trip End Location
+                 {text.TRIP_END_LOC}
                 </FormLabel>
                 <Controller
                   name="tripEndLoc"
                   control={control}
-                  rules={{ required: 'Trip End Location is required' }}
+                  rules={{ required: text.END_LOC_REQUIRED }}
                   render={({ field }) => (
                     <TextField
                       {...field}
                       fullWidth
                       size="small"
-                      placeholder="Enter End Location"
+                      placeholder={text.END_LOC}
                       error={!!errors.tripEndLoc}
                       helperText={errors.tripEndLoc?.message}
                     />
@@ -279,8 +268,8 @@ const DriverForm = () => {
                   control={control}
                   rules={{
                     required: 'Total KM is required',
-                    min: { value: 0.1, message: 'Total KM must be greater than 0' },
-                    max: { value: 100000, message: 'Total KM cannot exceed 100,000' }
+                    min: { value: 0.1, message: 'Must be greater than 0' },
+                    max: { value: 100000, message: 'Cannot exceed 100,000' }
                   }}
                   render={({ field }) => (
                     <TextField
@@ -367,8 +356,8 @@ const DriverForm = () => {
                   control={control}
                   rules={{
                     required: 'Total KM is required',
-                    min: { value: 0.1, message: 'Amount must be greater than 0' },
-                    max: { value: 100000, message: 'Amount cannot exceed 100,000' }
+                    min: { value: 0.1, message: 'Must be greater than 0' },
+                    max: { value: 100000, message: 'Cannot exceed 100,000' }
                   }}
                   render={({ field }) => (
                     <TextField

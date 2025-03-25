@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Box, Typography, Tabs, Tab, Card, CardContent, TextField, MenuItem, Button } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, Tabs, Tab, Card, CardContent, TextField, MenuItem, Button, Grid } from '@mui/material';
 import { urls } from 'common/urls';
 import { getApi } from 'common/apiClient';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { DataGrid } from '@mui/x-data-grid';
+import toast from 'react-hot-toast';
+import { ThumbUp, ThumbDown, Assessment } from '@mui/icons-material';
 
 const Reports = () => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -15,25 +17,20 @@ const Reports = () => {
   const [selectedDriver, setSelectedDriver] = useState('');
   const [bookings, setBookings] = useState([]);
   const [incomeExpense, setIncomeExpense] = useState([]);
+  const [fuel, setFuel] = useState([]);
+  const [driverReport, setDriverReport] = useState([]);
+  const [summary, setSummary] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchVehicles = async () => {
-      try {
-        const response = await getApi(urls.vehicle.get);
-        setVehicles(response.data);
-      } catch (error) {
-        console.error('Error fetching vehicles:', error);
-      }
+      const response = await getApi(urls.vehicle.get);
+      setVehicles(response.data);
     };
 
     const fetchDrivers = async () => {
-      try {
-        const response = await getApi(urls.driver.get);
-        setDrivers(response.data);
-      } catch (error) {
-        console.error('Error fetching drivers:', error);
-      }
+      const response = await getApi(urls.driver.get);
+      setDrivers(response.data);
     };
 
     fetchVehicles();
@@ -41,57 +38,134 @@ const Reports = () => {
   }, []);
 
   const fetchVehicleBookings = async () => {
-    setLoading(true);
-
     const queryParams = {
       startDate,
       endDate,
       vehicleId: selectedVehicle
     };
 
-    try {
-      const response = await getApi(urls.booking.report, queryParams);
-      setBookings(response.data || []);
-    } catch (error) {
-      console.error('Error fetching bookings:', error);
-    } finally {
-      setLoading(false);
+    const response = await getApi(urls.booking.report, queryParams);
+    setBookings(response.data || []);
+    if (response.data.length === 0) {
+      toast.error('No data found');
     }
   };
 
   const fetchVehicleIncomeExpense = async () => {
-    setLoading(true);
-
     const queryParams = {
       startDate,
       endDate,
       vehicleId: selectedVehicle
     };
 
-    try {
-      const response = await getApi(urls.incomeExpense.report, queryParams);
-      setIncomeExpense(response.data || []);
-    } catch (error) {
-      console.error('Error fetching income & expense:', error);
-    } finally {
-      setLoading(false);
+    const response = await getApi(urls.incomeExpense.report, queryParams);
+    setIncomeExpense(response.data.incomeExpenseDetails || []);
+    setSummary(response.data.summary || null);
+  };
+
+  const fetchVehicleFuel = async () => {
+    const queryParams = {
+      startDate,
+      endDate,
+      vehicleId: selectedVehicle
+    };
+
+    const response = await getApi(urls.fuel.report, queryParams);
+    setFuel(response.data || []);
+    if (response.data.length === 0) {
+      toast.error('No data found');
     }
   };
 
-  const handleGenerateReport = () => {
-    const tabFunctions = [fetchVehicleBookings, fetchVehicleIncomeExpense];
-    tabFunctions[tabIndex]();
+  const fetchDriverBookings = async () => {
+    const queryParams = {
+      startDate,
+      endDate,
+      driverId: selectedDriver
+    };
+
+    const response = await getApi(urls.booking.driverReport, queryParams);
+    setDriverReport(response.data || []);
+    if (response.data.length === 0) {
+      toast.error('No data found');
+    }
   };
+
+  const handleGenerateReport = async () => {
+    const tabFunctions = [fetchVehicleBookings, fetchVehicleIncomeExpense, fetchVehicleFuel, fetchDriverBookings];
+
+    await tabFunctions[tabIndex]();
+
+    setStartDate('');
+    setEndDate('');
+    setSelectedVehicle('');
+    setSelectedDriver('');
+  };
+
+  useEffect(() => {
+    setStartDate('');
+    setEndDate('');
+    setSelectedVehicle('');
+    setSelectedDriver('');
+  }, [tabIndex]);
 
   return (
     <Box>
       <CustomBreadcrumbs title="Report" links={[{ name: 'Reports', path: '/reports' }]} />
-      <Tabs value={tabIndex} onChange={(event, newIndex) => setTabIndex(newIndex)} variant="fullWidth">
-        <Tab label="Bookings" />
-        <Tab label="Income & Expense" />
-        <Tab label="Fuel" />
-        <Tab label="Driver" />
+
+      <Tabs
+        value={tabIndex}
+        onChange={(event, newIndex) => setTabIndex(newIndex)}
+        variant="fullWidth"
+        sx={{
+          backgroundColor: '#f5f5f5',
+          borderRadius: '8px',
+          '& .MuiTabs-indicator': {
+            backgroundColor: 'transparent'
+          }
+        }}
+      >
+        <Tab
+          label="Bookings"
+          sx={{
+            backgroundColor: tabIndex === 0 ? '#1482d7' : 'transparent',
+            color: tabIndex === 0 ? '#fff !important' : '#000',
+            borderRadius: '8px',
+            fontWeight: tabIndex === 0 ? 'bold' : 'normal'
+          }}
+        />
+
+        <Tab
+          label="Income & Expense"
+          sx={{
+            backgroundColor: tabIndex === 1 ? '#1482d7' : 'transparent',
+            color: tabIndex === 1 ? '#fff !important' : '#000',
+            borderRadius: '8px',
+            fontWeight: tabIndex === 1 ? 'bold' : 'normal'
+          }}
+        />
+
+        <Tab
+          label="Fuel"
+          sx={{
+            backgroundColor: tabIndex === 2 ? '#1482d7' : 'transparent',
+            color: tabIndex === 2 ? '#fff !important' : '#000',
+            borderRadius: '8px',
+            fontWeight: tabIndex === 2 ? 'bold' : 'normal'
+          }}
+        />
+
+        <Tab
+          label="Driver"
+          sx={{
+            backgroundColor: tabIndex === 3 ? '#1482d7' : 'transparent',
+            color: tabIndex === 3 ? '#fff !important' : '#000',
+            borderRadius: '8px',
+            fontWeight: tabIndex === 3 ? 'bold' : 'normal'
+          }}
+        />
       </Tabs>
+
       <Box sx={{ mt: 2 }}>
         <Card>
           <CardContent>
@@ -104,7 +178,11 @@ const Reports = () => {
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 sx={{ flex: 1, minWidth: 150 }}
+                inputProps={{
+                  max: endDate
+                }}
               />
+
               <TextField
                 label="Report To"
                 size="small"
@@ -113,7 +191,11 @@ const Reports = () => {
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 sx={{ flex: 1, minWidth: 150 }}
+                inputProps={{
+                  min: startDate
+                }}
               />
+
               {(tabIndex === 0 || tabIndex === 1 || tabIndex === 2) && (
                 <TextField
                   size="small"
@@ -143,7 +225,7 @@ const Reports = () => {
                 >
                   <MenuItem value="">All Drivers</MenuItem>
                   {drivers.map((driver) => (
-                    <MenuItem key={driver.id} value={driver.name}>
+                    <MenuItem key={driver.id} value={driver.id}>
                       {driver.name}
                     </MenuItem>
                   ))}
@@ -240,7 +322,6 @@ const Reports = () => {
                     '.MuiDataGrid-cell': { fontSize: '16px' }
                   }}
                   getRowHeight={() => 75}
-                  loading={loading}
                   initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
                   pageSizeOptions={[10]}
                 />
@@ -248,44 +329,224 @@ const Reports = () => {
             )}
 
             {tabIndex === 1 && incomeExpense.length > 0 && (
+              <>
+                <Grid container spacing={2} sx={{ mt: 2 }}>
+                  <Grid item xs={12} sm={4}>
+                    <Card sx={{ p: 2, display: 'flex', alignItems: 'center', backgroundColor: '#f8f9fa' }}>
+                      <Box
+                        sx={{
+                          width: 50,
+                          height: 50,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          backgroundColor: '#28a745',
+                          borderRadius: 1,
+                          mr: 2
+                        }}
+                      >
+                        <ThumbUp sx={{ color: 'white', fontSize: 30 }} />
+                      </Box>
+                      <Box>
+                        <Typography variant="h5">Total Income</Typography>
+                        <Typography variant="h6" fontWeight="bold">
+                          {summary?.income || 0}
+                        </Typography>
+                      </Box>
+                    </Card>
+                  </Grid>
+
+                  <Grid item xs={12} sm={4}>
+                    <Card sx={{ p: 2, display: 'flex', alignItems: 'center', backgroundColor: '#f8f9fa' }}>
+                      <Box
+                        sx={{
+                          width: 50,
+                          height: 50,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          backgroundColor: '#ffc107',
+                          borderRadius: 1,
+                          mr: 2
+                        }}
+                      >
+                        <ThumbDown sx={{ color: 'black', fontSize: 30 }} />
+                      </Box>
+                      <Box>
+                        <Typography variant="h5">Total Expense</Typography>
+                        <Typography variant="h6" fontWeight="bold">
+                          {summary?.expense || 0}
+                        </Typography>
+                      </Box>
+                    </Card>
+                  </Grid>
+
+                  <Grid item xs={12} sm={4}>
+                    <Card sx={{ p: 2, display: 'flex', alignItems: 'center', backgroundColor: '#f8f9fa' }}>
+                      <Box
+                        sx={{
+                          width: 50,
+                          height: 50,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          backgroundColor: '#17a2b8',
+                          borderRadius: 1,
+                          mr: 2
+                        }}
+                      >
+                        <Assessment sx={{ color: 'white', fontSize: 30 }} />
+                      </Box>
+                      <Box>
+                        <Typography variant="h5">{summary?.status || 'Status'}</Typography>
+                        <Typography variant="h6" fontWeight="bold">
+                          {summary?.profitOrLoss || 0}
+                        </Typography>
+                      </Box>
+                    </Card>
+                  </Grid>
+                </Grid>
+
+                <Card sx={{ mt: '20px' }}>
+                  <DataGrid
+                    rows={incomeExpense.map((row, index) => ({
+                      id: index + 1,
+                      sNo: index + 1,
+                      vehicle: row.vehicle?.vehicleName || 'N/A',
+                      date: row.date,
+                      description: row.description,
+                      amount: row.amount,
+                      type: row.type
+                    }))}
+                    columns={[
+                      { field: 'sNo', headerName: 'S.No', width: 70 },
+                      { field: 'vehicle', headerName: 'Vehicle', width: 200 },
+                      {
+                        field: 'date',
+                        headerName: 'Date',
+                        width: 150,
+                        renderCell: (params) => {
+                          return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
+                        }
+                      },
+                      { field: 'description', headerName: 'Description', width: 200 },
+                      { field: 'amount', headerName: 'Amount', width: 150 },
+                      {
+                        field: 'type',
+                        headerName: 'Type',
+                        width: 120,
+                        renderCell: (params) => {
+                          const isExpense = params.row.type === 'Expense';
+                          return (
+                            <Button
+                              variant="contained"
+                              style={{
+                                backgroundColor: isExpense ? '#dc3545' : '#30aa4c',
+                                color: 'white',
+                                fontWeight: 700,
+                                width: 'auto',
+                                fontSize: '10px',
+                                padding: 0
+                              }}
+                            >
+                              {params.row.type}
+                            </Button>
+                          );
+                        }
+                      }
+                    ]}
+                    disableRowSelectionOnClick
+                    sx={{
+                      '.MuiDataGrid-columnHeaderTitle': { fontWeight: 'bold', fontSize: '16px' },
+                      '.MuiDataGrid-cell': { fontSize: '16px' }
+                    }}
+                    getRowHeight={() => 75}
+                    initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
+                    pageSizeOptions={[10]}
+                  />
+                </Card>
+              </>
+            )}
+
+            {tabIndex === 2 && fuel.length > 0 && (
               <Card sx={{ mt: '20px' }}>
                 <DataGrid
-                  rows={incomeExpense.map((row, index) => ({
+                  rows={fuel.map((row, index) => ({
                     id: index + 1,
                     sNo: index + 1,
                     vehicle: row.vehicle?.vehicleName || 'N/A',
-                    date: row.date,
-                    description: row.description,
+                    driver: row.driver?.name || 'N/A',
+                    fillDate: row.fillDate,
                     amount: row.amount,
-                    type: row.type
+                    quantity: row.quantity,
+                    odometerReading: row.odometerReading,
+                    comments: row.comments
                   }))}
                   columns={[
                     { field: 'sNo', headerName: 'S.No', width: 70 },
-                    { field: 'vehicle', headerName: 'Vehicle', width: 150 },
-                    { field: 'date', headerName: 'Date', width: 150 },
-                    { field: 'description', headerName: 'Description', width: 150 },
-                    { field: 'amount', headerName: 'Amount', width: 100 },
                     {
-                      field: 'type',
-                      headerName: 'Type',
-                      width: 120,
+                      field: 'fillDate',
+                      headerName: 'Fuel Fill Date',
+                      width: 150,
                       renderCell: (params) => {
-                        const isActive = params.row.type === 'Expense';
-                        return (
-                          <Button
-                            variant="contained"
-                            style={{
-                              backgroundColor: isActive ? '#30aa4c' : '#dc3545',
-                              color: 'white',
-                              fontWeight: 700,
-                              width: 'auto',
-                              fontSize: '10px',
-                              padding: 0
-                            }}
-                          >
-                            {params.row.type}
-                          </Button>
-                        );
+                        return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
+                      }
+                    },
+                    { field: 'vehicle', headerName: 'Vehicle', width: 150 },
+                    { field: 'quantity', headerName: 'Quantity', width: 100 },
+                    { field: 'amount', headerName: 'Fuel Total Price', width: 150 },
+                    { field: 'driver', headerName: 'Fuel Filled By', width: 150 },
+                    { field: 'odometerReading', headerName: 'Odometer Reading', width: 150 },
+                    { field: 'comments', headerName: 'Comments', width: 150 }
+                  ]}
+                  disableRowSelectionOnClick
+                  sx={{
+                    '.MuiDataGrid-columnHeaderTitle': { fontWeight: 'bold', fontSize: '16px' },
+                    '.MuiDataGrid-cell': { fontSize: '16px' }
+                  }}
+                  getRowHeight={() => 75}
+                  initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
+                  pageSizeOptions={[10]}
+                />
+              </Card>
+            )}
+
+            {tabIndex === 3 && driverReport.length > 0 && (
+              <Card sx={{ mt: '20px' }}>
+                <DataGrid
+                  rows={driverReport.map((row, index) => ({
+                    id: index + 1,
+                    sNo: index + 1,
+                    driver: row.driver?.name || 'N/A',
+                    vehicle: row.vehicle?.vehicleName || 'N/A',
+                    createdAt: row.createdAt,
+                    tripStartDate: row.tripStartDate,
+                    totalAmt: row.totalAmt,
+                    totalKm: row.totalKm,
+                    tripStartLoc: row.tripStartLoc,
+                    tripEndLoc: row.tripEndLoc
+                  }))}
+                  columns={[
+                    { field: 'sNo', headerName: 'S.No', width: 70 },
+                    {
+                      field: 'tripStartDate',
+                      headerName: 'Booking Date',
+                      width: 150,
+                      renderCell: (params) => {
+                        return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
+                      }
+                    },
+                    { field: 'tripStartLoc', headerName: 'From', width: 150 },
+                    { field: 'tripEndLoc', headerName: 'To', width: 150 },
+                    { field: 'totalKm', headerName: 'Distance', width: 150 },
+                    { field: 'vehicle', headerName: 'Vehicle', width: 150 },
+                    { field: 'driver', headerName: 'Driver', width: 150 },
+                    {
+                      field: 'createdAt',
+                      headerName: 'Created Date',
+                      width: 150,
+                      renderCell: (params) => {
+                        return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
                       }
                     }
                   ]}
@@ -295,7 +556,6 @@ const Reports = () => {
                     '.MuiDataGrid-cell': { fontSize: '16px' }
                   }}
                   getRowHeight={() => 75}
-                  loading={loading}
                   initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
                   pageSizeOptions={[10]}
                 />
