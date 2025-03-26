@@ -8,6 +8,7 @@ import { getApi, deleteApi, updateApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import CustomToolbar from 'common/customToolbar';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
+import { text } from 'common/constant';
 
 const MaintenanceIndex = () => {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ const MaintenanceIndex = () => {
       }));
       setShowData(formattedData);
     } catch (error) {
-      toast.error('Failed to fetch data');
+      toast.error(text.ERROR_FETCHING);
     } finally {
       setLoading(false);
     }
@@ -47,29 +48,25 @@ const MaintenanceIndex = () => {
       const updateUrl = urls.maintenance.updateStatus.replace(':id', id);
       const response = await updateApi(updateUrl, { status: newStatus });
       setShowData((prevRows) => prevRows.map((row) => (row.id === id ? { ...row, status: response.data.status } : row)));
-      toast.success('Maintenance updated successfully');
+      toast.success(text.MAINTENANCE_UPDATED);
       fetchData();
     } catch (error) {
-      toast.error('Error updating status');
+      toast.error(text.ERROR_UPDATING);
     }
   };
 
   const handleDelete = async (id) => {
-    try {
       await deleteApi(urls.maintenance.delete.replace(':id', id));
-      toast.success('Maintenance deleted successfully');
+      toast.success(text.MAINTENANCE_DELETED);
       fetchData();
-    } catch (error) {
-      toast.error('Failed to delete maintenance data');
-    }
   };
 
   const columns = [
-    { field: 'sNo', headerName: 'S.No', width: 80 },
-    { field: 'group', headerName: 'Vehicle', width: 200 },
+    { field: 'sNo', headerName: text.S_NO, width: 80 },
+    { field: 'group', headerName: text.VEHICLE, width: 200 },
     {
       field: 'startDate',
-      headerName: 'Start Date',
+      headerName: text.START_DATE,
       width: 150,
       renderCell: (params) => {
         return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
@@ -77,30 +74,30 @@ const MaintenanceIndex = () => {
     },
     {
       field: 'endDate',
-      headerName: 'End Date',
+      headerName: text.END_DATE,
       width: 150,
       renderCell: (params) => {
         return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
       }
     },
-    { field: 'details', headerName: 'Service Info', width: 250 },
-    { field: 'vendorName', headerName: 'Vendor', width: 150 },
-    { field: 'totalCost', headerName: 'Cost', width: 120 },
+    { field: 'details', headerName: text.SERVICE_DETAILS, width: 250 },
+    { field: 'vendorName', headerName: text.VENDOR_NAME, width: 150 },
+    { field: 'totalCost', headerName: text.TOTAL_COST, width: 120 },
     {
       field: 'status',
-      headerName: 'Status',
+      headerName: text.STATUS,
       width: 150,
       renderCell: (params) => (
         <Select value={params.row.status} onChange={(e) => handleStatusChange(params.row.id, e.target.value)} size="small" fullWidth>
-          <MenuItem value="Pending">Pending</MenuItem>
-          <MenuItem value="In Progress">In Progress</MenuItem>
-          <MenuItem value="Completed">Completed</MenuItem>
+          <MenuItem value="Pending">{text.PENDING}</MenuItem>
+          <MenuItem value="In Progress">{text.IN_PROGRESS}</MenuItem>
+          <MenuItem value="Completed">{text.COMPLETED}</MenuItem>
         </Select>
       )
     },
     {
       field: 'actions',
-      headerName: 'Action',
+      headerName: text.ACTION,
       width: 150,
       sortable: false,
       renderCell: (params) => (
@@ -115,7 +112,7 @@ const MaintenanceIndex = () => {
 
   return (
     <>
-      <CustomBreadcrumbs title="Maintenance Records" links={[{ name: 'Maintenance Records', path: '/maintenance' }]} />
+      <CustomBreadcrumbs title={text.maintenanceRecords} links={[{ name: text.maintenanceRecords, path: '/maintenance' }]} />
 
       <Grid container spacing={2}>
         <Grid item xs={12}>

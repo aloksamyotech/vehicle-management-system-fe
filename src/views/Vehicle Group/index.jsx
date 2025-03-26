@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Box,Card, IconButton, Divider } from '@mui/material';
-import { DataGrid} from '@mui/x-data-grid';
+import { Box, Card, IconButton, Divider } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
 import { BorderColor as BorderColorIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import AddVehicleGroupModal from './addVehicleGroup';
 import { getApi, deleteApi } from 'common/apiClient';
@@ -8,6 +8,7 @@ import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
 import CustomToolbar from 'common/customToolbar';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
+import { text } from 'common/constant';
 
 const NewComponent = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -29,7 +30,7 @@ const NewComponent = () => {
       }));
       setRows(modifiedRows);
     } catch (error) {
-      toast.error('Failed to fetch data');
+      toast.error(text.ERROR_FETCHING);
     } finally {
       setLoading(false);
     }
@@ -50,22 +51,18 @@ const NewComponent = () => {
   };
 
   const handleDelete = async (id) => {
-    try {
-      await deleteApi(urls.vehicleGroup.delete.replace(':id', id));
-      toast.success('Vehicle group deleted successfully');
-      fetchData();
-    } catch (error) {
-      toast.error('Failed to delete');
-    }
+    await deleteApi(urls.vehicleGroup.delete.replace(':id', id));
+    toast.success(text.GROUP_DELETED);
+    fetchData();
   };
 
   const columns = [
-    { field: 'sno', headerName: 'S.No', width: 80 },
-    { field: 'name', headerName: 'Name', width: 180 },
-    { field: 'description', headerName: 'Description', width: 350 },
+    { field: 'sno', headerName: text.S_NO, width: 80 },
+    { field: 'name', headerName: text.NAME, width: 180 },
+    { field: 'description', headerName: text.DESCRIPTION, width: 350 },
     {
       field: 'createdAt',
-      headerName: 'Created Date',
+      headerName: text.CREATED_AT,
       width: 150,
       renderCell: (params) => {
         return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
@@ -73,7 +70,7 @@ const NewComponent = () => {
     },
     {
       field: 'actions',
-      headerName: 'Action',
+      headerName: text.ACTION,
       width: 100,
       sortable: false,
       renderCell: (params) => (
@@ -92,7 +89,7 @@ const NewComponent = () => {
 
   return (
     <>
-      <CustomBreadcrumbs title="Vehicle Group" links={[{ name: 'Vehicle Group', path: '/vehiclegroup' }]} />
+      <CustomBreadcrumbs title={text.VEHICLE_GROUP} links={[{ name: text.VEHICLE_GROUP, path: '/vehiclegroup' }]} />
 
       <Card>
         <Box sx={{ height: 'auto', width: '100%' }}>

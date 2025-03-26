@@ -6,6 +6,7 @@ import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { DataGrid } from '@mui/x-data-grid';
 import toast from 'react-hot-toast';
 import { ThumbUp, ThumbDown, Assessment } from '@mui/icons-material';
+import { text } from 'common/constant';
 
 const Reports = () => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -20,7 +21,6 @@ const Reports = () => {
   const [fuel, setFuel] = useState([]);
   const [driverReport, setDriverReport] = useState([]);
   const [summary, setSummary] = useState('');
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchVehicles = async () => {
@@ -47,7 +47,7 @@ const Reports = () => {
     const response = await getApi(urls.booking.report, queryParams);
     setBookings(response.data || []);
     if (response.data.length === 0) {
-      toast.error('No data found');
+      toast.error(text.NO_DATA_FOUND);
     }
   };
 
@@ -73,7 +73,7 @@ const Reports = () => {
     const response = await getApi(urls.fuel.report, queryParams);
     setFuel(response.data || []);
     if (response.data.length === 0) {
-      toast.error('No data found');
+      toast.error(text.NO_DATA_FOUND);
     }
   };
 
@@ -87,7 +87,7 @@ const Reports = () => {
     const response = await getApi(urls.booking.driverReport, queryParams);
     setDriverReport(response.data || []);
     if (response.data.length === 0) {
-      toast.error('No data found');
+      toast.error(text.NO_DATA_FOUND);
     }
   };
 
@@ -111,7 +111,7 @@ const Reports = () => {
 
   return (
     <Box>
-      <CustomBreadcrumbs title="Report" links={[{ name: 'Reports', path: '/reports' }]} />
+      <CustomBreadcrumbs title={text.REPORTS} links={[{ name: text.REPORTS, path: '/reports' }]} />
 
       <Tabs
         value={tabIndex}
@@ -126,7 +126,7 @@ const Reports = () => {
         }}
       >
         <Tab
-          label="Bookings"
+          label={text.BOOKINGS}
           sx={{
             backgroundColor: tabIndex === 0 ? '#1482d7' : 'transparent',
             color: tabIndex === 0 ? '#fff !important' : '#000',
@@ -136,7 +136,7 @@ const Reports = () => {
         />
 
         <Tab
-          label="Income & Expense"
+          label={text.incomeExpense}
           sx={{
             backgroundColor: tabIndex === 1 ? '#1482d7' : 'transparent',
             color: tabIndex === 1 ? '#fff !important' : '#000',
@@ -146,7 +146,7 @@ const Reports = () => {
         />
 
         <Tab
-          label="Fuel"
+          label={text.FUEL}
           sx={{
             backgroundColor: tabIndex === 2 ? '#1482d7' : 'transparent',
             color: tabIndex === 2 ? '#fff !important' : '#000',
@@ -156,7 +156,7 @@ const Reports = () => {
         />
 
         <Tab
-          label="Driver"
+          label={text.DRIVER}
           sx={{
             backgroundColor: tabIndex === 3 ? '#1482d7' : 'transparent',
             color: tabIndex === 3 ? '#fff !important' : '#000',
@@ -205,7 +205,7 @@ const Reports = () => {
                   onChange={(e) => setSelectedVehicle(e.target.value)}
                   sx={{ flex: 1, minWidth: 180 }}
                 >
-                  <MenuItem value="">All Vehicles</MenuItem>
+                  <MenuItem value="">{text.ALL_VEHICLE}</MenuItem>
                   {vehicles.map((vehicle) => (
                     <MenuItem key={vehicle.id} value={vehicle.id}>
                       {vehicle.vehicleName}
@@ -223,7 +223,7 @@ const Reports = () => {
                   onChange={(e) => setSelectedDriver(e.target.value)}
                   sx={{ flex: 1, minWidth: 180 }}
                 >
-                  <MenuItem value="">All Drivers</MenuItem>
+                  <MenuItem value="">{text.ALL_DRIVER}</MenuItem>
                   {drivers.map((driver) => (
                     <MenuItem key={driver.id} value={driver.id}>
                       {driver.name}
@@ -245,7 +245,7 @@ const Reports = () => {
                   }
                 }}
               >
-                Generate Report
+               {text.GENERATE_REPORT}
               </Button>
             </Box>
 
@@ -266,14 +266,14 @@ const Reports = () => {
                     tripEndLoc: row.tripEndLoc
                   }))}
                   columns={[
-                    { field: 'sNo', headerName: 'S.No', width: 70 },
-                    { field: 'customer', headerName: 'Customer', width: 150 },
-                    { field: 'vehicle', headerName: 'Vehicle', width: 150 },
-                    { field: 'tripType', headerName: 'Type', width: 150 },
-                    { field: 'driver', headerName: 'Driver', width: 150 },
+                    { field: 'sNo', headerName: text.S_NO, width: 70 },
+                    { field: 'customer', headerName: text.CUSTOMER, width: 150 },
+                    { field: 'vehicle', headerName: text.VEHICLE, width: 150 },
+                    { field: 'tripType', headerName: text.TYPE, width: 150 },
+                    { field: 'driver', headerName: text.DRIVER, width: 150 },
                     {
                       field: 'trip',
-                      headerName: 'From To',
+                      headerName: text.FROM_TO,
                       width: 200,
                       renderCell: (params) => (
                         <Box>
@@ -283,11 +283,11 @@ const Reports = () => {
                         </Box>
                       )
                     },
-                    { field: 'totalKm', headerName: 'Distance', width: 100 },
-                    { field: 'totalAmt', headerName: 'Amount', width: 100 },
+                    { field: 'totalKm', headerName: text.DISTANCE, width: 100 },
+                    { field: 'totalAmt', headerName: text.AMOUNT, width: 100 },
                     {
                       field: 'tripStatus',
-                      headerName: 'Trip Status',
+                      headerName: text.STATUS,
                       width: 120,
                       renderCell: (params) => {
                         const status = params.row.tripStatus;
@@ -348,7 +348,7 @@ const Reports = () => {
                         <ThumbUp sx={{ color: 'white', fontSize: 30 }} />
                       </Box>
                       <Box>
-                        <Typography variant="h5">Total Income</Typography>
+                        <Typography variant="h5">{text.TOTAL_INCOME}</Typography>
                         <Typography variant="h6" fontWeight="bold">
                           {summary?.income || 0}
                         </Typography>
@@ -373,7 +373,7 @@ const Reports = () => {
                         <ThumbDown sx={{ color: 'black', fontSize: 30 }} />
                       </Box>
                       <Box>
-                        <Typography variant="h5">Total Expense</Typography>
+                        <Typography variant="h5">{text.TOTAL_EXPENSE}</Typography>
                         <Typography variant="h6" fontWeight="bold">
                           {summary?.expense || 0}
                         </Typography>
@@ -419,21 +419,21 @@ const Reports = () => {
                       type: row.type
                     }))}
                     columns={[
-                      { field: 'sNo', headerName: 'S.No', width: 70 },
-                      { field: 'vehicle', headerName: 'Vehicle', width: 200 },
+                      { field: 'sNo', headerName: text.S_NO, width: 70 },
+                      { field: 'vehicle', headerName: text.VEHICLE, width: 200 },
                       {
                         field: 'date',
-                        headerName: 'Date',
+                        headerName: text.DATE,
                         width: 150,
                         renderCell: (params) => {
                           return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
                         }
                       },
-                      { field: 'description', headerName: 'Description', width: 200 },
-                      { field: 'amount', headerName: 'Amount', width: 150 },
+                      { field: 'description', headerName: text.DESCRIPTION, width: 200 },
+                      { field: 'amount', headerName: text.AMOUNT, width: 150 },
                       {
                         field: 'type',
-                        headerName: 'Type',
+                        headerName: text.TYPE,
                         width: 120,
                         renderCell: (params) => {
                           const isExpense = params.row.type === 'Expense';
@@ -483,21 +483,21 @@ const Reports = () => {
                     comments: row.comments
                   }))}
                   columns={[
-                    { field: 'sNo', headerName: 'S.No', width: 70 },
+                    { field: 'sNo', headerName: text_S_No, width: 70 },
                     {
                       field: 'fillDate',
-                      headerName: 'Fuel Fill Date',
+                      headerName: text.FILL_DATE,
                       width: 150,
                       renderCell: (params) => {
                         return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
                       }
                     },
-                    { field: 'vehicle', headerName: 'Vehicle', width: 150 },
-                    { field: 'quantity', headerName: 'Quantity', width: 100 },
-                    { field: 'amount', headerName: 'Fuel Total Price', width: 150 },
-                    { field: 'driver', headerName: 'Fuel Filled By', width: 150 },
-                    { field: 'odometerReading', headerName: 'Odometer Reading', width: 150 },
-                    { field: 'comments', headerName: 'Comments', width: 150 }
+                    { field: 'vehicle', headerName: text.VEHICLE, width: 150 },
+                    { field: 'quantity', headerName: text.QUANTITY, width: 100 },
+                    { field: 'amount', headerName: text.TOTAL_AMOUNT, width: 150 },
+                    { field: 'driver', headerName: text.FUEL_FILL_BY, width: 150 },
+                    { field: 'odometerReading', headerName: text.ODOMETER_READING, width: 150 },
+                    { field: 'comments', headerName: text.COMMENTS, width: 150 }
                   ]}
                   disableRowSelectionOnClick
                   sx={{
@@ -527,23 +527,23 @@ const Reports = () => {
                     tripEndLoc: row.tripEndLoc
                   }))}
                   columns={[
-                    { field: 'sNo', headerName: 'S.No', width: 70 },
+                    { field: 'sNo', headerName: text.S_NO, width: 70 },
                     {
                       field: 'tripStartDate',
-                      headerName: 'Booking Date',
+                      headerName: text.BOOKING_DATE,
                       width: 150,
                       renderCell: (params) => {
                         return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
                       }
                     },
-                    { field: 'tripStartLoc', headerName: 'From', width: 150 },
-                    { field: 'tripEndLoc', headerName: 'To', width: 150 },
-                    { field: 'totalKm', headerName: 'Distance', width: 150 },
-                    { field: 'vehicle', headerName: 'Vehicle', width: 150 },
-                    { field: 'driver', headerName: 'Driver', width: 150 },
+                    { field: 'tripStartLoc', headerName: text.FROM, width: 150 },
+                    { field: 'tripEndLoc', headerName: text.TO, width: 150 },
+                    { field: 'totalKm', headerName: text.DISTANCE, width: 150 },
+                    { field: 'vehicle', headerName: text.VEHICLE, width: 150 },
+                    { field: 'driver', headerName: text.DRIVER, width: 150 },
                     {
                       field: 'createdAt',
-                      headerName: 'Created Date',
+                      headerName: text.CREATED_AT,
                       width: 150,
                       renderCell: (params) => {
                         return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';

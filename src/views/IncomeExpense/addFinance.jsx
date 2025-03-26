@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Grid, Button, TextField, Box, FormLabel, FormControl, Select, MenuItem, Typography } from '@mui/material';
 import toast from 'react-hot-toast';
-import { postApi, getApi , updateApiPatch} from 'common/apiClient';
+import { postApi, getApi, updateApiPatch } from 'common/apiClient';
 import { urls } from 'common/urls';
+import { text } from 'common/constant';
 
 const IncomeExpenseForm = ({ initialData, onSave, refreshData, onCancel }) => {
   const [vehicles, setVehicles] = useState([]);
@@ -26,12 +27,8 @@ const IncomeExpenseForm = ({ initialData, onSave, refreshData, onCancel }) => {
 
   useEffect(() => {
     const fetchVehicles = async () => {
-      try {
-        const response = await getApi(urls.vehicle.get);
-        setVehicles(response.data);
-      } catch (error) {
-        console.error('Error fetching vehicles:', error);
-      }
+      const response = await getApi(urls.vehicle.get);
+      setVehicles(response.data);
     };
 
     fetchVehicles();
@@ -50,20 +47,20 @@ const IncomeExpenseForm = ({ initialData, onSave, refreshData, onCancel }) => {
   }, [initialData, reset]);
 
   const onSubmit = async (data) => {
-      let response;
-      const financeData = { ...data };
+    let response;
+    const financeData = { ...data };
 
-      if (initialData?.id) {
-        response = await updateApiPatch(urls.incomeExpense.update.replace(':id', initialData.id), financeData);
-        toast.success('Income expense updated successfully!');
-      } else {
-        response = await postApi(urls.incomeExpense.create, financeData);
-        toast.success('Income expense added successfully!');
-      }
+    if (initialData?.id) {
+      response = await updateApiPatch(urls.incomeExpense.update.replace(':id', initialData.id), financeData);
+      toast.success(text.INC_EXP_UPDATED);
+    } else {
+      response = await postApi(urls.incomeExpense.create, financeData);
+      toast.success(text.INC_EXP_ADDED);
+    }
 
-      onSave(response.data);
-      refreshData();
-      reset();
+    onSave(response.data);
+    refreshData();
+    reset();
   };
 
   return (
@@ -71,15 +68,17 @@ const IncomeExpenseForm = ({ initialData, onSave, refreshData, onCancel }) => {
       <Grid container spacing={2}>
         <Grid item xs={6}>
           <FormControl fullWidth>
-            <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Vehicle</FormLabel>
+            <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+              {text.VEHICLE}
+            </FormLabel>
             <Controller
               name="vehicleId"
               control={control}
-              rules={{ required: 'Vehicle is required' }}
+              rules={{ required: text.REQUIRED }}
               render={({ field }) => (
                 <Select {...field} size="small" displayEmpty>
                   <MenuItem value="" disabled>
-                    Select Vehicle
+                    {text.SELECT_VEHICLE}
                   </MenuItem>
                   {vehicles.map((group) => (
                     <MenuItem key={group.id} value={group.id}>
@@ -89,35 +88,49 @@ const IncomeExpenseForm = ({ initialData, onSave, refreshData, onCancel }) => {
                 </Select>
               )}
             />
-            {errors.vehicleId && <Typography color="error" sx={{ fontSize: '11px', mt: 0.5}}>{errors.vehicleId.message}</Typography>}
+            {errors.vehicleId && (
+              <Typography color="error" sx={{ fontSize: '11px', mt: 0.5 }}>
+                {errors.vehicleId.message}
+              </Typography>
+            )}
           </FormControl>
         </Grid>
 
         <Grid item xs={6}>
           <FormControl fullWidth size="small">
-            <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Type</FormLabel>
+            <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+              {text.TYPE}
+            </FormLabel>
             <Controller
               name="type"
               control={control}
-              rules={{ required: 'Type is required' }}
+              rules={{ required: text.REQUIRED }}
               render={({ field }) => (
                 <Select {...field} displayEmpty size="small" error={!!errors.type}>
-                  <MenuItem value="" disabled>Select Type</MenuItem>
-                  <MenuItem value="Income">Income</MenuItem>
-                  <MenuItem value="Expense">Expense</MenuItem>
+                  <MenuItem value="" disabled>
+                    {text.SELECT_TYPE}
+                  </MenuItem>
+                  <MenuItem value="Income">{text.INCOME}</MenuItem>
+                  <MenuItem value="Expense">{text.EXPENSE}</MenuItem>
                 </Select>
               )}
             />
-            {errors.type && <Typography color="error" sx={{ fontSize: '11px', mt: 0.5}}>{errors.type.message}</Typography>}
+            {errors.type && (
+              <Typography color="error" sx={{ fontSize: '11px', mt: 0.5 }}>
+                {errors.type.message}
+              </Typography>
+            )}
           </FormControl>
         </Grid>
 
         <Grid item xs={6}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Date</FormLabel>
+          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+            {text.DATE}
+          </FormLabel>
           <Controller
             name="date"
             control={control}
-            rules={{ required: 'Date is required' }}
+            rules={{ required: text.REQUIRED }}
             render={({ field }) => (
               <TextField
                 {...field}
@@ -134,13 +147,15 @@ const IncomeExpenseForm = ({ initialData, onSave, refreshData, onCancel }) => {
         </Grid>
 
         <Grid item xs={6}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Amount</FormLabel>
+          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+            {text.AMOUNT}
+          </FormLabel>
           <Controller
             name="amount"
             control={control}
             rules={{
-              required: 'Amount is required',
-              min: { value: 0.01, message: 'Amount must be greater than 0' }
+              required: text.REQUIRED,
+              min: { value: 0.01, message: text.GREATER_THAN_0 }
             }}
             render={({ field }) => (
               <TextField
@@ -154,19 +169,23 @@ const IncomeExpenseForm = ({ initialData, onSave, refreshData, onCancel }) => {
               />
             )}
           />
-          {errors.amount && <Typography color="error" sx={{ fontSize: '11px', mt: 0.5}}>{errors.amount.message}</Typography>}
+          {errors.amount && (
+            <Typography color="error" sx={{ fontSize: '11px', mt: 0.5 }}>
+              {errors.amount.message}
+            </Typography>
+          )}
         </Grid>
 
         <Grid item xs={12}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Description</FormLabel>
+          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.DESCRIPTION}</FormLabel>
           <Controller
             name="description"
             control={control}
             rules={{
               validate: (value) => {
-                if (!value.trim()) return 'Description is required';
+                if (!value.trim()) return text.REQUIRED;
                 const wordCount = value.trim().split(/\s+/).length;
-                return wordCount <= 100 || 'Description must be at most 100 words';
+                return wordCount <= 100 || text.MAX_100_CHAR;
               }
             }}
             render={({ field }) => (
@@ -195,10 +214,10 @@ const IncomeExpenseForm = ({ initialData, onSave, refreshData, onCancel }) => {
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
         <Button type="submit" variant="contained" color="primary" disabled={isSubmitting}>
-          {initialData?.id ? 'Update' : 'Add'} Income Expense
+          {initialData?.id ? text.update : text.add} {text.incomeExpense}
         </Button>
         <Button variant="outlined" onClick={onCancel} disabled={isSubmitting}>
-          Cancel
+          {text.CANCEL}
         </Button>
       </Box>
     </Box>

@@ -4,6 +4,7 @@ import { Grid, Button, TextField, Box, FormLabel, FormControl, Select, MenuItem,
 import toast from 'react-hot-toast';
 import { postApi, getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import { text } from 'common/constant';
 
 const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
   const [vehicles, setVehicles] = useState([]);
@@ -23,24 +24,20 @@ const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
 
   useEffect(() => {
     const fetchVehicles = async () => {
-      try {
-        const response = await getApi(urls.vehicle.get);
-        setVehicles(response.data);
-      } catch (error) {
-        console.error('Error fetching vehicles:', error);
-      }
+      const response = await getApi(urls.vehicle.get);
+      setVehicles(response.data);
     };
 
     fetchVehicles();
   }, []);
 
   const onSubmit = async (data) => {
-      const response = await postApi(urls.reminder.create, data);
-      toast.success('Reminder added successfully!');
+    const response = await postApi(urls.reminder.create, data);
+    toast.success(text.REM_ADDED);
 
-      onSave(response.data);
-      refreshData();
-      reset();
+    onSave(response.data);
+    refreshData();
+    reset();
   };
 
   return (
@@ -49,16 +46,16 @@ const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
         <Grid item xs={12}>
           <FormControl fullWidth>
             <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-              Vehicle
+              {text.VEHICLE}
             </FormLabel>
             <Controller
               name="vehicleId"
               control={control}
-              rules={{ required: 'Vehicle is required' }}
+              rules={{ required: text.REQUIRED }}
               render={({ field }) => (
                 <Select {...field} size="small" displayEmpty>
                   <MenuItem value="" disabled>
-                    Select Vehicle
+                    {text.SELECT_VEHICLE}
                   </MenuItem>
                   {vehicles.map((group) => (
                     <MenuItem key={group.id} value={group.id}>
@@ -68,16 +65,18 @@ const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
                 </Select>
               )}
             />
-            {errors.vehicleId && <Typography color="error">{errors.vehicleId.message}</Typography>}
+            {errors.vehicleId && <Typography color="error" sx={{ fontSize: '11px', mt: 0.5, ml: 2 }}>{errors.vehicleId.message}</Typography>}
           </FormControl>
         </Grid>
 
         <Grid item xs={12}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Date*</FormLabel>
+          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+            {text.DATE}
+          </FormLabel>
           <Controller
             name="reminderDate"
             control={control}
-            rules={{ required: 'Date is required' }}
+            rules={{ required: text.REQUIRED }}
             render={({ field }) => (
               <TextField
                 {...field}
@@ -85,7 +84,7 @@ const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
                 type="date"
                 size="small"
                 value={field.value ? field.value.split('T')[0] : ''}
-                inputProps={{ min: new Date().toISOString().split('T')[0] }} 
+                inputProps={{ min: new Date().toISOString().split('T')[0] }}
                 onChange={(e) => field.onChange(new Date(e.target.value).toISOString())}
                 error={!!errors.reminderDate}
                 helperText={errors.reminderDate?.message}
@@ -95,13 +94,13 @@ const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
         </Grid>
 
         <Grid item xs={12}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Message</FormLabel>
+          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.MESSAGE}</FormLabel>
           <Controller
             name="message"
             control={control}
             rules={{
-              required: 'Message is required',
-              maxLength: { value: 200, message: 'Max 200 characters allowed' }
+              required: text.REQUIRED,
+              maxLength: { value: 200, message: text.MAX_200_CHAR }
             }}
             render={({ field }) => (
               <TextField
@@ -120,10 +119,10 @@ const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
         <Button type="submit" variant="contained" disabled={isSubmitting}>
-          {isSubmitting ? 'Saving...' : 'Add Reminder'}
+          {isSubmitting ? 'Saving...' : text.add} {text.REM}
         </Button>
         <Button variant="outlined" onClick={onCancel} disabled={isSubmitting}>
-          Cancel
+        {text.CANCEL}
         </Button>
       </Box>
     </Box>

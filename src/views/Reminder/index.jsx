@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card,Box, Grid, Typography,IconButton,Modal } from '@mui/material';
+import { Card, Box, Grid, Typography, IconButton, Modal } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FuelReminderForm from './addReminder.jsx';
@@ -8,6 +8,7 @@ import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
 import CustomToolbar from 'common/customToolbar';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
+import { text } from 'common/constant.jsx';
 
 const FuelReminderIndex = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -31,27 +32,27 @@ const FuelReminderIndex = () => {
       }));
       setRows(formattedData);
     } catch (error) {
-      toast.error('Failed to fetch data');
+      toast.error(text.ERROR_FETCHING);
     } finally {
       setLoading(false);
     }
   };
 
   const columns = [
-    { field: 'sNo', headerName: 'S.No', width: 80 },
-    { field: 'group', headerName: 'Vehicle', width: 250 },
+    { field: 'sNo', headerName: text.S_NO, width: 80 },
+    { field: 'group', headerName: text.VEHICLE, width: 250 },
     {
       field: 'reminderDate',
-      headerName: 'Date',
+      headerName: text.DATE,
       width: 150,
       renderCell: (params) => {
         return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
       }
     },
-    { field: 'message', headerName: 'Message', width: 400 },
+    { field: 'message', headerName: text.MESSAGE, width: 400 },
     {
       field: 'actions',
-      headerName: 'Action',
+      headerName: text.ACTION,
       width: 100,
       sortable: false,
       renderCell: (params) => (
@@ -75,18 +76,14 @@ const FuelReminderIndex = () => {
   };
 
   const handleDelete = async (id) => {
-    try {
-      await deleteApi(urls.reminder.delete.replace(':id', id));
-      toast.success('Reminder deleted successfully');
-      fetchData();
-    } catch (error) {
-      toast.error('Failed to reminder');
-    }
+    await deleteApi(urls.reminder.delete.replace(':id', id));
+    toast.success(text.REM_DELETED);
+    fetchData();
   };
 
   return (
     <>
-      <CustomBreadcrumbs title="Reminder Info" links={[{ name: 'Reminders', path: '/reminder' }]} />
+      <CustomBreadcrumbs title={text.REM_INFO} links={[{ name: text.REM, path: '/reminder' }]} />
 
       <Grid container spacing={2}>
         <Grid item xs={12}>
@@ -129,7 +126,7 @@ const FuelReminderIndex = () => {
           }}
         >
           <Typography variant="h4" sx={{ mb: 2 }}>
-            Add Reminder
+            {text.ADD_REM}
           </Typography>
           <FuelReminderForm onSave={handleClose} onCancel={handleClose} refreshData={refreshData} />
         </Box>

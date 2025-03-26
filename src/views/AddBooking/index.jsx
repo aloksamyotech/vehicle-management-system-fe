@@ -114,12 +114,12 @@ const DriverForm = () => {
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth>
                   <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                   {text.CUSTOMER}
+                    {text.CUSTOMER}
                   </FormLabel>
                   <Controller
                     name="customerId"
                     control={control}
-                    rules={{ required: text.CUSTOMER_REQUIRED }}
+                    rules={{ required: text.REQUIRED }}
                     render={({ field }) => (
                       <Select {...field} size="small" displayEmpty>
                         <MenuItem value="" disabled>
@@ -144,16 +144,16 @@ const DriverForm = () => {
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth>
                   <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                   {text.VEHICLE}
+                    {text.VEHICLE}
                   </FormLabel>
                   <Controller
                     name="vehicleId"
                     control={control}
-                    rules={{ required: text.VEHICLE_REQUIRED }}
+                    rules={{ required: text.REQUIRED }}
                     render={({ field }) => (
                       <Select {...field} size="small" displayEmpty>
                         <MenuItem value="" disabled>
-                        {text.SELECT_VEHICLE}
+                          {text.SELECT_VEHICLE}
                         </MenuItem>
                         {vehicles.map((group) => (
                           <MenuItem key={group.id} value={group.id}>
@@ -174,16 +174,16 @@ const DriverForm = () => {
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth>
                   <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                 {text.DRIVER}
+                    {text.DRIVER}
                   </FormLabel>
                   <Controller
                     name="driverId"
                     control={control}
-                    rules={{ required: 'Driver is required' }}
+                    rules={{ required: text.REQUIRED }}
                     render={({ field }) => (
                       <Select {...field} size="small" displayEmpty>
                         <MenuItem value="" disabled>
-                          Select Driver
+                          {text.SELECT_DRIVER}
                         </MenuItem>
                         {drivers.map((group) => (
                           <MenuItem key={group.id} value={group.id}>
@@ -224,52 +224,38 @@ const DriverForm = () => {
                 <Controller
                   name="tripStartLoc"
                   control={control}
-                  rules={{ required: text.START_LOC_REQUIRED }}
+                  rules={{ required: text.REQUIRED }}
                   render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      size="small"
-                      placeholder= {text.START_LOC}
-                      error={!!errors.tripStartLoc}
-                      helperText={errors.tripStartLoc?.message}
-                    />
+                    <TextField {...field} fullWidth size="small" error={!!errors.tripStartLoc} helperText={errors.tripStartLoc?.message} />
                   )}
                 />
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                 {text.TRIP_END_LOC}
+                  {text.TRIP_END_LOC}
                 </FormLabel>
                 <Controller
                   name="tripEndLoc"
                   control={control}
-                  rules={{ required: text.END_LOC_REQUIRED }}
+                  rules={{ required: text.REQUIRED }}
                   render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      size="small"
-                      placeholder={text.END_LOC}
-                      error={!!errors.tripEndLoc}
-                      helperText={errors.tripEndLoc?.message}
-                    />
+                    <TextField {...field} fullWidth size="small" error={!!errors.tripEndLoc} helperText={errors.tripEndLoc?.message} />
                   )}
                 />
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  Approx Total KM
+                  {text.TOTAL_KM}
                 </FormLabel>
                 <Controller
                   name="totalKm"
                   control={control}
                   rules={{
-                    required: 'Total KM is required',
-                    min: { value: 0.1, message: 'Must be greater than 0' },
-                    max: { value: 100000, message: 'Cannot exceed 100,000' }
+                    required: text.REQUIRED,
+                    min: { value: 0.1, message: text.GREATER_THAN_0 },
+                    max: { value: 100000, message: text.CANNOT_EXCEED }
                   }}
                   render={({ field }) => (
                     <TextField
@@ -292,12 +278,12 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  Trip Start Date
+                 {text.START_DATE}
                 </FormLabel>
                 <Controller
                   name="tripStartDate"
                   control={control}
-                  rules={{ required: 'Trip Start Date & Time is required' }}
+                  rules={{ required: text.REQUIRED }}
                   render={({ field }) => (
                     <TextField
                       {...field}
@@ -319,17 +305,17 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  Trip End Date
+                 {text.END_DATE}
                 </FormLabel>
                 <Controller
                   name="tripEndDate"
                   control={control}
                   rules={{
-                    required: 'Trip End Date & Time is required',
+                    required: text.REQUIRED,
                     validate: (value) => {
                       const startDate = new Date(getValues('tripStartDate'));
                       const endDate = new Date(value);
-                      return endDate >= startDate || 'End Date must be after Start Date';
+                      return endDate >= startDate || text.END_DATE_AFTER_START;
                     }
                   }}
                   render={({ field }) => (
@@ -349,15 +335,15 @@ const DriverForm = () => {
               </Grid>
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  Total Amount
+                {text.TOTAL_AMOUNT}
                 </FormLabel>
                 <Controller
                   name="totalAmt"
                   control={control}
                   rules={{
-                    required: 'Total KM is required',
-                    min: { value: 0.1, message: 'Must be greater than 0' },
-                    max: { value: 100000, message: 'Cannot exceed 100,000' }
+                    required: text.REQUIRED,
+                    min: { value: 0.1, message: text.GREATER_THAN_0 },
+                    max: { value: 100000, message: text.CANNOT_EXCEED }
                   }}
                   render={({ field }) => (
                     <TextField
@@ -380,16 +366,16 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth required>
-                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Trip Status</FormLabel>
+                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.STATUS}</FormLabel>
                   <Controller
                     name="tripStatus"
                     control={control}
                     render={({ field }) => (
                       <Select {...field} size="small">
-                        <MenuItem value="YetToStart">Yet to Start</MenuItem>
-                        <MenuItem value="Completed">Completed</MenuItem>
-                        <MenuItem value="Ongoing">Ongoing</MenuItem>
-                        <MenuItem value="Cancelled">Cancelled</MenuItem>
+                        <MenuItem value="YetToStart">{text.YET_TO_START}</MenuItem>
+                        <MenuItem value="Completed">{text.COMPLETED}</MenuItem>
+                        <MenuItem value="Ongoing">{text.ONGOING}</MenuItem>
+                        <MenuItem value="Cancelled">{text.CANCELLED}</MenuItem>
                       </Select>
                     )}
                   />
@@ -406,7 +392,7 @@ const DriverForm = () => {
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
               <Button variant="contained" color="primary" type="submit">
-                {id ? 'Update Booking' : 'Add Booking'}
+                {id ? text.UPDATE_BOOKING : text.ADD_BOOKING}
               </Button>
             </Box>
           </form>

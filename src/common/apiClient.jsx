@@ -74,7 +74,8 @@ export const deleteApi = async (url, headers = {}) => {
     const response = await axios.delete(url, { headers: defaultHeaders });
     return response.data;
   } catch (error) {
-    console.error('API Error:', error.response || error.message);
-    throw new Error(error.response ? error.response.data : error.message);
+    const errorMessage = error.response?.data?.message || 'Something went wrong!';
+    toast.error(errorMessage);
+    throw error;
   }
 };

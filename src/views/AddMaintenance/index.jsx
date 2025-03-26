@@ -22,6 +22,7 @@ import { urls } from 'common/urls';
 import { postApi, getApi } from 'common/apiClient';
 import toast from 'react-hot-toast';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
+import { text } from 'common/constant';
 
 const AddMaintenanceForm = () => {
   const navigate = useNavigate();
@@ -57,21 +58,13 @@ const AddMaintenanceForm = () => {
 
   useEffect(() => {
     const fetchVehicles = async () => {
-      try {
-        const response = await getApi(urls.vehicle.get);
-        setVehicles(response.data);
-      } catch (error) {
-        console.error('Error fetching vehicles:', error);
-      }
+      const response = await getApi(urls.vehicle.get);
+      setVehicles(response.data);
     };
 
     const fetchParts = async () => {
-      try {
-        const response = await getApi(urls.partsInventory.get);
-        setPartsList(response.data);
-      } catch (error) {
-        console.error('Error fetching parts:', error);
-      }
+      const response = await getApi(urls.partsInventory.get);
+      setPartsList(response.data);
     };
 
     fetchVehicles();
@@ -93,7 +86,7 @@ const AddMaintenanceForm = () => {
       .filter((part) => part !== null);
 
     if (formattedParts.length === 0) {
-      toast.error('Please select at least one valid part.');
+      toast.error(text.SELECT_ONE);
       return;
     }
 
@@ -103,7 +96,7 @@ const AddMaintenanceForm = () => {
     };
 
     let response = await postApi(urls.maintenance.create, finalData);
-    toast.success('Maintenance added successfully');
+    toast.success(text.MAINTENANCE_ADDED);
 
     reset();
     navigate('/maintenance');
@@ -114,10 +107,10 @@ const AddMaintenanceForm = () => {
   return (
     <>
       <CustomBreadcrumbs
-        title="Add Maintenance"
+        title={text.Add_MAINTENANCE}
         links={[
-          { name: 'Maintenance', path: '/maintenance' },
-          { name: 'Add Maintenance', path: '' }
+          { name: text.MAINTENANCE, path: '/maintenance' },
+          { name: text.Add_MAINTENANCE, path: '' }
         ]}
       />
 
@@ -128,16 +121,16 @@ const AddMaintenanceForm = () => {
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth>
                   <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                    Vehicle
+                    {text.VEHICLE}
                   </FormLabel>
                   <Controller
                     name="vehicleId"
                     control={control}
-                    rules={{ required: 'Vehicle is required' }}
+                    rules={{ required: text.REQUIRED }}
                     render={({ field }) => (
                       <Select {...field} size="small" displayEmpty>
                         <MenuItem value="" disabled>
-                          Select Vehicle
+                          {text.SELECT_VEHICLE}
                         </MenuItem>
                         {vehicles.map((group) => (
                           <MenuItem key={group.id} value={group.id}>
@@ -153,12 +146,12 @@ const AddMaintenanceForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  Maintenance Start Date
+                  {text.START_DATE}
                 </FormLabel>
                 <Controller
                   name="startDate"
                   control={control}
-                  rules={{ required: 'Start Date is required' }}
+                  rules={{ required: text.REQUIRED }}
                   render={({ field }) => (
                     <TextField
                       {...field}
@@ -180,17 +173,17 @@ const AddMaintenanceForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  Maintenance End Date
+                  {text.END_DATE}
                 </FormLabel>
                 <Controller
                   name="endDate"
                   control={control}
                   rules={{
-                    required: 'End Date is required',
+                    required: text.REQUIRED,
                     validate: (value) => {
                       const startDate = new Date(getValues('startDate'));
                       const endDate = new Date(value);
-                      return endDate >= startDate || 'End Date must be after Start Date';
+                      return endDate >= startDate || text.END_DATE_AFTER_START;
                     }
                   }}
                   render={({ field }) => (
@@ -211,15 +204,15 @@ const AddMaintenanceForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  Total Cost
+                {text.TOTAL_COST}
                 </FormLabel>
                 <Controller
                   name="totalCost"
                   control={control}
                   rules={{
-                    required: 'Cost is required',
-                    min: { value: 0.01, message: 'Cost must be greater than 0' },
-                    max: { value: 10000000, message: 'Cost cannot exceed 10,000,000' }
+                    required: text.REQUIRED,
+                    min: { value: 0.1, message: text.GREATER_THAN_0 },
+                    max: { value: 100000, message: text.CANNOT_EXCEED }
                   }}
                   render={({ field }) => (
                     <TextField
@@ -228,7 +221,7 @@ const AddMaintenanceForm = () => {
                       required
                       type="number"
                       size="small"
-                      inputProps={{ step: '0.01', min: 0.01, max: 10000000 }}
+                      inputProps={{ step: '0.01', min: 0.01, max: 100000 }}
                       onChange={(e) => field.onChange(parseFloat(e.target.value))}
                       error={!!errors.totalCost}
                       helperText={errors.totalCost?.message}
@@ -239,17 +232,17 @@ const AddMaintenanceForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  Vendor Name
+                {text.VENDOR_NAME}
                 </FormLabel>
                 <Controller
                   name="vendorName"
                   control={control}
                   rules={{
-                    required: 'Name is required',
-                    maxLength: { value: 30, message: 'Max 30 characters' },
+                    required: text.REQUIRED,
+                    maxLength: { value: 30, message: text.MAX_30_CHAR },
                     pattern: {
                       value: /^[A-Za-z\s]+$/,
-                      message: 'Only alphabets are allowed'
+                      message: text.ALPHABETS_ONLY
                     }
                   }}
                   render={({ field: { onChange, onBlur, value, ref } }) => (
@@ -278,22 +271,22 @@ const AddMaintenanceForm = () => {
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth required>
                   <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                    Maintenance Status
+                   {text.STATUS}
                   </FormLabel>
                   <Select {...register('status')} defaultValue="" size="small">
-                    <MenuItem value="Pending">Pending</MenuItem>
-                    <MenuItem value="In Progress">In Progress</MenuItem>
-                    <MenuItem value="Completed">Completed</MenuItem>
+                    <MenuItem value="Pending">{text.PENDING}</MenuItem>
+                    <MenuItem value="In Progress">{text.IN_PROGRESS}</MenuItem>
+                    <MenuItem value="Completed">{text.COMPLETED}</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Service Details</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.SERVICE_DETAILS}</FormLabel>
                 <Controller
                   name="details"
                   control={control}
-                  rules={{ maxLength: { value: 100, message: 'Max 100 characters' } }}
+                  rules={{ maxLength: { value: 100, message: text.MAX_100_CHAR } }}
                   render={({ field }) => (
                     <TextField fullWidth size="small" {...field} error={!!errors.details} helperText={errors.details?.message} />
                   )}
@@ -312,7 +305,7 @@ const AddMaintenanceForm = () => {
                           '&.Mui-focused': { color: 'black' }
                         }}
                       >
-                        Parts Name
+                      {text.PARTS}
                       </FormLabel>
 
                       <Controller
@@ -344,7 +337,7 @@ const AddMaintenanceForm = () => {
                           '&.Mui-focused': { color: 'black' }
                         }}
                       >
-                        Qty
+                      {text.QTY}
                       </FormLabel>
 
                       <Controller
@@ -380,7 +373,7 @@ const AddMaintenanceForm = () => {
             </Grid>
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
               <Button type="submit" variant="contained" color="primary">
-                Add Maintenance
+              {text.Add_MAINTENANCE}
               </Button>
             </Box>
           </form>

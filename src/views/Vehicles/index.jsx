@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Divider, Box, Grid, IconButton, Button } from '@mui/material';
-import { DataGrid} from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import { gridSpacing } from 'config.js';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
@@ -11,6 +11,7 @@ import { getApi, deleteApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import CustomToolbar from 'common/customToolbar';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
+import { text } from 'common/constant';
 
 const VehiclePage = () => {
   const navigate = useNavigate();
@@ -44,22 +45,22 @@ const VehiclePage = () => {
       }));
       setVehicles(formattedData);
     } catch (error) {
-      toast.error('Failed to fetch vehicles');
+      toast.error(text.ERROR_FETCHING);
     } finally {
       setLoading(false);
     }
   };
 
   const columns = [
-    { field: 'sNo', headerName: 'S.No', width: 80 },
-    { field: 'vehicleName', headerName: 'Vehicle Name', width: 150, editable: true },
-    { field: 'registrationNo', headerName: 'Registration Number', width: 180, editable: true },
-    { field: 'model', headerName: 'Model', width: 100, editable: true },
-    { field: 'chasisNo', headerName: 'Chassis No', width: 120, editable: true },
-    { field: 'group', headerName: 'Group', width: 150, editable: true },
+    { field: 'sNo', headerName: text.S_NO, width: 80 },
+    { field: 'vehicleName', headerName: text.VEHICLE_NAME, width: 150, editable: true },
+    { field: 'registrationNo', headerName: text.RES_NO, width: 180, editable: true },
+    { field: 'model', headerName: text.MODEL, width: 100, editable: true },
+    { field: 'chasisNo', headerName: text.CHASIS_NO, width: 150, editable: true },
+    { field: 'group', headerName: text.GROUP, width: 150, editable: true },
     {
       field: 'isActive',
-      headerName: 'Status',
+      headerName: text.STATUS,
       width: 100,
       renderCell: (params) => {
         return (
@@ -80,7 +81,7 @@ const VehiclePage = () => {
     },
     {
       field: 'actions',
-      headerName: 'Action',
+      headerName: text.ACTION,
       width: 150,
       sortable: false,
       renderCell: (params) => {
@@ -109,20 +110,14 @@ const VehiclePage = () => {
   ];
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this vehicle?')) {
-      try {
-        await deleteApi(urls.vehicle.delete.replace(':id', id));
-        toast.success('Vehicle deleted successfully');
-        fetchVehicles();
-      } catch (error) {
-        toast.error('Failed to delete vehicle');
-      }
-    }
+    await deleteApi(urls.vehicle.delete.replace(':id', id));
+    toast.success(text.VEHICLE_DELETED);
+    fetchVehicles();
   };
 
   return (
     <>
-      <CustomBreadcrumbs title="Vehicle Info" links={[{ name: 'Vehicle Management', path: '/vehicle' }]} />
+      <CustomBreadcrumbs title={text.VEHICLE_INFO} links={[{ name: text.VEHICLE_MNGT, path: '/vehicle' }]} />
 
       <Grid container spacing={gridSpacing}>
         <Grid item xs={12}>

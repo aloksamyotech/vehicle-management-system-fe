@@ -4,6 +4,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { urls } from 'common/urls';
 import { postApi, updateApiPatch } from 'common/apiClient';
 import toast from 'react-hot-toast';
+import { text } from 'common/constant';
 
 const AddVehicleGroupModal = ({ open, handleClose, refreshData, editItem }) => {
   const {
@@ -38,10 +39,10 @@ const AddVehicleGroupModal = ({ open, handleClose, refreshData, editItem }) => {
   const onSubmit = async (data) => {
     if (editItem?.id) {
       await updateApiPatch(urls.vehicleGroup.update.replace(':id', editItem.id), data);
-      toast.success('Vehicle group updated!');
+      toast.success(text.GROUP_UPDATED);
     } else {
       await postApi(urls.vehicleGroup.create, data);
-      toast.success('Vehicle group added!');
+      toast.success(text.GROUP_ADDED);
     }
 
     handleClose();
@@ -64,22 +65,22 @@ const AddVehicleGroupModal = ({ open, handleClose, refreshData, editItem }) => {
         }}
       >
         <Typography variant="h5" mb={2}>
-          {editItem ? 'Edit' : 'Add'} Vehicle Group
+          {editItem ? text.edit : text.add} {text.vehicleGroup}
         </Typography>
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Name</FormLabel>
+              <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>{text.NAME}</FormLabel>
               <Controller
                 name="name"
                 control={control}
                 rules={{
-                  required: 'Name is required',
-                  maxLength: { value: 30, message: 'Max 30 characters' },
+                  required: text.REQUIRED,
+                  maxLength: { value: 30, message: text.MAX_30_CHAR},
                   pattern: {
                     value: /^[A-Za-z\s]+$/,
-                    message: 'Only alphabets are allowed'
+                    message: text.ALPHABETS_ONLY
                   }
                 }}
                 render={({ field: { onChange, onBlur, value, ref } }) => (
@@ -106,15 +107,15 @@ const AddVehicleGroupModal = ({ open, handleClose, refreshData, editItem }) => {
             </Grid>
 
             <Grid item xs={12}>
-              <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Description</FormLabel>
+              <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.DESCRIPTION}</FormLabel>
               <Controller
                 name="description"
                 control={control}
                 rules={{
                   validate: (value) => {
-                    if (!value.trim()) return 'Description is required';
+                    if (!value.trim()) return text.REQUIRED;
                     const wordCount = value.trim().split(/\s+/).length;
-                    return wordCount <= 100 || 'Description must be at most 100 words';
+                    return wordCount <= 100 || text.MAX_100_CHAR;
                   }
                 }}
                 render={({ field }) => (
@@ -143,7 +144,7 @@ const AddVehicleGroupModal = ({ open, handleClose, refreshData, editItem }) => {
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
             <Button type="submit" variant="contained" color="primary" disabled={isSubmitting}>
-              {isSubmitting ? 'Processing...' : editItem?.id ? 'Update Group' : 'Add Group'}
+              {isSubmitting ? 'Processing...' : editItem?.id ? text.update : text.add} {text.vehicleGroup}
             </Button>
             <Button variant="outlined" onClick={handleClose} disabled={isSubmitting}>
               Cancel

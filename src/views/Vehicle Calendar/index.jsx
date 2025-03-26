@@ -7,6 +7,7 @@ import { Box, Card } from '@mui/material';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
+import { text } from 'common/constant';
 
 const VehicleAvailability = () => {
   const [events, setEvents] = useState([]);
@@ -39,7 +40,7 @@ const VehicleAvailability = () => {
 
         setEvents([...bookingEvents, ...maintenanceEvents]);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error(text.ERROR_FETCHING, error);
       }
     };
 
@@ -48,7 +49,7 @@ const VehicleAvailability = () => {
 
   return (
     <>
-     <CustomBreadcrumbs title=" Vehicle Calendar" links={[{ name: 'Vehicle Calendar', path: '/vehicleavailability' }]} />
+     <CustomBreadcrumbs title={text.CALENDAR} links={[{ name: text.CALENDAR, path: '/vehicleavailability' }]} />
     
       <Card style={{ height: 'auto', marginTop: '20px' }}>
         <Box sx={{ padding: '10px 10px' }}>
