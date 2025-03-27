@@ -1,5 +1,6 @@
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { text } from './constant';
 
 export const postApi = async (url, data, headers = {}) => {
   try {
@@ -11,7 +12,7 @@ export const postApi = async (url, data, headers = {}) => {
     const response = await axios.post(url, data, { headers: defaultHeaders });
     return response.data;
   } catch (error) {
-    const errorMessage = error.response?.data?.message || 'Something went wrong!';
+    const errorMessage = error.response?.data?.message || text.ERROR;
     toast.error(errorMessage);
     throw error;
   }
@@ -29,7 +30,7 @@ export const getApi = async (url, params = {}, headers = {}) => {
     });
     return response.data;
   } catch (error) {
-    const errorMessage = error.response?.data?.message || 'Something went wrong!';
+    const errorMessage = error.response?.data?.message || text.ERROR;
     toast.error(errorMessage);
     throw error;
   }
@@ -61,7 +62,7 @@ export const updateApiPatch = async (url, data, headers = {}) => {
     return response.data;
   } catch (error) {
     console.error('API Error:', error.response?.data || error.message);
-    throw new Error(error.response?.data?.message || 'Something went wrong');
+    throw new Error(error.response?.data?.message || text.ERROR);
   }
 };
 
@@ -74,7 +75,7 @@ export const deleteApi = async (url, headers = {}) => {
     const response = await axios.delete(url, { headers: defaultHeaders });
     return response.data;
   } catch (error) {
-    const errorMessage = error.response?.data?.message || 'Something went wrong!';
+    const errorMessage = error.response?.data?.message || text.ERROR;
     toast.error(errorMessage);
     throw error;
   }

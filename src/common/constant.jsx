@@ -191,6 +191,7 @@ export const text = {
   ERROR_UPDATING: 'Error updating data',
   INVALID_FORMAT: 'Invalid data format',
   REQUIRED: 'Field is required',
+  ERROR :'Something went wrong!',
 
   //MIN & MAX
   END_DATE_AFTER_START: 'End Date must be after Start Date',
