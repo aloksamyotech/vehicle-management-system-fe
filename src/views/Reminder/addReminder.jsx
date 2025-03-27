@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Grid, Button, TextField, Box, FormLabel, FormControl, Select, MenuItem, Typography } from '@mui/material';
+import { Grid, Button, TextField, Box, FormLabel, FormControl, Select, MenuItem, Typography, Autocomplete } from '@mui/material';
 import toast from 'react-hot-toast';
 import { postApi, getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
@@ -53,19 +53,23 @@ const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
               control={control}
               rules={{ required: text.REQUIRED }}
               render={({ field }) => (
-                <Select {...field} size="small" displayEmpty>
-                  <MenuItem value="" disabled>
-                    {text.SELECT_VEHICLE}
-                  </MenuItem>
-                  {vehicles.map((group) => (
-                    <MenuItem key={group.id} value={group.id}>
-                      {group.vehicleName}
-                    </MenuItem>
-                  ))}
-                </Select>
+                <Autocomplete
+                  options={vehicles}
+                  getOptionLabel={(option) => option.vehicleName || ''}
+                  isOptionEqualToValue={(option, value) => option.id === value}
+                  onChange={(_, newValue) => field.onChange(newValue?.id || '')}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      size="small"
+                      placeholder={text.SELECT_VEHICLE}
+                      error={!!errors.vehicleId}
+                      helperText={errors.vehicleId?.message}
+                    />
+                  )}
+                />
               )}
             />
-            {errors.vehicleId && <Typography color="error" sx={{ fontSize: '11px', mt: 0.5, ml: 2 }}>{errors.vehicleId.message}</Typography>}
           </FormControl>
         </Grid>
 
@@ -122,7 +126,7 @@ const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
           {isSubmitting ? 'Saving...' : text.add} {text.REM}
         </Button>
         <Button variant="outlined" onClick={onCancel} disabled={isSubmitting}>
-        {text.CANCEL}
+          {text.CANCEL}
         </Button>
       </Box>
     </Box>

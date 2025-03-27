@@ -48,8 +48,27 @@ export const text = {
   TOTAL_KM: 'Approx Total KM',
   START_DATE: 'Start Date',
   END_DATE: 'End Date',
+  OVERVIEW: 'Overview',
   TOTAL_AMOUNT: 'Total Amount',
+  PAID_AMOUNT: 'Paid Amount',
+  PAID_ON: 'Paid On',
+  PAYEMNT_ACTIVITY: ' Payment Activity',
+  ADD_PAYMENT: ' Add Payment',
+  ADD_TRIP_EXPENSE: 'Add Trip Expense',
+  ADD_EXPENSE: 'Add Expense',
+  TRACKING_URL: ' Tracking URL',
+  TRIP_EXPENSE: 'Trip Expense',
+  SAVE_PAYMENT: 'Save Payment',
+  MAKE_PAYMENT: 'Make Payment',
+  GENERATE_INVOICE: ' Generate Invoice',
+  SHARE_TO_CUSTOMER: 'Share to Customer',
+  EXCESS: 'Excess',
   stock: 'Stock',
+  CREATED_DATE: 'Created Date',
+  MODIFIED_DATE: 'Modified Date',
+  GEOFENCE: 'Geofence',
+  NOTIFICATIONS: 'Notifications',
+  BASIC_INFO: 'Basic Info',
 
   //Bookings
   BOOKINGS: 'Bookings',
@@ -59,6 +78,7 @@ export const text = {
   EDIT_BOOKING: 'Edit Booking',
   ADD_BOOKING: 'Add Booking',
   UPDATE_BOOKING: 'Update Booking',
+  BOOKING_DETAILS: 'Booking Details',
 
   //Customer
   CUSTOMER: 'Customer',
@@ -112,6 +132,7 @@ export const text = {
   ADD_VEHICLE: 'Add Vehicle',
   VEHICLE_NAME: ' Vehicle Name',
   VEHICLE_INFO: 'Vehicle Info',
+  VEHICLE_DETAILS: 'Vehicle Details',
   VEHICLE_MNGT: 'Vehicle Management',
   ALL_VEHICLE: 'All Vehicles',
   VEHICLE_TYPE: ' Vehicle Type',
@@ -187,11 +208,12 @@ export const text = {
 
   //Errors & Validation
   NO_DATA_FOUND: 'No data found',
+  NO_DATE_AVAILABLE: 'No data available',
   ERROR_FETCHING: 'Error fetching data',
   ERROR_UPDATING: 'Error updating data',
   INVALID_FORMAT: 'Invalid data format',
   REQUIRED: 'Field is required',
-  ERROR :'Something went wrong!',
+  ERROR: 'Something went wrong!',
 
   //MIN & MAX
   END_DATE_AFTER_START: 'End Date must be after Start Date',

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Card,
   Tabs,
@@ -8,8 +8,6 @@ import {
   Box,
   Grid,
   Typography,
-  Breadcrumbs,
-  Link as MuiLink,
   Button,
   Table,
   TableBody,
@@ -20,58 +18,131 @@ import {
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { text } from 'common/constant';
+import { getApi } from 'common/apiClient';
+import { urls } from 'common/urls';
+import CustomBreadcrumbs from 'common/customBreadcrumbs';
 
 const ViewVehiclePage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [vehicles, setVehicles] = useState({});
   const [tabIndex, setTabIndex] = useState(0);
+
+  const fetchVehicles = async () => {
+    const response = await getApi(urls.vehicle.getById.replace(':id', id));
+    setVehicles(response?.data);
+  };
+
+  useEffect(() => {
+    if (id) {
+      fetchVehicles();
+    }
+  }, [id]);
 
   const handleTabChange = (event, newIndex) => {
     setTabIndex(newIndex);
   };
 
   const vehicleData = [
-    { label: 'Registration No', value: 'KDH 678T' },
-    { label: 'Name', value: '33 SEATER MATATU ISUZU' },
-    { label: 'Model', value: 'FRR36' },
-    { label: 'Chassis No.', value: '234567777' },
-    { label: 'Engine No.', value: '57689404' },
-    { label: 'Manufactured By', value: 'GENERAL MOTORS' },
-    { label: 'Type', value: 'BUS' },
-    { label: 'Mileage/Litre', value: '0' },
-    { label: 'API URL', value: 'https://codeforts.com/vms/api' },
-    { label: 'GPS API Username', value: 'KDH 678T' },
-    { label: 'GPS API Password', value: '278561' },
-    { label: 'Created Date', value: '2025-03-06 06:21:22' },
-    { label: 'Modified Date', value: '2025-03-06 18:23:35' },
-    { label: 'Document', value: '-' }
+    { label: text.RES_NO, value: vehicles.registrationNo },
+    { label: text.NAME, value: vehicles.vehicleName },
+    { label: text.MODEL, value: vehicles.model },
+    { label: text.CHASIS_NO, value: vehicles.chasisNo },
+    { label: text.ENGINE_NO, value: vehicles.engineNo },
+    { label: text.MANUFACTURED_BY, value: vehicles.manufacturedBy },
+    { label: text.VEHICLE_TYPE, value: vehicles.vehicleType },
+    { label: text.GPS_API, value: 'https://codeforts.com/vms/api' },
+    { label: text.API_USERNAME, value: 'KDH 678T' },
+    { label: text.API_PASS, value: '278561' },
+    { label: text.CREATED_DATE, value: vehicles.createdAt },
+    { label: text.MODIFIED_DATE, value: vehicles.updatedAt },
+    { label: text.DOCUMENT, value: vehicles.doc }
   ];
 
   const bookingColumns = [
-    { field: 'id', headerName: '#', width: 50 },
-    { field: 'driver', headerName: 'Driver', width: 150 },
-    { field: 'customer', headerName: 'Customer', width: 150 },
-    { field: 'fromTo', headerName: 'From & To', width: 200 },
-    { field: 'bookingValue', headerName: 'Booking Value', width: 150 },
-    { field: 'tripStatus', headerName: 'Trip Status', width: 150 },
+    { field: 'sNo', headerName: '#', width: 50 },
+    { field: 'driver', headerName: text.DRIVER, width: 120 },
+    { field: 'customer', headerName: text.CUSTOMER, width: 120 },
+    {
+      field: 'fromTo',
+      headerName: text.FROM_TO,
+      width: 200,
+      renderCell: (params) => (
+        <Box>
+          <Typography>{params.row?.tripStartLoc}</Typography>
+
+          <Typography>{text.TO}</Typography>
+
+          <Typography>{params.row?.tripEndLoc}</Typography>
+        </Box>
+      )
+    },
+    { field: 'totalAmt', headerName: text.AMOUNT, width: 150 },
+    {
+      field: 'tripStatus',
+      headerName: text.STATUS,
+      width: 100,
+      renderCell: (params) => {
+        const status = params.row?.tripStatus;
+        const statusColors = {
+          Cancelled: '#dc3545',
+          Ongoing: '#17a2b8',
+          Completed: '#30aa4c',
+          YetToStart: '#ffc107'
+        };
+        return (
+          <Button
+            variant="contained"
+            style={{
+              backgroundColor: statusColors[status] || '#6c757d',
+              color: status === 'YetToStart' ? '#000' : 'white',
+              fontWeight: 700,
+              fontSize: '10px',
+              width: 'auto',
+              padding: '0'
+            }}
+          >
+            {status === 'YetToStart' ? 'Yet to start' : status}
+          </Button>
+        );
+      }
+    },
     {
       field: 'action',
-      headerName: 'Action',
-      width: 150,
-      renderCell: () => (
-        <Button variant="contained" color="primary" size="small">
-          View
-        </Button>
-      )
+      headerName: text.ACTION,
+      width: 100,
+      renderCell: (params) => {
+        return (
+          <>
+            <IconButton color="primary" onClick={() => navigate(`/view-booking/${params.row.id}`)}>
+              <VisibilityIcon />
+            </IconButton>
+          </>
+        );
+      }
     }
   ];
-  const bookingRows = [];
+
+  const bookingRows =
+    vehicles?.bookings?.map((booking, index) => ({
+      sNo: index + 1,
+      id: booking?.id,
+      driver: booking?.driver?.name || 'N/A',
+      customer: booking?.customer?.name || 'N/A',
+      tripStartLoc: booking?.tripStartLoc || 'N/A',
+      tripEndLoc: booking?.tripEndLoc || 'N/A',
+      totalAmt: booking?.totalAmt || 'N/A',
+      tripStatus: booking?.tripStatus || 'N/A'
+    })) || [];
 
   const geofenceColumns = [
     { field: 'id', headerName: '#', width: 50 },
-    { field: 'name', headerName: 'Name', width: 150 },
-    { field: 'description', headerName: 'Description', width: 250 },
+    { field: 'name', headerName: text.NAME, width: 150 },
+    { field: 'description', headerName: text.DESCRIPTION, width: 250 },
     {
       field: 'action',
-      headerName: 'Action',
+      headerName: text.ACTION,
       width: 100,
       renderCell: () => (
         <IconButton color="primary">
@@ -90,45 +161,69 @@ const ViewVehiclePage = () => {
 
   const incomeExpenseColumns = [
     { field: 'id', headerName: '#', width: 50 },
-    { field: 'date', headerName: 'Date', width: 150 },
-    { field: 'description', headerName: 'Description', width: 200 },
-    { field: 'amount', headerName: 'Amount', width: 100 },
-    { field: 'type', headerName: 'Type', width: 150 },
+    {
+      field: 'date',
+      headerName: text.DATE,
+      width: 150,
+      renderCell: (params) => {
+        return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
+      }
+    },
+    { field: 'description', headerName: text.DESCRIPTION, width: 200 },
+    { field: 'amount', headerName: text.AMOUNT, width: 100 },
+    {
+      field: 'type',
+      headerName: text.TYPE,
+      width: 120,
+      renderCell: (params) => {
+        const isActive = params.row?.type === 'Expense';
+        return (
+          <Button
+            variant="contained"
+            style={{
+              backgroundColor: isActive ? '#30aa4c' : '#dc3545',
+              color: 'white',
+              fontWeight: 700,
+              width: 'auto',
+              fontSize: '10px',
+              padding: 0
+            }}
+          >
+            {params.row.type}
+          </Button>
+        );
+      }
+    },
     {
       field: 'action',
-      headerName: 'Action',
+      headerName: text.ACTION,
       width: 100,
       renderCell: () => (
-        <Button variant="contained" color="primary" size="small">
-          View
-        </Button>
+        <IconButton color="primary" sx={{ py: 2 }} onClick={() => navigate('/finance')}>
+          <VisibilityIcon />
+        </IconButton>
       )
     }
   ];
 
-  const incomeExpenseRows = [];
+  const incomeExpenseRows =
+    vehicles?.incomeExpense?.map((income, index) => ({
+      id: index + 1,
+      date: income?.date || 'N/A',
+      description: income?.description || 'N/A',
+      amount: income?.amount || 'N/A',
+      type: income?.type || 'N/A'
+    })) || [];
 
   return (
     <Box>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          mb: 2
-        }}
-      >
-        <Typography variant="h3">Vehicle Details</Typography>
-        <Breadcrumbs separator="/" aria-label="breadcrumb">
-          <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
-            <Typography color="#17a2b8">Dashboard</Typography>
-          </MuiLink>
-          <MuiLink component={Link} to="/vehicles" color="inherit" underline="none">
-            <Typography color="#17a2b8">Vehicles</Typography>
-          </MuiLink>
-          <Typography color="text.primary">Vehicle Details</Typography>
-        </Breadcrumbs>
-      </Box>
+      <CustomBreadcrumbs
+        title={text.VEHICLE_DETAILS}
+        links={[
+          { name: text.VEHICLE, path: '/vehicles' },
+          { name: text.VEHICLE_DETAILS, path: '' }
+        ]}
+      />
 
       <Grid container spacing={2}>
         <Grid item xs={3}>
@@ -142,23 +237,23 @@ const ViewVehiclePage = () => {
               borderTop: '3px solid #007bff'
             }}
           >
-            <Typography sx={{ fontWeight: 'bold', fontSize: '18px' }}> 33 SEATER MATATU ISUZU</Typography>
-            <Typography>BUS</Typography>
+            <Typography sx={{ fontWeight: 'bold', fontSize: '18px' }}>{vehicles?.vehicleName || 'N/A'}</Typography>
+            <Typography>{vehicles?.vehicleType?.toUpperCase()}</Typography>
             <Button
               variant="contained"
               size="small"
               sx={{
-                backgroundColor: '#28a745',
+                backgroundColor: vehicles.isActive ? '#28a745' : '#dc3545',
                 color: 'white',
                 fontWeight: 'bold',
                 fontSize: '10px',
                 padding: '2px 8px',
                 minWidth: 'auto',
                 mt: 1,
-                '&:hover': { backgroundColor: '#28a745' }
+                '&:hover': { backgroundColor: vehicles.isActive ? '#28a745' : '#dc3545' }
               }}
             >
-              Active
+              {vehicles.isActive ? 'Active' : 'Inactive'}
             </Button>
 
             <Divider sx={{ my: 2, width: '100%' }} />
@@ -166,7 +261,7 @@ const ViewVehiclePage = () => {
             <Box sx={{ width: '100%' }}>
               <Grid container spacing={1}>
                 <Grid item xs={6}>
-                  <Typography sx={{ fontWeight: 'bold', textAlign: 'left' }}>Bookings:</Typography>
+                  <Typography sx={{ fontWeight: 'bold', textAlign: 'left' }}>{text.BOOKINGS}:</Typography>
                 </Grid>
                 <Grid item xs={6}>
                   <Typography sx={{ textAlign: 'right' }}>0</Typography>
@@ -177,7 +272,7 @@ const ViewVehiclePage = () => {
                 </Grid>
 
                 <Grid item xs={6}>
-                  <Typography sx={{ fontWeight: 'bold', textAlign: 'left' }}>Geofence:</Typography>
+                  <Typography sx={{ fontWeight: 'bold', textAlign: 'left' }}>{text.GEOFENCE}:</Typography>
                 </Grid>
                 <Grid item xs={6}>
                   <Typography sx={{ textAlign: 'right' }}>4</Typography>
@@ -188,7 +283,7 @@ const ViewVehiclePage = () => {
                 </Grid>
 
                 <Grid item xs={6}>
-                  <Typography sx={{ fontWeight: 'bold', textAlign: 'left' }}>Notifications:</Typography>
+                  <Typography sx={{ fontWeight: 'bold', textAlign: 'left' }}>{text.NOTIFICATIONS}:</Typography>
                 </Grid>
                 <Grid item xs={6}>
                   <Typography sx={{ textAlign: 'right' }}>0</Typography>
@@ -200,11 +295,55 @@ const ViewVehiclePage = () => {
 
         <Grid item xs={9}>
           <Card sx={{ p: 2 }}>
-            <Tabs value={tabIndex} onChange={handleTabChange} textColor="primary" indicatorColor="primary">
-              <Tab label="Basic Info" />
-              <Tab label="Bookings" />
-              <Tab label="Geofence" />
-              <Tab label="Income & Expense" />
+            <Tabs
+              value={tabIndex}
+              onChange={handleTabChange}
+              sx={{
+                backgroundColor: '#ffff',
+                borderRadius: '8px',
+                '& .MuiTabs-indicator': {
+                  backgroundColor: 'transparent'
+                }
+              }}
+            >
+              <Tab
+                label={text.BASIC_INFO}
+                sx={{
+                  backgroundColor: tabIndex === 0 ? '#1482d7' : 'transparent',
+                  color: tabIndex === 0 ? '#fff !important' : '#000',
+                  borderRadius: '8px',
+                  fontWeight: tabIndex === 0 ? 'bold' : 'normal'
+                }}
+              />
+              <Tab
+                label={text.BOOKINGS}
+                sx={{
+                  backgroundColor: tabIndex === 1 ? '#1482d7' : 'transparent',
+                  color: tabIndex === 1 ? '#fff !important' : '#000',
+                  borderRadius: '8px',
+                  fontWeight: tabIndex === 1 ? 'bold' : 'normal'
+                }}
+              />
+
+              <Tab
+                label={text.GEOFENCE}
+                sx={{
+                  backgroundColor: tabIndex === 2 ? '#1482d7' : 'transparent',
+                  color: tabIndex === 2 ? '#fff !important' : '#000',
+                  borderRadius: '8px',
+                  fontWeight: tabIndex === 2 ? 'bold' : 'normal'
+                }}
+              />
+
+              <Tab
+                label={text.incomeExpense}
+                sx={{
+                  backgroundColor: tabIndex === 3 ? '#1482d7' : 'transparent',
+                  color: tabIndex === 3 ? '#fff !important' : '#000',
+                  borderRadius: '8px',
+                  fontWeight: tabIndex === 3 ? 'bold' : 'normal'
+                }}
+              />
             </Tabs>
 
             <Divider sx={{ my: 2 }} />
@@ -238,39 +377,43 @@ const ViewVehiclePage = () => {
                     </TableBody>
                   </Table>
                 </TableContainer>
-
-                <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-start' }}>
-                  <Button variant="contained" sx={{ background: '#28a745' }}>
-                    Edit Info
-                  </Button>
-                </Box>
               </>
             )}
 
             {tabIndex === 1 && (
               <>
-                <Box sx={{ height: 400, width: '100%' }}>
-                  <DataGrid
-                    columns={bookingColumns}
-                    rows={bookingRows}
-                    pageSize={5}
-                    autoHeight
-                    disableSelectionOnClick
-                    localeText={{ noRowsLabel: 'No data available in table' }}
-                    sx={{
-                      '.MuiDataGrid-columnHeaderTitle': {
-                        fontWeight: 'bold',
-                        fontSize: '14px'
-                      }
-                    }}
-                  />
-                </Box>
+                {bookingRows.length > 0 ? (
+                  <Box sx={{ height: 'auto', width: '100%' }}>
+                    <DataGrid
+                      columns={bookingColumns}
+                      rows={bookingRows || []}
+                      getRowHeight={() => 75}
+                      initialState={{
+                        pagination: {
+                          paginationModel: {
+                            pageSize: 5
+                          }
+                        }
+                      }}
+                      pageSizeOptions={[5]}
+                      disableSelectionOnClick
+                      sx={{
+                        '.MuiDataGrid-columnHeaderTitle': {
+                          fontWeight: 'bold',
+                          fontSize: '14px'
+                        }
+                      }}
+                    />
+                  </Box>
+                ) : (
+                  <Typography>{text.NO_DATE_AVAILABLE}</Typography>
+                )}
               </>
             )}
 
             {tabIndex === 2 && (
               <>
-                <Box sx={{ height: 400, width: '100%' }}>
+                <Box sx={{ height: 'auto', width: '100%' }}>
                   <DataGrid
                     columns={geofenceColumns}
                     rows={geofenceRows}
@@ -291,22 +434,32 @@ const ViewVehiclePage = () => {
 
             {tabIndex === 3 && (
               <>
-                <Box sx={{ height: 400, width: '100%' }}>
-                  <DataGrid
-                    columns={incomeExpenseColumns}
-                    rows={incomeExpenseRows}
-                    pageSize={5}
-                    autoHeight
-                    disableSelectionOnClick
-                    localeText={{ noRowsLabel: 'No data available in table' }}
-                    sx={{
-                      '.MuiDataGrid-columnHeaderTitle': {
-                        fontWeight: 'bold',
-                        fontSize: '14px'
-                      }
-                    }}
-                  />
-                </Box>
+                {incomeExpenseRows.length > 0 ? (
+                  <Box sx={{ height: 'auto', width: '100%' }}>
+                    <DataGrid
+                      columns={incomeExpenseColumns}
+                      rows={incomeExpenseRows}
+                      disableSelectionOnClick
+                      sx={{
+                        '.MuiDataGrid-columnHeaderTitle': {
+                          fontWeight: 'bold',
+                          fontSize: '14px'
+                        }
+                      }}
+                      getRowHeight={() => 75}
+                      initialState={{
+                        pagination: {
+                          paginationModel: {
+                            pageSize: 5
+                          }
+                        }
+                      }}
+                      pageSizeOptions={[5]}
+                    />
+                  </Box>
+                ) : (
+                  <Typography>{text.NO_DATE_AVAILABLE}</Typography>
+                )}
               </>
             )}
           </Card>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Grid, Button, TextField, Box, FormLabel, FormControl, Select, MenuItem, Typography } from '@mui/material';
+import { Grid, Button, TextField, Box, FormLabel, FormControl, Select, MenuItem, Typography, Autocomplete } from '@mui/material';
 import toast from 'react-hot-toast';
 import { postApi, getApi, updateApiPatch } from 'common/apiClient';
 import { urls } from 'common/urls';
@@ -55,6 +55,7 @@ const IncomeExpenseForm = ({ initialData, onSave, refreshData, onCancel }) => {
       toast.success(text.INC_EXP_UPDATED);
     } else {
       response = await postApi(urls.incomeExpense.create, financeData);
+      console.log(response);
       toast.success(text.INC_EXP_ADDED);
     }
 
@@ -76,23 +77,24 @@ const IncomeExpenseForm = ({ initialData, onSave, refreshData, onCancel }) => {
               control={control}
               rules={{ required: text.REQUIRED }}
               render={({ field }) => (
-                <Select {...field} size="small" displayEmpty>
-                  <MenuItem value="" disabled>
-                    {text.SELECT_VEHICLE}
-                  </MenuItem>
-                  {vehicles.map((group) => (
-                    <MenuItem key={group.id} value={group.id}>
-                      {group.vehicleName}
-                    </MenuItem>
-                  ))}
-                </Select>
+                <Autocomplete
+                  options={vehicles}
+                  getOptionLabel={(option) => option.vehicleName || ''}
+                  isOptionEqualToValue={(option, value) => option.id === value}
+                  value={vehicles.find((v) => v.id === field.value) || null}
+                  onChange={(_, newValue) => field.onChange(newValue?.id || '')}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      size="small"
+                      placeholder={text.SELECT_VEHICLE}
+                      error={!!errors.vehicleId}
+                      helperText={errors.vehicleId?.message}
+                    />
+                  )}
+                />
               )}
             />
-            {errors.vehicleId && (
-              <Typography color="error" sx={{ fontSize: '11px', mt: 0.5 }}>
-                {errors.vehicleId.message}
-              </Typography>
-            )}
           </FormControl>
         </Grid>
 

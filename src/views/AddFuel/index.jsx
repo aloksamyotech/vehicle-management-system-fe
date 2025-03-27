@@ -5,6 +5,7 @@ import {
   Button,
   TextField,
   Box,
+  Autocomplete,
   Checkbox,
   FormLabel,
   FormControlLabel,
@@ -34,13 +35,13 @@ const FuelExpenseForm = () => {
 
   useEffect(() => {
     const fetchVehicles = async () => {
-        const response = await getApi(urls.vehicle.get);
-        setVehicles(response.data);
+      const response = await getApi(urls.vehicle.get);
+      setVehicles(response.data);
     };
 
     const fetchDriver = async () => {
-        const response = await getApi(urls.driver.get);
-        setDrivers(response.data);
+      const response = await getApi(urls.driver.get);
+      setDrivers(response.data);
     };
 
     fetchVehicles();
@@ -99,7 +100,7 @@ const FuelExpenseForm = () => {
         title={id ? text.EDIT_FUEL : text.ADD_FUEL}
         links={[
           { name: text.FUEL, path: '/fuel' },
-          { name: id ? text.EDIT_FUEL  : text.ADD_FUEL , path: '' }
+          { name: id ? text.EDIT_FUEL : text.ADD_FUEL, path: '' }
         ]}
       />
 
@@ -117,23 +118,24 @@ const FuelExpenseForm = () => {
                     control={control}
                     rules={{ required: text.REQUIRED }}
                     render={({ field }) => (
-                      <Select {...field} size="small" displayEmpty>
-                        <MenuItem value="" disabled>
-                          {text.SELECT_VEHICLE}
-                        </MenuItem>
-                        {vehicles.map((group) => (
-                          <MenuItem key={group.id} value={group.id}>
-                            {group.vehicleName}
-                          </MenuItem>
-                        ))}
-                      </Select>
+                      <Autocomplete
+                        options={vehicles}
+                        getOptionLabel={(option) => option.vehicleName || ''}
+                        isOptionEqualToValue={(option, value) => option.id === value}
+                        onChange={(_, newValue) => field.onChange(newValue?.id || '')}
+                        value={vehicles.find((v) => v.id === field.value) || null}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            size="small"
+                            placeholder={text.SELECT_VEHICLE}
+                            error={!!errors.vehicleId}
+                            helperText={errors.vehicleId?.message}
+                          />
+                        )}
+                      />
                     )}
                   />
-                  {errors.vehicleId && (
-                    <Typography color="error" sx={{ fontSize: '11px', mt: 0.5, ml: 2 }}>
-                      {errors.vehicleId.message}
-                    </Typography>
-                  )}
                 </FormControl>
               </Grid>
 
@@ -142,28 +144,30 @@ const FuelExpenseForm = () => {
                   <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
                     {text.DRIVER}
                   </FormLabel>
+
                   <Controller
                     name="driverId"
                     control={control}
                     rules={{ required: text.REQUIRED }}
                     render={({ field }) => (
-                      <Select {...field} size="small" displayEmpty>
-                        <MenuItem value="" disabled>
-                          {text.SELECT_DRIVER}
-                        </MenuItem>
-                        {drivers.map((group) => (
-                          <MenuItem key={group.id} value={group.id}>
-                            {group.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
+                      <Autocomplete
+                        options={drivers}
+                        getOptionLabel={(option) => option.name || ''}
+                        isOptionEqualToValue={(option, value) => option.id === value}
+                        onChange={(_, newValue) => field.onChange(newValue?.id || '')}
+                        value={drivers.find((v) => v.id === field.value) || null}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            size="small"
+                            placeholder={text.SELECT_DRIVER}
+                            error={!!errors.driverId}
+                            helperText={errors.driverId?.message}
+                          />
+                        )}
+                      />
                     )}
                   />
-                  {errors.driverId && (
-                    <Typography color="error" sx={{ fontSize: '11px', mt: 0.5, ml: 2 }}>
-                      {errors.driverId.message}
-                    </Typography>
-                  )}
                 </FormControl>
               </Grid>
 
@@ -311,7 +315,7 @@ const FuelExpenseForm = () => {
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
               <Button variant="contained" color="primary" type="submit">
-                {id ? text.UPDATE_FUEL: text.ADD_FUEL}
+                {id ? text.UPDATE_FUEL : text.ADD_FUEL}
               </Button>
             </Box>
           </form>
