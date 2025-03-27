@@ -9,6 +9,7 @@ import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
 import CustomToolbar from 'common/customToolbar';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
+import { text } from 'common/constant.jsx';
 
 const FinanceIndex = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -35,28 +36,28 @@ const FinanceIndex = () => {
       }));
       setRows(formattedData);
     } catch (error) {
-      toast.error('Failed to fetch data');
+      toast.error(text.ERROR_FETCHING);
     } finally {
       setLoading(false);
     }
   };
 
   const columns = [
-    { field: 'sNo', headerName: 'S.No', width: 80 },
-    { field: 'vehicle', headerName: 'Vehicle', width: 150 },
+    { field: 'sNo', headerName: text.S_NO, width: 80 },
+    { field: 'vehicle', headerName: text.VEHICLE, width: 150 },
     {
       field: 'date',
-      headerName: 'Date',
+      headerName: text.DATE,
       width: 150,
       renderCell: (params) => {
         return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
       }
     },
-    { field: 'description', headerName: 'Description', width: 300 },
-    { field: 'amount', headerName: 'Amount', width: 120 },
+    { field: 'description', headerName: text.DESCRIPTION, width: 300 },
+    { field: 'amount', headerName: text.AMOUNT, width: 120 },
     {
       field: 'type',
-      headerName: 'Type',
+      headerName: text.TYPE,
       width: 120,
       renderCell: (params) => {
         const isActive = params.row.type === 'Expense';
@@ -79,7 +80,7 @@ const FinanceIndex = () => {
     },
     {
       field: 'actions',
-      headerName: 'Action',
+      headerName: text.ACTION,
       width: 150,
       sortable: false,
       renderCell: (params) => (
@@ -118,18 +119,14 @@ const FinanceIndex = () => {
   };
 
   const handleDelete = async (id) => {
-    try {
       await deleteApi(urls.incomeExpense.delete.replace(':id', id));
-      toast.success('Income expense deleted successfully');
+      toast.success(text.INC_EXP_DELETED);
       fetchData();
-    } catch (error) {
-      toast.error('Failed to income expense');
-    }
   };
 
   return (
     <>
-      <CustomBreadcrumbs title="Income & Expense" links={[{ name: 'Income & Expense', path: '/finance' }]} />
+      <CustomBreadcrumbs title={text.incomeExpense} links={[{ name: text.incomeExpense, path: '/finance' }]} />
 
       <Grid container spacing={2}>
         <Grid item xs={12}>
@@ -182,7 +179,7 @@ const FinanceIndex = () => {
           }}
         >
           <Typography variant="h4" sx={{ mb: 2 }}>
-            {editData?.id ? 'Edit' : 'Add'} Income Expense
+            {editData?.id ? text.edit : text.add} {text.incomeExpense}
           </Typography>
           <IncomeExpenseForm initialData={editData} onSave={handleClose} onCancel={handleClose} refreshData={refreshData} />
         </Box>

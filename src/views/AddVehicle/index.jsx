@@ -7,21 +7,20 @@ import {
   MenuItem,
   Select,
   FormControl,
-  FormHelperText,
   Box,
   FormLabel,
   Typography,
   Divider,
-  Breadcrumbs,
-  Link as MuiLink,
   Card,
   CardContent
 } from '@mui/material';
-import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { gridSpacing } from 'config.js';
 import { urls } from 'common/urls';
 import { postApi, getApi, updateApiPatch } from 'common/apiClient';
 import toast from 'react-hot-toast';
+import CustomBreadcrumbs from 'common/customBreadcrumbs';
+import { text } from 'common/constant';
 
 const VehicleForm = () => {
   const { id } = useParams();
@@ -33,12 +32,8 @@ const VehicleForm = () => {
 
   useEffect(() => {
     const fetchVehicleGroups = async () => {
-      try {
-        const response = await getApi(urls.vehicleGroup.get);
-        setVehicleGroups(response.data);
-      } catch (error) {
-        console.error('Error fetching vehicle groups:', error);
-      }
+      const response = await getApi(urls.vehicleGroup.get);
+      setVehicleGroups(response.data);
     };
 
     fetchVehicleGroups();
@@ -87,10 +82,10 @@ const VehicleForm = () => {
     let response;
     if (id) {
       response = await updateApiPatch(urls.vehicle.update.replace(':id', id), filteredData);
-      toast.success('Vehicle updated successfully');
+      toast.success(text.VEHICLE_UPDATED);
     } else {
       response = await postApi(urls.vehicle.create, filteredData);
-      toast.success('Vehicle added successfully');
+      toast.success(text.VEHICLE_ADDED);
     }
 
     reset();
@@ -99,44 +94,32 @@ const VehicleForm = () => {
 
   return (
     <>
-      <Box 
-       sx={{
-        backgroundColor: '#ffff',
-        padding: '10px',
-        borderRadius: '8px',
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-      }}>
-        <Typography variant="h4">{id ? 'Edit Vehicle' : 'Add Vehicle'}</Typography>
-        <Breadcrumbs separator="/" aria-label="breadcrumb">
-          <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
-            <Typography color="#17a2b8">Dashboard</Typography>
-          </MuiLink>
-          <MuiLink component={Link} to="/vehicles" color="inherit" underline="none">
-            <Typography color="#17a2b8">Vehicles</Typography>
-          </MuiLink>
-          <Typography color="text.primary">{id ? 'Edit Vehicle' : 'Add Vehicle'}</Typography>
-        </Breadcrumbs>
-      </Box>
+      <CustomBreadcrumbs
+        title={id ? text.EDIT_VEHICLE : text.ADD_VEHICLE}
+        links={[
+          { name: text.VEHICLE, path: '/vehicles' },
+          { name: id ? text.EDIT_VEHICLE : text.ADD_VEHICLE, path: '' }
+        ]}
+      />
 
       <Card sx={{ mt: 3, padding: 1 }}>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Grid container spacing={gridSpacing}>
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Registration Number</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  {text.RES_NO}
+                </FormLabel>
                 <Controller
                   name="registrationNo"
                   control={control}
                   rules={{
-                    required: 'Registration No. is required',
-                    minLength: { value: 6, message: 'At least 6 characters required' },
-                    maxLength: { value: 12, message: 'Cannot exceed 12 characters' },
+                    required: text.REQUIRED,
+                    minLength: { value: 6, message: text.MIN_6_CHAR },
+                    maxLength: { value: 12, message: text.MAX_12_CHAR },
                     pattern: {
                       value: /^[A-Za-z0-9]+$/,
-                      message: 'Only alphanumeric characters allowed (A-Z, 0-9)'
+                      message: text.ALPHA_NUM
                     }
                   }}
                   render={({ field }) => (
@@ -152,17 +135,19 @@ const VehicleForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Vehicle Name</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  {text.VEHICLE_NAME}
+                </FormLabel>
                 <Controller
                   name="vehicleName"
                   control={control}
                   rules={{
-                    required: 'Vehicle Name is required',
-                    minLength: { value: 3, message: 'At least 3 characters required' },
-                    maxLength: { value: 30, message: 'Max 30 characters required' },
+                    required: text.REQUIRED,
+                    minLength: { value: 3, message: text.MIN_3_CHAR },
+                    maxLength: { value: 30, message: text.MAX_30_CHAR },
                     pattern: {
                       value: /^[A-Za-z\s]+$/,
-                      message: 'Only alphabets are allowed (A-Z, a-z)'
+                      message: text.ALPHABETS_ONLY
                     }
                   }}
                   render={({ field }) => (
@@ -187,14 +172,16 @@ const VehicleForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Model</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  {text.MODEL}
+                </FormLabel>
                 <Controller
                   name="model"
                   control={control}
                   rules={{
-                    required: 'Model is required',
-                    minLength: { value: 4, message: 'At least 4 characters required' },
-                    maxLength: { value: 20, message: 'Cannot exceed 20 characters' },
+                    required: text.REQUIRED,
+                    minLength: { value: 4, message: text.MIN_4_CHAR },
+                    maxLength: { value: 20, message: text.MAX_20_CHAR },
                     pattern: {
                       value: /^(19[0-9]{2}|20[0-9]{2}|[A-Za-z0-9 ]+)$/,
                       message: 'Invalid model format (e.g., "2015" or "XUV500")'
@@ -207,17 +194,19 @@ const VehicleForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Chassis No</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  {text.CHASIS_NO}
+                </FormLabel>
                 <Controller
                   name="chasisNo"
                   control={control}
                   rules={{
-                    required: 'Chassis No. is required',
-                    minLength: { value: 5, message: 'At least 5 characters required' },
-                    maxLength: { value: 17, message: 'Cannot exceed 17 characters' },
+                    required: text.REQUIRED,
+                    minLength: { value: 5, message: text.MIN_5_CHAR },
+                    maxLength: { value: 17, message: text.MAX_17_CHAR },
                     pattern: {
                       value: /^[A-HJ-NPR-Z0-9]+$/,
-                      message: 'Only alphanumeric characters allowed (A-Z, 0-9)'
+                      message: text.ALPHA_NUM
                     }
                   }}
                   render={({ field }) => (
@@ -227,17 +216,19 @@ const VehicleForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Engine No</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  {text.ENGINE_NO}
+                </FormLabel>
                 <Controller
                   name="engineNo"
                   control={control}
                   rules={{
-                    required: 'Engine No. is required',
-                    minLength: { value: 6, message: 'At least 6 characters required' },
-                    maxLength: { value: 17, message: 'Cannot exceed 17 characters' },
+                    required: text.REQUIRED,
+                    minLength: { value: 6, message: text.MIN_6_CHAR },
+                    maxLength: { value: 17, message: text.MAX_17_CHAR },
                     pattern: {
                       value: /^[A-Za-z0-9]+$/,
-                      message: 'Only alphanumeric characters allowed (A-Z, 0-9)'
+                      message: text.ALPHA_NUM
                     }
                   }}
                   render={({ field }) => (
@@ -247,17 +238,19 @@ const VehicleForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Manufactured By</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  {text.MANUFACTURED_BY}
+                </FormLabel>
                 <Controller
                   name="manufacturedBy"
                   control={control}
                   rules={{
-                    required: 'Manufactured By is required',
-                    minLength: { value: 3, message: 'At least 3 characters required' },
-                    maxLength: { value: 50, message: 'Max 50 characters allowed' },
+                    required: text.REQUIRED,
+                    minLength: { value: 3, message: text.MIN_3_CHAR },
+                    maxLength: { value: 50, message: text.MAX_50_CHAR },
                     pattern: {
                       value: /^[A-Za-z\s]+$/,
-                      message: 'Only alphabets are allowed (A-Z, a-z)'
+                      message: text.ALPHABETS_ONLY
                     }
                   }}
                   render={({ field }) => (
@@ -274,22 +267,24 @@ const VehicleForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth>
-                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Vehicle Type</FormLabel>
+                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                    {text.VEHICLE_TYPE}
+                  </FormLabel>
                   <Controller
                     name="vehicleType"
                     control={control}
-                    rules={{ required: 'Vehicle Type is required' }}
+                    rules={{ required: text.REQUIRED }}
                     render={({ field }) => (
                       <Select {...field} size="small" displayEmpty>
                         <MenuItem value="" disabled>
-                          Select Vehicle Type
+                          {text.SELECT_VEHICLE_TYPE}
                         </MenuItem>{' '}
-                        <MenuItem value="car">CAR</MenuItem>
-                        <MenuItem value="bus">BUS</MenuItem>
-                        <MenuItem value="taxi">TAXI</MenuItem>
-                        <MenuItem value="motorcycle">MOTORCYCLE</MenuItem>
-                        <MenuItem value="truck">TRUCK</MenuItem>
-                        <MenuItem value="bicycle">BICYCLE</MenuItem>
+                        <MenuItem value="car">{text.CAR}</MenuItem>
+                        <MenuItem value="bus">{text.BUS}</MenuItem>
+                        <MenuItem value="taxi">{text.TAXI}</MenuItem>
+                        <MenuItem value="motorcycle">{text.MOTORCYCLE}</MenuItem>
+                        <MenuItem value="truck">{text.TRUCK}</MenuItem>
+                        <MenuItem value="bicycle">{text.BICYCLE}</MenuItem>
                       </Select>
                     )}
                   />
@@ -302,7 +297,7 @@ const VehicleForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Vehicle Color</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.COLOR}</FormLabel>
                 <Controller
                   name="vehicleColor"
                   control={control}
@@ -312,18 +307,20 @@ const VehicleForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Registration Expiry Date</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  {text.RES_EXP_DATE}
+                </FormLabel>
                 <Controller
                   name="registrationExpiry"
                   control={control}
                   rules={{
-                    required: 'Registration Expiry Date is required',
+                    required: text.REQUIRED,
                     validate: (value) => {
-                      if (!value) return 'Registration Expiry Date is required';
+                      if (!value) return text.REQUIRED;
                       const selectedDate = new Date(value);
                       const today = new Date();
                       today.setHours(0, 0, 0, 0);
-                      return selectedDate >= today || 'Expiry date must be in the future';
+                      return selectedDate >= today;
                     }
                   }}
                   render={({ field }) => (
@@ -352,17 +349,17 @@ const VehicleForm = () => {
                       fontSize: '14px'
                     }}
                   >
-                    Vehicle Group
+                    {text.VEHICLE_GROUP}
                   </FormLabel>
 
                   <Controller
                     name="vehicleGroupId"
                     control={control}
-                    rules={{ required: 'Vehicle group is required' }}
+                    rules={{ required: text.REQUIRED }}
                     render={({ field }) => (
                       <Select {...field} size="small" displayEmpty>
                         <MenuItem value="" disabled>
-                          Select Vehicle Group
+                          {text.SELECT_GROUP}
                         </MenuItem>
                         {vehicleGroups.map((group) => (
                           <MenuItem key={group.id} value={group.id}>
@@ -382,7 +379,7 @@ const VehicleForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Vehicle Image</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.PHOTO}</FormLabel>
                 <Controller
                   name="image"
                   control={control}
@@ -399,7 +396,7 @@ const VehicleForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Vehicle Document</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.DOCUMENT}</FormLabel>
                 <Controller
                   name="doc"
                   control={control}
@@ -422,29 +419,29 @@ const VehicleForm = () => {
             <Grid container spacing={gridSpacing}>
               <Grid item xs={12}>
                 <Typography variant="h6" gutterBottom>
-                  GPS API Details(Feed GPS Data)
+                  {text.GPS_DETAILS}
                 </Typography>
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>GPS API URL</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.GPS_API}</FormLabel>
                 <TextField fullWidth size="small" {...register('gpsApiUrl')} />
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>API Username</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.API_USERNAME}</FormLabel>
                 <TextField fullWidth size="small" {...register('apiUsername')} />
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>API Password</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.API_PASS}</FormLabel>
                 <TextField fullWidth type="password" size="small" {...register('apiPassword')} />
               </Grid>
             </Grid>
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
               <Button variant="contained" color="primary" type="submit">
-                {id ? 'Update Vehicle' : 'Add Vehicle'}
+                {id ? text.update : text.add} {text.VEHICLE}
               </Button>
             </Box>
           </form>

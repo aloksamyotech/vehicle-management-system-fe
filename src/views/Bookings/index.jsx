@@ -12,6 +12,7 @@ import { gridSpacing } from 'config';
 import dayjs from 'dayjs';
 import CustomToolbar from 'common/customToolbar';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
+import {text} from "common/constant";
 
 const BookingPage = () => {
   const navigate = useNavigate();
@@ -52,12 +53,12 @@ const BookingPage = () => {
   }, []);
 
   const columns = [
-    { field: 'sNo', headerName: 'S.No', width: 80 },
-    { field: 'customer', headerName: 'Customer', width: 150 },
-    { field: 'vehicle', headerName: 'Vehicle', width: 150, editable: true },
+    { field: 'sNo', headerName: text.S_NO, width: 80 },
+    { field: 'customer', headerName: text.CUSTOMER, width: 150 },
+    { field: 'vehicle', headerName: text.VEHICLE, width: 150, editable: true },
     {
       field: 'tripDates',
-      headerName: 'Date',
+      headerName: text.DATE,
       width: 200,
       renderCell: (params) => (
         <Box>
@@ -67,12 +68,12 @@ const BookingPage = () => {
         </Box>
       )
     },
-    { field: 'tripType', headerName: 'Type', width: 120 },
-    { field: 'driver', headerName: 'Driver', width: 150 },
+    { field: 'tripType', headerName: text.TYPE, width: 120 },
+    { field: 'driver', headerName: text.DRIVER, width: 150 },
     {
       field: 'tripStatus',
-      headerName: 'Trip Status',
-      width: 120,
+      headerName: text.STATUS,
+      width: 100,
       renderCell: (params) => {
         const status = params.row.tripStatus;
         const statusColors = {
@@ -101,7 +102,7 @@ const BookingPage = () => {
     },
     {
       field: 'actions',
-      headerName: 'Action',
+      headerName: text.ACTION,
       width: 150,
       sortable: false,
       renderCell: (params) => {
@@ -129,18 +130,14 @@ const BookingPage = () => {
   ];
 
   const handleDelete = async (id) => {
-    try {
       await deleteApi(urls.booking.delete.replace(':id', id));
-      toast.success('Booking deleted successfully');
+      toast.success(text.BOOKING_DELETED);
       fetchData();
-    } catch (error) {
-      toast.error('Booking to delete fuel');
-    }
   };
 
   return (
     <>
-     <CustomBreadcrumbs title="Bookings" links={[{ name: 'Bookings', path: '/booking' }]} />
+     <CustomBreadcrumbs title={text.BOOKINGS} links={[{ name: text.BOOKINGS, path: '/booking' }]} />
 
       <Grid container spacing={gridSpacing}>
         <Grid item xs={12}>

@@ -10,6 +10,7 @@ import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
 import CustomToolbar from 'common/customToolbar';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
+import { text } from 'common/constant.jsx';
 
 const CustomerManagementPage = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -31,21 +32,21 @@ const CustomerManagementPage = () => {
       }));
       setRows(modifiedRows);
     } catch (error) {
-      toast.error('Failed to fetch data');
+      toast.error(text.ERROR_FETCHING);
     } finally {
       setLoading(false);
     }
   };
 
   const columns = [
-    { field: 'sno', headerName: 'S.No', width: 80 },
-    { field: 'name', headerName: 'Name', width: 150 },
-    { field: 'mobileNo', headerName: 'Mobile', width: 150 },
-    { field: 'email', headerName: 'Email', width: 200 },
-    { field: 'address', headerName: 'Address', width: 200 },
+    { field: 'sno', headerName: text.S_NO, width: 80 },
+    { field: 'name', headerName: text.NAME, width: 150 },
+    { field: 'mobileNo', headerName: text.PHONE, width: 150 },
+    { field: 'email', headerName: text.EMAIL, width: 200 },
+    { field: 'address', headerName: text.ADDRESS, width: 200 },
     {
       field: 'status',
-      headerName: 'Status',
+      headerName: text.STATUS,
       width: 100,
       renderCell: (params) => (
         <Button
@@ -65,7 +66,7 @@ const CustomerManagementPage = () => {
     },
     {
       field: 'actions',
-      headerName: 'Action',
+      headerName: text.ACTION,
       width: 100,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -96,18 +97,14 @@ const CustomerManagementPage = () => {
   };
 
   const handleDelete = async (id) => {
-    try {
       await deleteApi(urls.customer.delete.replace(':id', id));
-      toast.success('Customer deleted successfully');
+      toast.success(text.CUSTOMER_DELETED);
       fetchData();
-    } catch (error) {
-      toast.error('Failed to customer');
-    }
   };
 
   return (
     <>
-       <CustomBreadcrumbs title="Customer Info" links={[{ name: 'Customer Management', path: '/customer' }]} />
+       <CustomBreadcrumbs title={text.CUSTOMER_INFO} links={[{ name: text.CUSTOMER_MGNT, path: '/customer' }]} />
 
       <Grid container spacing={gridSpacing}>
         <Grid item xs={12}>
@@ -165,7 +162,7 @@ const CustomerManagementPage = () => {
           }}
         >
           <Typography variant="h4" sx={{ mb: 2 }}>
-            {editCustomer?.id ? 'Edit Customer' : 'Add Customer'}
+            {editCustomer?.id ? text.edit : text.add} {text.CUSTOMER}
           </Typography>
           <AddCustomerForm initialData={editCustomer} onSave={handleClose} onCancel={handleClose} refreshData={refreshData} />
         </Box>

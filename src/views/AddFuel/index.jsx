@@ -7,22 +7,21 @@ import {
   Box,
   Checkbox,
   FormLabel,
-  Breadcrumbs,
   FormControlLabel,
-  FormHelperText,
   MenuItem,
-  Link as MuiLink,
   Card,
   CardContent,
   Typography,
   Select,
   FormControl
 } from '@mui/material';
-import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { gridSpacing } from 'config.js';
 import { urls } from 'common/urls';
 import { postApi, getApi, updateApiPatch } from 'common/apiClient';
 import toast from 'react-hot-toast';
+import CustomBreadcrumbs from 'common/customBreadcrumbs';
+import { text } from 'common/constant';
 
 const FuelExpenseForm = () => {
   const { id } = useParams();
@@ -35,26 +34,16 @@ const FuelExpenseForm = () => {
 
   useEffect(() => {
     const fetchVehicles = async () => {
-      try {
         const response = await getApi(urls.vehicle.get);
         setVehicles(response.data);
-      } catch (error) {
-        console.error('Error fetching vehicles:', error);
-      }
+    };
+
+    const fetchDriver = async () => {
+        const response = await getApi(urls.driver.get);
+        setDrivers(response.data);
     };
 
     fetchVehicles();
-  }, []);
-
-  useEffect(() => {
-    const fetchDriver = async () => {
-      try {
-        const response = await getApi(urls.driver.get);
-        setDrivers(response.data);
-      } catch (error) {
-        console.error('Error fetching drivers:', error);
-      }
-    };
 
     fetchDriver();
   }, []);
@@ -85,7 +74,6 @@ const FuelExpenseForm = () => {
 
   useEffect(() => {
     if (initialData) {
-      console.log(initialData);
       Object.keys(initialData).forEach((key) => setValue(key, initialData[key]));
     }
   }, [initialData, setValue]);
@@ -95,10 +83,10 @@ const FuelExpenseForm = () => {
     let response;
     if (id) {
       response = await updateApiPatch(urls.fuel.update.replace(':id', id), filteredData);
-      toast.success('Fuel updated successfully');
+      toast.success(text.FUEL_UPDATED);
     } else {
       response = await postApi(urls.fuel.create, filteredData);
-      toast.success('Fuel added successfully');
+      toast.success(text.FUEL_ADDED);
     }
 
     reset();
@@ -107,29 +95,13 @@ const FuelExpenseForm = () => {
 
   return (
     <>
-      <Box 
-       sx={{
-        backgroundColor: '#ffff',
-        padding: '10px',
-        borderRadius: '8px',
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-      }}>
-        <Typography variant="h4" sx={{ m: 0 }}>
-          {id ? 'Edit Fuel' : 'Add Fuel'}
-        </Typography>
-        <Breadcrumbs separator="/" aria-label="breadcrumb">
-          <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
-            <Typography color="#17a2b8">Dashboard</Typography>
-          </MuiLink>
-          <MuiLink component={Link} to="/fuel" color="inherit" underline="none">
-            <Typography color="#17a2b8">Fuel</Typography>
-          </MuiLink>
-          <Typography color="text.primary">{id ? 'Edit Fuel' : 'Add Fuel'}</Typography>
-        </Breadcrumbs>
-      </Box>
+      <CustomBreadcrumbs
+        title={id ? text.EDIT_FUEL : text.ADD_FUEL}
+        links={[
+          { name: text.FUEL, path: '/fuel' },
+          { name: id ? text.EDIT_FUEL  : text.ADD_FUEL , path: '' }
+        ]}
+      />
 
       <Card sx={{ maxWidth: 'auto', mt: 3, padding: 1 }}>
         <CardContent>
@@ -138,16 +110,16 @@ const FuelExpenseForm = () => {
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth>
                   <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                    Vehicle
+                    {text.VEHICLE}
                   </FormLabel>
                   <Controller
                     name="vehicleId"
                     control={control}
-                    rules={{ required: 'Vehicle is required' }}
+                    rules={{ required: text.REQUIRED }}
                     render={({ field }) => (
                       <Select {...field} size="small" displayEmpty>
                         <MenuItem value="" disabled>
-                          Select Vehicle
+                          {text.SELECT_VEHICLE}
                         </MenuItem>
                         {vehicles.map((group) => (
                           <MenuItem key={group.id} value={group.id}>
@@ -168,16 +140,16 @@ const FuelExpenseForm = () => {
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth>
                   <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                    Added Driver
+                    {text.DRIVER}
                   </FormLabel>
                   <Controller
                     name="driverId"
                     control={control}
-                    rules={{ required: 'Driver is required' }}
+                    rules={{ required: text.REQUIRED }}
                     render={({ field }) => (
                       <Select {...field} size="small" displayEmpty>
                         <MenuItem value="" disabled>
-                          Select Driver
+                          {text.SELECT_DRIVER}
                         </MenuItem>
                         {drivers.map((group) => (
                           <MenuItem key={group.id} value={group.id}>
@@ -197,12 +169,12 @@ const FuelExpenseForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  Fuel Fill Date
+                  {text.FILL_DATE}
                 </FormLabel>
                 <Controller
                   name="fillDate"
                   control={control}
-                  rules={{ required: 'Fuel Fill Date is required' }}
+                  rules={{ required: text.REQUIRED }}
                   render={({ field }) => (
                     <TextField
                       {...field}
@@ -220,15 +192,15 @@ const FuelExpenseForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  Quantity
+                  {text.QUANTITY}
                 </FormLabel>
                 <Controller
                   name="quantity"
                   control={control}
                   rules={{
-                    required: 'Quantity is required',
-                    min: { value: 0.1, message: 'Quantity must be greater than 0' },
-                    max: { value: 100000, message: 'Quantity cannot exceed 100,000' }
+                    required: text.REQUIRED,
+                    min: { value: 0.1, message: text.GREATER_THAN_0 },
+                    max: { value: 100000, message: text.CANNOT_EXCEED }
                   }}
                   render={({ field }) => (
                     <TextField
@@ -251,15 +223,15 @@ const FuelExpenseForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  Odometer Reading
+                  {text.ODOMETER_READING}
                 </FormLabel>
                 <Controller
                   name="odometerReading"
                   control={control}
                   rules={{
-                    required: 'Odometer reading is required',
-                    min: { value: 0, message: 'Odometer reading cannot be negative' },
-                    max: { value: 1000000, message: 'Odometer reading cannot exceed 1,000,000' }
+                    required: text.REQUIRED,
+                    min: { value: 0.1, message: text.GREATER_THAN_0 },
+                    max: { value: 100000, message: text.CANNOT_EXCEED }
                   }}
                   render={({ field }) => (
                     <TextField
@@ -268,7 +240,7 @@ const FuelExpenseForm = () => {
                       required
                       type="number"
                       size="small"
-                      inputProps={{ step: '1', min: 0, max: 1000000 }}
+                      inputProps={{ step: '1', min: 0, max: 100000 }}
                       onChange={(e) => field.onChange(Number(e.target.value))}
                     />
                   )}
@@ -282,15 +254,15 @@ const FuelExpenseForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  Amount
+                  {text.AMOUNT}
                 </FormLabel>
                 <Controller
                   name="amount"
                   control={control}
                   rules={{
-                    required: 'Amount is required',
-                    min: { value: 0.01, message: 'Amount must be greater than 0' },
-                    max: { value: 1000000, message: 'Amount cannot exceed 1,000,000' }
+                    required: text.REQUIRED,
+                    min: { value: 0.1, message: text.GREATER_THAN_0 },
+                    max: { value: 100000, message: text.CANNOT_EXCEED }
                   }}
                   render={({ field }) => (
                     <TextField
@@ -299,7 +271,7 @@ const FuelExpenseForm = () => {
                       required
                       type="number"
                       size="small"
-                      inputProps={{ step: '0.01', min: 0.01, max: 1000000 }}
+                      inputProps={{ step: '0.01', min: 0.01, max: 100000 }}
                       onChange={(e) => field.onChange(parseFloat(e.target.value))}
                     />
                   )}
@@ -312,11 +284,11 @@ const FuelExpenseForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Comments</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.COMMENTS}</FormLabel>
                 <Controller
                   name="comments"
                   control={control}
-                  rules={{ required: 'Comments is required' }}
+                  rules={{ required: text.REQUIRED }}
                   render={({ field }) => (
                     <TextField {...field} fullWidth size="small" error={!!errors.comments} helperText={errors.comments?.message} />
                   )}
@@ -339,7 +311,7 @@ const FuelExpenseForm = () => {
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
               <Button variant="contained" color="primary" type="submit">
-                {id ? 'Update Fuel' : 'Add Fuel'}
+                {id ? text.UPDATE_FUEL: text.ADD_FUEL}
               </Button>
             </Box>
           </form>

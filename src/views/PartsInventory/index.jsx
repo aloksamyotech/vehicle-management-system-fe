@@ -9,6 +9,7 @@ import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
 import CustomToolbar from 'common/customToolbar';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
+import { text } from 'common/constant';
 
 const PartsInventory = () => {
   const [rows, setRows] = useState([]);
@@ -30,20 +31,20 @@ const PartsInventory = () => {
       }));
       setRows(modifiedRows);
     } catch (error) {
-      toast.error('Failed to fetch data');
+      toast.error(text.ERROR_FETCHING);
     } finally {
       setLoading(false);
     }
   };
 
   const columns = [
-    { field: 'sno', headerName: 'S.No', width: 80 },
-    { field: 'name', headerName: 'Name', width: 200 },
-    { field: 'description', headerName: 'Description', width: 350 },
-    { field: 'stock', headerName: 'Stock', width: 120 },
+    { field: 'sno', headerName: text.S_NO, width: 80 },
+    { field: 'name', headerName: text.NAME, width: 200 },
+    { field: 'description', headerName: text.DESCRIPTION, width: 350 },
+    { field: 'stock', headerName: text.stock, width: 120 },
     {
       field: 'status',
-      headerName: 'Status',
+      headerName: text.STATUS,
       width: 100,
       renderCell: (params) => {
         const isActive = params.row.status === 'Active';
@@ -65,7 +66,7 @@ const PartsInventory = () => {
     },
     {
       field: 'actions',
-      headerName: 'Action',
+      headerName: text.ACTION,
       width: 100,
       sortable: false,
       renderCell: (params) => (
@@ -97,18 +98,14 @@ const PartsInventory = () => {
   };
 
   const handleDelete = async (id) => {
-    try {
-      await deleteApi(urls.partsInventory.delete.replace(':id', id));
-      toast.success('Parts inventory deleted successfully');
-      fetchData();
-    } catch (error) {
-      toast.error('Failed to parts inventory');
-    }
+    await deleteApi(urls.partsInventory.delete.replace(':id', id));
+    toast.success(text.PARTS_DELETED);
+    fetchData();
   };
 
   return (
     <>
-      <CustomBreadcrumbs title="Parts Inventory" links={[{ name: 'Parts Inventory', path: '/partsinventory' }]} />
+      <CustomBreadcrumbs title={text.PartsInventory} links={[{ name: text.PartsInventory, path: '/partsinventory' }]} />
 
       <Grid container spacing={2}>
         <Grid item xs={12}>
@@ -160,7 +157,7 @@ const PartsInventory = () => {
           }}
         >
           <Typography variant="h4" sx={{ mb: 2 }}>
-            {editData?.id ? 'Edit Part' : 'Add Part'}
+            {editData?.id ? text.edit : text.add} {text.parts}
           </Typography>
           <AddPartForm initialData={editData} onSave={handleClose} onCancel={handleClose} refreshData={refreshData} />
         </Box>

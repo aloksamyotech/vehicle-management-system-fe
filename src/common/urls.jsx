@@ -23,28 +23,28 @@ export const urls = Object.freeze({
     get: `${baseUrl}/customer/fetch`,
     getById: `${baseUrl}/customer/getById/:id`,
     update: `${baseUrl}/customer/update/:id`,
-    delete: `${baseUrl}/customer/delete/:id`,
+    delete: `${baseUrl}/customer/delete/:id`
   },
   driver: {
     create: `${baseUrl}/driver/save`,
     get: `${baseUrl}/driver/fetch`,
     getById: `${baseUrl}/driver/getById/:id`,
     update: `${baseUrl}/driver/update/:id`,
-    delete: `${baseUrl}/driver/delete/:id`,
+    delete: `${baseUrl}/driver/delete/:id`
   },
   partsInventory: {
     create: `${baseUrl}/parts/save`,
     get: `${baseUrl}/parts/fetch`,
     getById: `${baseUrl}/parts/getById/:id`,
     update: `${baseUrl}/parts/update/:id`,
-    delete: `${baseUrl}/parts/delete/:id`,
+    delete: `${baseUrl}/parts/delete/:id`
   },
   reminder: {
     create: `${baseUrl}/reminder/save`,
     get: `${baseUrl}/reminder/fetch`,
     getById: `${baseUrl}/reminder/getById/:id`,
     update: `${baseUrl}/reminder/update/:id`,
-    delete: `${baseUrl}/reminder/delete/:id`,
+    delete: `${baseUrl}/reminder/delete/:id`
   },
   fuel: {
     create: `${baseUrl}/fuel/save`,
@@ -52,6 +52,7 @@ export const urls = Object.freeze({
     getById: `${baseUrl}/fuel/getById/:id`,
     update: `${baseUrl}/fuel/update/:id`,
     delete: `${baseUrl}/fuel/delete/:id`,
+    report: `${baseUrl}/fuel/report`
   },
   incomeExpense: {
     create: `${baseUrl}/income-expense/save`,
@@ -59,13 +60,14 @@ export const urls = Object.freeze({
     getById: `${baseUrl}/income-expense/getById/:id`,
     update: `${baseUrl}/income-expense/update/:id`,
     delete: `${baseUrl}/income-expense/delete/:id`,
+    report: `${baseUrl}/income-expense/report`,
   },
   maintenance: {
     create: `${baseUrl}/maintenance/save`,
     get: `${baseUrl}/maintenance/fetch`,
     getById: `${baseUrl}/maintenance/getById/:id`,
     updateStatus: `${baseUrl}/maintenance/updateStatus/:id`,
-    delete: `${baseUrl}/maintenance/delete/:id`,
+    delete: `${baseUrl}/maintenance/delete/:id`
   },
   booking: {
     create: `${baseUrl}/booking/save`,
@@ -73,5 +75,7 @@ export const urls = Object.freeze({
     getById: `${baseUrl}/booking/getById/:id`,
     update: `${baseUrl}/booking/update/:id`,
     delete: `${baseUrl}/booking/delete/:id`,
-  },
+    report: `${baseUrl}/booking/report`,
+    driverReport: `${baseUrl}/booking/driver-report`
+  }
 });

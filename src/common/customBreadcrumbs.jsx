@@ -8,8 +8,8 @@ const CustomBreadcrumbs = ({ title, links = [] }) => {
     <Box
       sx={{
         backgroundColor: '#ffff',
-        padding: '10px',
-        marginBottom:'15px',
+        padding: '8px',
+        marginBottom: '15px',
         borderRadius: '8px',
         width: '100%',
         display: 'flex',
@@ -17,21 +17,24 @@ const CustomBreadcrumbs = ({ title, links = [] }) => {
         justifyContent: 'space-between'
       }}
     >
-      <Typography variant="h4" sx={{ fontWeight: 600 }}>
+      <Typography variant="h4" sx={{ fontWeight: 700 }}>
         {title}
       </Typography>
+
       <Breadcrumbs aria-label="breadcrumb" separator="/">
         <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
-          <HomeIcon sx={{ color: '#17a2b8', mt:'5px' }} />
+          <HomeIcon sx={{ color: '#17a2b8', fontSize: 24 , mt:'5px' }} />
         </MuiLink>
         {links.map((link, index) =>
           index === links.length - 1 ? (
-            <Typography key={index} color="text.primary">
+            <Typography key={index} color="text.primary" sx={{ fontSize: '16px', fontWeight: 600 }}>
               {link.name}
             </Typography>
           ) : (
             <MuiLink key={index} component={Link} to={link.path} color="inherit" underline="hover">
-              {link.name}
+              <Typography sx={{ fontSize: '16px', fontWeight: 500 }}>
+                {link.name}
+              </Typography>
             </MuiLink>
           )
         )}

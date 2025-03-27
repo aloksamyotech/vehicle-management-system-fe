@@ -10,6 +10,7 @@ import { getApi, deleteApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import CustomToolbar from 'common/customToolbar';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
+import { text } from 'common/constant';
 
 const DriverManagementPage = () => {
   const navigate = useNavigate();
@@ -41,53 +42,49 @@ const DriverManagementPage = () => {
       }));
       setDrivers(formattedData);
     } catch (error) {
-      toast.error('Failed to fetch drivers');
+      toast.error(text.ERROR_FETCHING);
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
-    try {
       await deleteApi(urls.driver.delete.replace(':id', id));
-      toast.success('Driver deleted successfully');
+      toast.success(text.DRIVER_DELETED);
       fetchDrivers();
-    } catch (error) {
-      toast.error('Failed to delete driver');
-    }
   };
 
   const columns = [
-    { field: 'sNo', headerName: 'S.No', width: 80 },
+    { field: 'sNo', headerName: text.S_NO, width: 80 },
     {
       field: 'image',
-      headerName: 'Photo',
+      headerName: text.PHOTO,
       width: 120,
       renderCell: (params) => <img src={params.row.image} alt="driver" style={{ width: 50, height: 50, borderRadius: '50%' }} />
     },
-    { field: 'name', headerName: 'Name', width: 150 },
-    { field: 'mobileNo', headerName: 'Mobile', width: 150 },
-    { field: 'licenseNo', headerName: 'License No', width: 150 },
+    { field: 'name', headerName: text.NAME, width: 150 },
+    { field: 'mobileNo', headerName: text.MOBILE, width: 150 },
+    { field: 'licenseNo', headerName: text.LICENSE_NO, width: 150 },
     {
       field: 'licenseExpiry',
-      headerName: 'License Exp Date',
-      width: 150,
+      headerName: text.LICENSE_EXP_DATE,
+      width: 180,
       renderCell: (params) => {
         return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
       }
     },
     {
       field: 'dateOfJoining',
-      headerName: 'Date of Joining',
+      headerName: text.DATE_OF_JOINING,
       width: 150,
       renderCell: (params) => {
         return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
       }
     },
-    { field: 'doc', headerName: 'Doc', width: 100 },
+    { field: 'doc', headerName: text.DOCUMENT, width: 100 },
     {
       field: 'status',
-      headerName: 'Status',
+      headerName: text.STATUS,
       width: 100,
       renderCell: (params) => {
         const isActive = params.row.status === 'Active';
@@ -109,7 +106,7 @@ const DriverManagementPage = () => {
     },
     {
       field: 'actions',
-      headerName: 'Action',
+      headerName: text.ACTION,
       width: 100,
       sortable: false,
       renderCell: (params) => (
@@ -132,7 +129,7 @@ const DriverManagementPage = () => {
 
   return (
     <>
-      <CustomBreadcrumbs title="Driver Info" links={[{ name: 'Driver Management', path: '/driver' }]} />
+      <CustomBreadcrumbs title={text.DRIVER_INFO} links={[{ name: text.DRIVER_MGNT, path: '/driver' }]} />
 
       <Grid container spacing={gridSpacing}>
         <Grid item xs={12}>

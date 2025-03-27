@@ -9,6 +9,7 @@ import { getApi, deleteApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import CustomToolbar from 'common/customToolbar';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
+import { text } from 'common/constant';
 
 const FuelRecords = () => {
   const navigate = useNavigate();
@@ -37,31 +38,31 @@ const FuelRecords = () => {
       }));
       setRows(formattedData);
     } catch (error) {
-      toast.error('Failed to fetch fuel data');
+      toast.error(text.ERROR_FETCHING);
     } finally {
       setLoading(false);
     }
   };
 
   const columns = [
-    { field: 'sNo', headerName: 'S.No', width: 80 },
+    { field: 'sNo', headerName: text.S_NO, width: 80 },
     {
       field: 'fillDate',
-      headerName: 'Fill Date',
+      headerName: text.FILL_DATE,
       width: 150,
       renderCell: (params) => {
         return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
       }
     },
-    { field: 'vehicle', headerName: 'Vehicle', width: 200 },
-    { field: 'quantity', headerName: 'Quantity', width: 120 },
-    { field: 'amount', headerName: 'Fuel Total Price', width: 150 },
-    { field: 'driver', headerName: 'Fuel Filled By', width: 150 },
-    { field: 'odometerReading', headerName: 'Odometer Reading', width: 150 },
-    { field: 'comments', headerName: 'Comments', width: 200 },
+    { field: 'vehicle', headerName: text.VEHICLE, width: 200 },
+    { field: 'quantity', headerName: text.QUANTITY, width: 120 },
+    { field: 'amount', headerName: text.TOTAL_AMOUNT, width: 150 },
+    { field: 'driver', headerName: text.FUEL_FILL_BY, width: 150 },
+    { field: 'odometerReading', headerName: text.ODOMETER_READING, width: 150 },
+    { field: 'comments', headerName: text.COMMENTS, width: 200 },
     {
       field: 'actions',
-      headerName: 'Action',
+      headerName: text.ACTION,
       width: 100,
       sortable: false,
       renderCell: (params) => {
@@ -86,18 +87,14 @@ const FuelRecords = () => {
   ];
 
   const handleDelete = async (id) => {
-    try {
       await deleteApi(urls.fuel.delete.replace(':id', id));
       toast.success('Fuel deleted successfully');
       fetchData();
-    } catch (error) {
-      toast.error('Failed to delete fuel');
-    }
   };
 
   return (
     <>
-      <CustomBreadcrumbs title="Fuel Management" links={[{ name: 'Fuel Management', path: '/fuel' }]} />
+      <CustomBreadcrumbs title={text.FUEL_MGNT} links={[{ name: text.FUEL_MGNT, path: '/fuel' }]} />
 
       <Grid container spacing={2}>
         <Grid item xs={12}>

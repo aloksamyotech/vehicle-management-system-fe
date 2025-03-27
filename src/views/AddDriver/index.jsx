@@ -1,25 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import {
-  Grid,
-  Button,
-  TextField,
-  FormControl,
-  Select,
-  MenuItem,
-  FormLabel,
-  Box,
-  Typography,
-  Breadcrumbs,
-  Link as MuiLink,
-  Card,
-  CardContent
-} from '@mui/material';
-import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
+import { Grid, Button, TextField, FormControl, Select, MenuItem, FormLabel, Box, Typography, Card, CardContent } from '@mui/material';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { gridSpacing } from 'config.js';
 import { urls } from 'common/urls';
 import { postApi, updateApiPatch } from 'common/apiClient';
 import toast from 'react-hot-toast';
+import CustomBreadcrumbs from 'common/customBreadcrumbs';
+import { text } from 'common/constant';
 
 const DriverForm = () => {
   const { id } = useParams();
@@ -65,10 +53,10 @@ const DriverForm = () => {
     let response;
     if (id) {
       response = await updateApiPatch(urls.driver.update.replace(':id', id), filteredData);
-      toast.success('Driver updated successfully');
+      toast.success(text.DRIVER_UPDATED);
     } else {
       response = await postApi(urls.driver.create, filteredData);
-      toast.success('Driver added successfully');
+      toast.success(text.DRIVER_ADDED);
     }
 
     reset();
@@ -77,27 +65,13 @@ const DriverForm = () => {
 
   return (
     <>
-      <Box 
-       sx={{
-        backgroundColor: '#ffff',
-        padding: '10px',
-        borderRadius: '8px',
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-      }}>
-        <Typography variant="h4">{id ? 'Edit Driver' : 'Add Driver'}</Typography>
-        <Breadcrumbs separator="/" aria-label="breadcrumb">
-          <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
-            <Typography color="#17a2b8">Dashboard</Typography>
-          </MuiLink>
-          <MuiLink component={Link} to="/drivers" color="inherit" underline="none">
-            <Typography color="#17a2b8">Driver</Typography>
-          </MuiLink>
-          <Typography color="text.primary">{id ? 'Edit Driver' : 'Add Driver'}</Typography>
-        </Breadcrumbs>
-      </Box>
+      <CustomBreadcrumbs
+        title={id ? text.EDIT_DRIVER : text.ADD_DRIVER}
+        links={[
+          { name: text.DRIVER, path: '/drivers' },
+          { name: id ? text.EDIT_DRIVER : text.ADD_DRIVER, path: '' }
+        ]}
+      />
 
       <Card sx={{ maxWidth: 'auto', mt: 3, padding: 1 }}>
         <CardContent>
@@ -105,18 +79,18 @@ const DriverForm = () => {
             <Grid container spacing={gridSpacing}>
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  Driver Name
+                {text.DRIVER_NAME}
                 </FormLabel>
                 <Controller
                   name="name"
                   control={control}
                   rules={{
-                    required: 'Driver Name is required',
-                    minLength: { value: 3, message: 'At least 3 characters required' },
-                    maxLength: { value: 50, message: 'Max 50 characters allowed' },
+                    required: text.REQUIRED,
+                    minLength: { value: 3, message: text.MIN_3_CHAR },
+                    maxLength: { value: 50, message: text.MAX_50_CHAR },
                     pattern: {
                       value: /^[A-Za-z\s]+$/,
-                      message: 'Only alphabets are allowed (A-Z, a-z)'
+                      message: text.ALPHABETS_ONLY
                     }
                   }}
                   render={({ field }) => (
@@ -142,18 +116,18 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  Mobile
+                  {text.MOBILE}
                 </FormLabel>
                 <Controller
                   name="mobileNo"
                   control={control}
                   rules={{
-                    required: 'Mobile is required',
-                    minLength: { value: 10, message: 'Must be at least 10 digits' },
-                    maxLength: { value: 12, message: 'Cannot exceed 12 digits' },
+                    required: text.REQUIRED,
+                    minLength: { value: 10, message: text.MIN_10_DIGIT },
+                    maxLength: { value: 12, message: text.MAX_12_DIGIT },
                     pattern: {
                       value: /^[0-9]+$/,
-                      message: 'Only numbers are allowed'
+                      message: text.NUMBERS_ONLY
                     }
                   }}
                   render={({ field }) => (
@@ -180,15 +154,15 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  Age
+                  {text.AGE}
                 </FormLabel>
                 <Controller
                   name="age"
                   control={control}
                   rules={{
-                    required: 'Age is required',
-                    min: { value: 18, message: 'Age must be at least 18' },
-                    max: { value: 50, message: 'Age must be below 50' }
+                    required: text.REQUIRED,
+                    min: { value: 18, message: text.MIN_18_AGE },
+                    max: { value: 50, message: text.MAX_50_AGE }
                   }}
                   render={({ field }) => (
                     <TextField
@@ -212,18 +186,18 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  License No
+              {text.LICENSE_NO}
                 </FormLabel>
                 <Controller
                   name="licenseNo"
                   control={control}
                   rules={{
-                    required: 'License No is required',
-                    minLength: { value: 6, message: 'At least 6 characters required' },
-                    maxLength: { value: 14, message: 'Cannot exceed 14 characters' },
+                    required: text.REQUIRED,
+                    minLength: { value: 6, message: text.MIN_6_CHAR },
+                    maxLength: { value: 14, message: text.MAX_14_CHAR },
                     pattern: {
                       value: /^[A-Za-z0-9]+$/,
-                      message: 'Only alphabets and numbers are allowed'
+                      message: text.ALPHA_NUM
                     }
                   }}
                   render={({ field }) => (
@@ -248,18 +222,20 @@ const DriverForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>License Expiry Date</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                {text.LICENSE_EXP_DATE}
+                </FormLabel>
                 <Controller
                   name="licenseExpiry"
                   control={control}
                   rules={{
-                    required: 'License Expiry Date is required',
+                    required: text.REQUIRED,
                     validate: (value) => {
-                      if (!value) return 'License Expiry Date is required';
+                      if (!value) return text.REQUIRED;
                       const selectedDate = new Date(value);
                       const today = new Date();
                       today.setHours(0, 0, 0, 0);
-                      return selectedDate >= today || 'Expiry date must be in the future';
+                      return selectedDate >= today;
                     }
                   }}
                   render={({ field }) => (
@@ -281,14 +257,16 @@ const DriverForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Total Experience</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                 {text.TOTAL_EXP}
+                </FormLabel>
                 <Controller
                   name="totalExp"
                   control={control}
                   rules={{
-                    required: 'Total Experience is required',
-                    min: { value: 1, message: 'At least 1 year exp is required' },
-                    max: { value: 40, message: 'Max 40 years exp is allowed' }
+                    required: text.REQUIRED,
+                    min: { value: 1, message: text.MIN_1_EXP },
+                    max: { value: 40, message: text.MAX_40_EXP }
                   }}
                   render={({ field }) => (
                     <TextField
@@ -304,8 +282,8 @@ const DriverForm = () => {
                       }}
                       onChange={(e) => {
                         let value = Number(e.target.value);
-                        if (value > 40) value = 40; 
-                        if (value < 1) value = 1; 
+                        if (value > 40) value = 40;
+                        if (value < 1) value = 1;
                         field.onChange(value);
                       }}
                     />
@@ -314,11 +292,13 @@ const DriverForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>Date of Joining</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                {text.DATE_OF_JOINING}
+                </FormLabel>
                 <Controller
                   name="dateOfJoining"
                   control={control}
-                  rules={{ required: 'Date of Joining is required' }}
+                  rules={{ required: text.REQUIRED }}
                   render={({ field }) => (
                     <TextField
                       {...field}
@@ -335,14 +315,14 @@ const DriverForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Reference/Notes</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.NOTES}</FormLabel>
                 <Controller
                   name="notes"
                   control={control}
                   rules={{
                     pattern: {
                       value: /^[A-Za-z\s]+$/,
-                      message: 'Only alphabets are allowed (A-Z, a-z)'
+                      message: text.ALPHABETS_ONLY
                     }
                   }}
                   render={({ field }) => (
@@ -368,15 +348,15 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  Address
+                  {text.ADDRESS}
                 </FormLabel>
                 <Controller
                   name="address"
                   control={control}
                   rules={{
-                    required: 'Address is required',
-                    minLength: { value: 5, message: 'Address must be at least 5 characters' },
-                    maxLength: { value: 100, message: 'Address cannot exceed 100 characters' }
+                    required: text.REQUIRED,
+                    minLength: { value: 3, message: text.MIN_3_CHAR },
+                    maxLength: { value: 100, message: text.MAX_100_CHAR}
                   }}
                   render={({ field }) => (
                     <TextField
@@ -394,16 +374,16 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth size="small">
-                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Driver Status</FormLabel>
+                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.STATUS}</FormLabel>
                   <Controller
                     name="status"
                     control={control}
                     defaultValue="Active"
-                    rules={{ required: 'Status is required' }}
+                    rules={{ required: text.REQUIRED }}
                     render={({ field }) => (
                       <Select {...field} error={!!errors.status}>
-                        <MenuItem value="Active">Active</MenuItem>
-                        <MenuItem value="Inactive">Inactive</MenuItem>
+                        <MenuItem value="Active">{text.ACTIVE}</MenuItem>
+                        <MenuItem value="Inactive">{text.INACTIVE}</MenuItem>
                       </Select>
                     )}
                   />
@@ -411,7 +391,7 @@ const DriverForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Driver Photo</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.PHOTO}</FormLabel>
                 <Controller
                   name="image"
                   control={control}
@@ -428,7 +408,7 @@ const DriverForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>Driver Document</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.DOCUMENT}</FormLabel>
                 <Controller
                   name="doc"
                   control={control}
@@ -448,7 +428,7 @@ const DriverForm = () => {
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
               <Button variant="contained" color="primary" type="submit">
-                {id ? 'Update Driver' : 'Add Driver'}
+                {id ? text.update : text.add} {text.DRIVER}
               </Button>
             </Box>
           </form>
