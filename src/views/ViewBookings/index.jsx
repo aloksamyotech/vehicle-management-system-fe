@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import {
   Box,
   Grid,
   Typography,
-  Breadcrumbs,
-  Link as MuiLink,
   Card,
   CardContent,
   Table,
@@ -20,108 +18,149 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField
+  TextField,
+  Divider
 } from '@mui/material';
+import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { text } from 'common/constant';
+import { urls } from 'common/urls';
+import { getApi, postApi } from 'common/apiClient';
+import PaymentDialog from './paymentForm';
+import toast from 'react-hot-toast';
 
 const ViewBookingPage = () => {
   const paymentData = [{ id: 1, amount: 1200, comments: 'cc', paidOn: '2025-03-13 00:31:37' }];
-  const [openDialog, setOpenDialog] = useState(false);
-  const [tripExpense, setTripExpense] = useState({ amount: '', notes: '' });
+  const { id } = useParams();
+  const [bookings, setBookings] = useState({});
 
-  const handleOpenDialog = () => setOpenDialog(true);
-  const handleCloseDialog = () => setOpenDialog(false);
+  const [openPaymentDialog, setOpenPaymentDialog] = useState(false);
+  const [totalAmount, setTotalAmount] = useState(0);
+
+  const fetchBookingData = async () => {
+    const response = await getApi(urls.booking.getById.replace(':id', id));
+    setBookings(response?.data);
+  };
+
+  useEffect(() => {
+    if (id) {
+      fetchBookingData();
+    }
+  }, [id]);
+
+  const handleOpenPaymentDialog = () => {
+    setTotalAmount(bookings.totalAmt || 0);
+    setOpenPaymentDialog(true);
+  };
+
+  const handleClosePaymentDialog = () => {
+    setOpenPaymentDialog(false);
+  };
+
+  const [openDialog, setOpenDialog] = useState(false);
+  const [tripExpense, setTripExpense] = useState({
+    amount: '',
+    description: '',
+    vehicleId: '',
+    date: '',
+    type: 'expense'
+  });
+
+  const handleOpenDialog = () => {
+    setTripExpense({
+      amount: '',
+      description: '',
+      vehicleId: bookings?.vehicleId || '',
+      date: new Date().toISOString(),
+      type: 'Expense'
+    });
+    setOpenDialog(true);
+  };
+
+  const handleAddExpense = async () => {
+    const response = await postApi(urls.incomeExpense.create, tripExpense);
+    toast.success(text.INC_EXP_ADDED);
+    handleCloseDialog();
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
 
   return (
     <Box>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          mb: 2
-        }}
-      >
-        <Typography variant="h3">Booking Details</Typography>
-        <Breadcrumbs separator="/" aria-label="breadcrumb">
-          <MuiLink component={Link} to="/dashboard/default" color="inherit" underline="none">
-            <Typography color="#17a2b8">Dashboard</Typography>
-          </MuiLink>
-          <MuiLink component={Link} to="/booking" color="inherit" underline="none">
-            <Typography color="#17a2b8">Bookings</Typography>
-          </MuiLink>
-          <Typography color="text.primary">Booking Details</Typography>
-        </Breadcrumbs>
-      </Box>
+      <CustomBreadcrumbs
+        title={text.BOOKING_DETAILS}
+        links={[
+          { name: text.BOOKINGS, path: '/booking' },
+          { name: text.BOOKING_DETAILS, path: '' }
+        ]}
+      />
 
-      <Grid container spacing={2}>
-        <Grid item xs={12} md={8}>
-          <Grid container spacing={2} justifyContent="center">
-            {[
-              { title: 'Total Amount', value: '1200' },
-              { title: 'Paid Amount', value: '1200' },
-              { title: 'Excess', value: '0' }
-            ].map((item, index) => (
-              <Grid item xs={12} sm={4} key={index} display="flex" justifyContent="center">
-                <Card sx={{ textAlign: 'center', width: '100%' }}>
-                  <CardContent>
-                    <Typography variant="h6" fontWeight="bold">
-                      {item.title}
-                    </Typography>
-                    <Typography variant="h5">{item.value}</Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
+      <Card>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={8}>
+            <Grid container spacing={2} padding={2} justifyContent="center">
+              {[
+                { title: text.TOTAL_AMOUNT, value: bookings.totalAmt },
+                { title: text.PAID_AMOUNT, value: '1200' },
+                { title: text.EXCESS, value: '0' }
+              ].map((item, index) => (
+                <Grid item xs={12} sm={4} key={index} display="flex" justifyContent="center">
+                  <Card sx={{ textAlign: 'center', width: '100%', backgroundColor: '#f8f9fa' }}>
+                    <CardContent>
+                      <Typography variant="h6" fontWeight="bold">
+                        {item.title}
+                      </Typography>
+                      <Typography variant="h5">{item.value}</Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
 
-          <Card sx={{ mt: 2, p: 2 }}>
-            <CardContent>
-              <Typography variant="h5" fontWeight="bold">
-                Overview :
-              </Typography>
+            <Box sx={{ p: 2 }}>
+              <Typography variant="h5">{text.OVERVIEW}:</Typography>
               <Grid container alignItems="center" justifyContent="space-between">
                 <Grid item xs={4} textAlign="left">
                   <Typography variant="body1" fontWeight="bold">
-                    Start Location
+                    {bookings.tripStartLoc}
                   </Typography>
                   <Typography variant="body2" color="textSecondary">
-                    2025-03-13
+                    {bookings.tripStartDate}
                   </Typography>
                 </Grid>
 
                 <Grid item xs={4} textAlign="center">
                   <Typography variant="body1" fontWeight="bold">
-                    To
+                    {text.TO}
                   </Typography>
                 </Grid>
 
                 <Grid item xs={4} textAlign="right">
                   <Typography variant="body1" fontWeight="bold">
-                    End Location
+                    {bookings.tripEndLoc}
                   </Typography>
                   <Typography variant="body2" color="textSecondary">
-                    2025-03-13
+                    {bookings.tripEndDate}
                   </Typography>
                 </Grid>
               </Grid>
-            </CardContent>
-          </Card>
+            </Box>
 
-          <Card sx={{ mt: 2 }}>
-            <CardContent>
-              <Typography variant="h6" fontWeight="bold">
-                Payment Activity
-              </Typography>
+            <Divider />
+
+            <Box sx={{ mt: 2, p: 2 }}>
+              <Typography variant="h5">{text.PAYEMNT_ACTIVITY}</Typography>
               <TableContainer>
                 <Table>
                   <TableHead>
                     <TableRow>
                       <TableCell>#</TableCell>
-                      <TableCell>Amount</TableCell>
-                      <TableCell>Comments</TableCell>
-                      <TableCell>Paid On</TableCell>
-                      <TableCell>Action</TableCell>
+                      <TableCell>{text.AMOUNT}</TableCell>
+                      <TableCell>{text.COMMENTS}</TableCell>
+                      <TableCell>{text.PAID_ON}</TableCell>
+                      <TableCell>{text.ACTION}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -141,48 +180,45 @@ const ViewBookingPage = () => {
                   </TableBody>
                 </Table>
               </TableContainer>
-            </CardContent>
-          </Card>
-        </Grid>
+            </Box>
+          </Grid>
 
-        <Grid item xs={12} md={4}>
-          <Card sx={{ p: 2 }}>
-            <CardContent>
+          <Grid item xs={12} md={4}>
+            <Box sx={{ p: 2 }}>
               <Grid container spacing={1} justifyContent="center">
                 <Grid item>
-                  <Button variant="contained" color="primary">
-                    Add Payment
+                  <Button variant="contained" color="primary" onClick={handleOpenPaymentDialog}>
+                    {text.ADD_PAYMENT}
                   </Button>
                 </Grid>
                 <Grid item>
                   <Button variant="contained" color="secondary" onClick={handleOpenDialog}>
-                    Trip Expense
+                    {text.TRIP_EXPENSE}
                   </Button>
                 </Grid>
                 <Grid item>
-                  <Button variant="contained" sx={{background:'#28a745'}}>
-                    Generate Invoice
+                  <Button variant="contained" sx={{ background: '#28a745' }}>
+                    {text.GENERATE_INVOICE}
                   </Button>
                 </Grid>
               </Grid>
 
               <Typography variant="h6" fontWeight="bold" sx={{ mt: 2 }}>
-                Customer Info
+                {text.CUSTOMER_INFO}
               </Typography>
-              <Typography variant="body2">010101101</Typography>
-              <Typography variant="body2">01010101011</Typography>
-              <Typography variant="body2">010101010@gmail.com</Typography>
-              <Typography variant="body2">000001</Typography>
+              <Typography variant="body2">{bookings?.customer?.name}</Typography>
+              <Typography variant="body2">{bookings?.customer?.mobileNo}</Typography>
+              <Typography variant="body2">{bookings?.customer?.email}</Typography>
+              <Typography variant="body2">{bookings?.customer?.address}</Typography>
 
               <Typography variant="h6" fontWeight="bold" sx={{ mt: 2 }}>
-                Driver Info
+                {text.DRIVER_INFO}
               </Typography>
-              <Typography variant="body2">Gerald Bautista</Typography>
-              <Typography variant="body2">6456456565</Typography>
-              <Typography variant="body2">6565656</Typography>
-
+              <Typography variant="body2">{bookings?.driver?.name}</Typography>
+              <Typography variant="body2">{bookings?.driver?.mobileNo}</Typography>
+              <Typography variant="body2">{bookings?.driver?.address}</Typography>
               <Typography variant="h6" fontWeight="bold" sx={{ mt: 2 }}>
-                Tracking URL
+                {text.TRACKING_URL}
               </Typography>
               <Typography variant="body2" color="primary">
                 <a href="https://codeforts.com/vms/triptracking/67d226feda21d" target="_blank" rel="noopener noreferrer">
@@ -190,45 +226,47 @@ const ViewBookingPage = () => {
                 </a>
               </Typography>
 
-              <Button variant="contained" sx={{ mt: 2 ,background:'#28a745'}}>
-                Share to Customer
+              <Button variant="contained" sx={{ mt: 2, background: '#28a745' }}>
+                {text.SHARE_TO_CUSTOMER}
               </Button>
-            </CardContent>
-          </Card>
+            </Box>
 
-          <Dialog open={openDialog} onClose={handleCloseDialog}>
-            <DialogTitle  sx={{ fontWeight: 'bold', fontSize: '16px' }}>Add Trip Expense</DialogTitle>
-            <DialogContent>
-              <TextField
-                fullWidth
-                label="Amount"
-                variant="outlined"
-                margin="dense"
-                value={tripExpense.amount}
-                onChange={(e) => setTripExpense({ ...tripExpense, amount: e.target.value })}
-              />
-              <TextField
-                fullWidth
-                label="Notes"
-                variant="outlined"
-                margin="dense"
-                multiline
-                rows={3}
-                value={tripExpense.notes}
-                onChange={(e) => setTripExpense({ ...tripExpense, notes: e.target.value })}
-              />
-            </DialogContent>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', p:2}}>
-                <Button type="submit" variant="contained">
-                  Add Expense
+            <Dialog open={openDialog} onClose={handleCloseDialog}>
+              <DialogTitle sx={{ fontWeight: 'bold', fontSize: '18px' }}>{text.ADD_TRIP_EXPENSE}</DialogTitle>
+              <DialogContent>
+                <TextField
+                  fullWidth
+                  label={text.AMOUNT}
+                  variant="outlined"
+                  margin="dense"
+                  value={tripExpense.amount}
+                  onChange={(e) => setTripExpense({ ...tripExpense, amount: parseFloat(e.target.value) || 0 })}
+                />
+                <TextField
+                  fullWidth
+                  label={text.DESCRIPTION}
+                  variant="outlined"
+                  margin="dense"
+                  multiline
+                  rows={3}
+                  value={tripExpense.description}
+                  onChange={(e) => setTripExpense({ ...tripExpense, description: e.target.value })}
+                />
+              </DialogContent>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: 2 }}>
+                <Button type="submit" variant="contained" onClick={handleAddExpense}>
+                  {text.ADD_EXPENSE}
                 </Button>
                 <Button variant="outlined" onClick={handleCloseDialog}>
-                  Cancel
+                  {text.CANCEL}
                 </Button>
               </Box>
-          </Dialog>
+            </Dialog>
+          </Grid>
         </Grid>
-      </Grid>
+      </Card>
+
+      <PaymentDialog open={openPaymentDialog} handleClose={handleClosePaymentDialog} totalAmount={totalAmount} />
     </Box>
   );
 };

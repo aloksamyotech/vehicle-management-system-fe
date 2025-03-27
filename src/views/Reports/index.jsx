@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Tabs, Tab, Card, CardContent, TextField, MenuItem, Button, Grid } from '@mui/material';
+import { Box, Typography, Tabs, Tab, Card, CardContent, TextField, MenuItem, Autocomplete, Button, Grid } from '@mui/material';
 import { urls } from 'common/urls';
 import { getApi } from 'common/apiClient';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
@@ -177,7 +177,7 @@ const Reports = () => {
                 InputLabelProps={{ shrink: true }}
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                sx={{ flex: 1, minWidth: 150 }}
+                sx={{ flex: 1, minWidth: 200 }}
                 inputProps={{
                   max: endDate
                 }}
@@ -190,46 +190,34 @@ const Reports = () => {
                 InputLabelProps={{ shrink: true }}
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                sx={{ flex: 1, minWidth: 150 }}
+                sx={{ flex: 1, minWidth: 200 }}
                 inputProps={{
                   min: startDate
                 }}
               />
 
               {(tabIndex === 0 || tabIndex === 1 || tabIndex === 2) && (
-                <TextField
+                <Autocomplete
                   size="small"
-                  select
-                  label="Select Vehicle"
-                  value={selectedVehicle}
-                  onChange={(e) => setSelectedVehicle(e.target.value)}
-                  sx={{ flex: 1, minWidth: 180 }}
-                >
-                  <MenuItem value="">{text.ALL_VEHICLE}</MenuItem>
-                  {vehicles.map((vehicle) => (
-                    <MenuItem key={vehicle.id} value={vehicle.id}>
-                      {vehicle.vehicleName}
-                    </MenuItem>
-                  ))}
-                </TextField>
+                  options={vehicles}
+                  getOptionLabel={(option) => option.vehicleName || ''}
+                  isOptionEqualToValue={(option, value) => option.id === value}
+                  value={vehicles.find((v) => v.id === selectedVehicle) || null}
+                  onChange={(_, newValue) => setSelectedVehicle(newValue?.id || '')}
+                  renderInput={(params) => <TextField {...params} label={text.SELECT_VEHICLE} sx={{ flex: 1, minWidth: 180 }} />}
+                />
               )}
 
               {tabIndex === 3 && (
-                <TextField
+                <Autocomplete
                   size="small"
-                  select
-                  label="Select Driver"
-                  value={selectedDriver}
-                  onChange={(e) => setSelectedDriver(e.target.value)}
-                  sx={{ flex: 1, minWidth: 180 }}
-                >
-                  <MenuItem value="">{text.ALL_DRIVER}</MenuItem>
-                  {drivers.map((driver) => (
-                    <MenuItem key={driver.id} value={driver.id}>
-                      {driver.name}
-                    </MenuItem>
-                  ))}
-                </TextField>
+                  options={drivers}
+                  getOptionLabel={(option) => option.name || ''}
+                  isOptionEqualToValue={(option, value) => option.id === value}
+                  value={drivers.find((d) => d.id === selectedDriver) || null}
+                  onChange={(_, newValue) => setSelectedDriver(newValue?.id || '')}
+                  renderInput={(params) => <TextField {...params} label={text.SELECT_DRIVER} sx={{ flex: 1, minWidth: 180 }} />}
+                />
               )}
               <Button
                 variant="outlined"
@@ -245,7 +233,7 @@ const Reports = () => {
                   }
                 }}
               >
-               {text.GENERATE_REPORT}
+                {text.GENERATE_REPORT}
               </Button>
             </Box>
 

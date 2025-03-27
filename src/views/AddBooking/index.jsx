@@ -6,6 +6,7 @@ import {
   TextField,
   Box,
   Checkbox,
+  Autocomplete,
   FormLabel,
   MenuItem,
   Card,
@@ -116,28 +117,31 @@ const DriverForm = () => {
                   <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
                     {text.CUSTOMER}
                   </FormLabel>
+
                   <Controller
                     name="customerId"
                     control={control}
                     rules={{ required: text.REQUIRED }}
                     render={({ field }) => (
-                      <Select {...field} size="small" displayEmpty>
-                        <MenuItem value="" disabled>
-                          {text.SELECT_CUSTOMER}
-                        </MenuItem>
-                        {customers.map((group) => (
-                          <MenuItem key={group.id} value={group.id}>
-                            {group.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
+                      <Autocomplete
+                        {...field}
+                        options={customers}
+                        getOptionLabel={(option) => option.name || ''}
+                        isOptionEqualToValue={(option, value) => option.id === value}
+                        onChange={(_, newValue) => field.onChange(newValue?.id || '')}
+                        value={customers.find((v) => v.id === field.value) || null}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            size="small"
+                            placeholder={text.SELECT_CUSTOMER}
+                            error={!!errors.customerId}
+                            helperText={errors.customerId?.message}
+                          />
+                        )}
+                      />
                     )}
                   />
-                  {errors.customerId && (
-                    <Typography color="error" sx={{ fontSize: '11px', mt: 0.5, ml: 2 }}>
-                      {errors.customerId.message}
-                    </Typography>
-                  )}
                 </FormControl>
               </Grid>
 
@@ -146,28 +150,30 @@ const DriverForm = () => {
                   <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
                     {text.VEHICLE}
                   </FormLabel>
+
                   <Controller
                     name="vehicleId"
                     control={control}
                     rules={{ required: text.REQUIRED }}
                     render={({ field }) => (
-                      <Select {...field} size="small" displayEmpty>
-                        <MenuItem value="" disabled>
-                          {text.SELECT_VEHICLE}
-                        </MenuItem>
-                        {vehicles.map((group) => (
-                          <MenuItem key={group.id} value={group.id}>
-                            {group.vehicleName}
-                          </MenuItem>
-                        ))}
-                      </Select>
+                      <Autocomplete
+                        options={vehicles}
+                        getOptionLabel={(option) => option.vehicleName || ''}
+                        isOptionEqualToValue={(option, value) => option.id === value}
+                        onChange={(_, newValue) => field.onChange(newValue?.id || '')}
+                        value={vehicles.find((v) => v.id === field.value) || null}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            size="small"
+                            placeholder={text.SELECT_VEHICLE}
+                            error={!!errors.vehicleId}
+                            helperText={errors.vehicleId?.message}
+                          />
+                        )}
+                      />
                     )}
                   />
-                  {errors.vehicleId && (
-                    <Typography color="error" sx={{ fontSize: '11px', mt: 0.5, ml: 2 }}>
-                      {errors.vehicleId.message}
-                    </Typography>
-                  )}
                 </FormControl>
               </Grid>
 
@@ -176,28 +182,30 @@ const DriverForm = () => {
                   <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
                     {text.DRIVER}
                   </FormLabel>
+
                   <Controller
                     name="driverId"
                     control={control}
                     rules={{ required: text.REQUIRED }}
                     render={({ field }) => (
-                      <Select {...field} size="small" displayEmpty>
-                        <MenuItem value="" disabled>
-                          {text.SELECT_DRIVER}
-                        </MenuItem>
-                        {drivers.map((group) => (
-                          <MenuItem key={group.id} value={group.id}>
-                            {group.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
+                      <Autocomplete
+                        options={drivers}
+                        getOptionLabel={(option) => option.name || ''}
+                        isOptionEqualToValue={(option, value) => option.id === value}
+                        onChange={(_, newValue) => field.onChange(newValue?.id || '')}
+                        value={drivers.find((v) => v.id === field.value) || null}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            size="small"
+                            placeholder={text.SELECT_DRIVER}
+                            error={!!errors.driverId}
+                            helperText={errors.driverId?.message}
+                          />
+                        )}
+                      />
                     )}
                   />
-                  {errors.driverId && (
-                    <Typography color="error" sx={{ fontSize: '11px', mt: 0.5, ml: 2 }}>
-                      {errors.driverId.message}
-                    </Typography>
-                  )}
                 </FormControl>
               </Grid>
 
@@ -278,7 +286,7 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                 {text.START_DATE}
+                  {text.START_DATE}
                 </FormLabel>
                 <Controller
                   name="tripStartDate"
@@ -305,7 +313,7 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                 {text.END_DATE}
+                  {text.END_DATE}
                 </FormLabel>
                 <Controller
                   name="tripEndDate"
@@ -335,7 +343,7 @@ const DriverForm = () => {
               </Grid>
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                {text.TOTAL_AMOUNT}
+                  {text.TOTAL_AMOUNT}
                 </FormLabel>
                 <Controller
                   name="totalAmt"

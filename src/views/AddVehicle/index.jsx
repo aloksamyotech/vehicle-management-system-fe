@@ -6,6 +6,7 @@ import {
   TextField,
   MenuItem,
   Select,
+  Autocomplete,
   FormControl,
   Box,
   FormLabel,
@@ -340,7 +341,6 @@ const VehicleForm = () => {
                   )}
                 />
               </Grid>
-
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth required>
                   <FormLabel
@@ -357,24 +357,25 @@ const VehicleForm = () => {
                     control={control}
                     rules={{ required: text.REQUIRED }}
                     render={({ field }) => (
-                      <Select {...field} size="small" displayEmpty>
-                        <MenuItem value="" disabled>
-                          {text.SELECT_GROUP}
-                        </MenuItem>
-                        {vehicleGroups.map((group) => (
-                          <MenuItem key={group.id} value={group.id}>
-                            {group.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
+                      <Autocomplete
+                        {...field}
+                        options={vehicleGroups}
+                        getOptionLabel={(option) => option.name || ''}
+                        isOptionEqualToValue={(option, value) => option.id === value}
+                        onChange={(_, newValue) => field.onChange(newValue?.id || '')}
+                        value={vehicleGroups.find((v) => v.id === field.value) || null}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            size="small"
+                            placeholder={text.SELECT_GROUP}
+                            error={!!errors.vehicleGroupId}
+                            helperText={errors.vehicleGroupId?.message}
+                          />
+                        )}
+                      />
                     )}
                   />
-
-                  {errors.vehicleGroupId && (
-                    <Typography color="error" sx={{ fontSize: '11px', mt: 0.5, ml: 2 }}>
-                      {errors.vehicleGroupId.message}
-                    </Typography>
-                  )}
                 </FormControl>
               </Grid>
 

@@ -3,6 +3,7 @@ import {
   Grid,
   Button,
   TextField,
+  Autocomplete,
   Box,
   FormLabel,
   Card,
@@ -123,24 +124,29 @@ const AddMaintenanceForm = () => {
                   <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
                     {text.VEHICLE}
                   </FormLabel>
+
                   <Controller
                     name="vehicleId"
                     control={control}
                     rules={{ required: text.REQUIRED }}
                     render={({ field }) => (
-                      <Select {...field} size="small" displayEmpty>
-                        <MenuItem value="" disabled>
-                          {text.SELECT_VEHICLE}
-                        </MenuItem>
-                        {vehicles.map((group) => (
-                          <MenuItem key={group.id} value={group.id}>
-                            {group.vehicleName}
-                          </MenuItem>
-                        ))}
-                      </Select>
+                      <Autocomplete
+                        options={vehicles}
+                        getOptionLabel={(option) => option.vehicleName || ''}
+                        isOptionEqualToValue={(option, value) => option.id === value}
+                        onChange={(_, newValue) => field.onChange(newValue?.id || '')}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            size="small"
+                            placeholder={text.SELECT_VEHICLE}
+                            error={!!errors.vehicleId}
+                            helperText={errors.vehicleId?.message}
+                          />
+                        )}
+                      />
                     )}
                   />
-                  {errors.vehicleId && <Typography color="error">{errors.vehicleId.message}</Typography>}
                 </FormControl>
               </Grid>
 
@@ -204,7 +210,7 @@ const AddMaintenanceForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                {text.TOTAL_COST}
+                  {text.TOTAL_COST}
                 </FormLabel>
                 <Controller
                   name="totalCost"
@@ -232,7 +238,7 @@ const AddMaintenanceForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                {text.VENDOR_NAME}
+                  {text.VENDOR_NAME}
                 </FormLabel>
                 <Controller
                   name="vendorName"
@@ -271,7 +277,7 @@ const AddMaintenanceForm = () => {
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth required>
                   <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                   {text.STATUS}
+                    {text.STATUS}
                   </FormLabel>
                   <Select {...register('status')} defaultValue="" size="small">
                     <MenuItem value="Pending">{text.PENDING}</MenuItem>
@@ -305,7 +311,7 @@ const AddMaintenanceForm = () => {
                           '&.Mui-focused': { color: 'black' }
                         }}
                       >
-                      {text.PARTS}
+                        {text.PARTS}
                       </FormLabel>
 
                       <Controller
@@ -337,7 +343,7 @@ const AddMaintenanceForm = () => {
                           '&.Mui-focused': { color: 'black' }
                         }}
                       >
-                      {text.QTY}
+                        {text.QTY}
                       </FormLabel>
 
                       <Controller
@@ -373,7 +379,7 @@ const AddMaintenanceForm = () => {
             </Grid>
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
               <Button type="submit" variant="contained" color="primary">
-              {text.Add_MAINTENANCE}
+                {text.Add_MAINTENANCE}
               </Button>
             </Box>
           </form>
