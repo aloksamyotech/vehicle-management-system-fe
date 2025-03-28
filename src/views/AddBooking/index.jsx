@@ -22,6 +22,7 @@ import { postApi, getApi, updateApiPatch } from 'common/apiClient';
 import toast from 'react-hot-toast';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { text } from 'common/constant';
+import axios from 'axios';
 
 const DriverForm = () => {
   const { id } = useParams();
@@ -65,11 +66,13 @@ const DriverForm = () => {
   } = useForm({
     defaultValues: initialData || {
       vehicleId: '',
-      driverId: '',
+      driverId: null,
       customerId: '',
       tripType: '',
       tripStartDate: '',
       tripEndDate: '',
+      tripStartPincode: '',
+      tripEndPincode: '',
       tripStartLoc: '',
       tripEndLoc: '',
       totalKm: '',
@@ -78,11 +81,53 @@ const DriverForm = () => {
     },
     mode: 'all'
   });
+
   useEffect(() => {
     if (initialData) {
       Object.keys(initialData).forEach((key) => setValue(key, initialData[key]));
     }
   }, [initialData, setValue]);
+
+  const fetchCityAndDetails = async (pincode) => {
+    if (pincode && pincode.length === 6) {
+      try {
+        const response = await axios.get(`https://api.postalpincode.in/pincode/${pincode}`);
+        const data = response.data[0];
+
+        if (data.Status === 'Success') {
+          const { District, State, Division } = data.PostOffice[0];
+
+          setValue('tripStartLoc', `${Division}, ${District}, ${State}`);
+          setValue('tripStartPincode', pincode);
+        } else {
+          setValue('tripStartLoc', '');
+          setValue('tripStartPincode', '');
+        }
+      } catch (error) {
+        console.error(text.ERROR_FETCHING, error);
+      }
+    }
+  };
+
+  const fetchEndCityAndDetails = async (pincode) => {
+    if (pincode && pincode.length === 6) {
+      try {
+        const response = await axios.get(`https://api.postalpincode.in/pincode/${pincode}`);
+        const data = response.data[0];
+
+        if (data.Status === 'Success') {
+          const { District, State, Division } = data.PostOffice[0];
+          setValue('tripEndLoc', `${Division}, ${District}, ${State}`);
+          setValue('tripEndPincode', pincode);
+        } else {
+          setValue('tripEndLoc', '');
+          setValue('tripEndPincode', '');
+        }
+      } catch (error) {
+        console.error(text.ERROR_FETCHING, error);
+      }
+    }
+  };
 
   const onSubmit = async (data) => {
     const { ...filteredData } = data;
@@ -179,14 +224,11 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth>
-                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                    {text.DRIVER}
-                  </FormLabel>
+                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.DRIVER}</FormLabel>
 
                   <Controller
                     name="driverId"
                     control={control}
-                    rules={{ required: text.REQUIRED }}
                     render={({ field }) => (
                       <Autocomplete
                         options={drivers}
@@ -227,6 +269,30 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  Trip Start Pincode
+                </FormLabel>
+                <Controller
+                  name="tripStartPincode"
+                  control={control}
+                  rules={{ required: text.REQUIRED }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      size="small"
+                      error={!!errors.tripStartPincode}
+                      helperText={errors.tripStartPincode?.message}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        fetchCityAndDetails(e.target.value);
+                      }}
+                    />
+                  )}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={4} md={3}>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
                   {text.TRIP_START_LOC}
                 </FormLabel>
                 <Controller
@@ -234,7 +300,41 @@ const DriverForm = () => {
                   control={control}
                   rules={{ required: text.REQUIRED }}
                   render={({ field }) => (
-                    <TextField {...field} fullWidth size="small" error={!!errors.tripStartLoc} helperText={errors.tripStartLoc?.message} />
+                    <TextField
+                      {...field}
+                      fullWidth
+                      size="small"
+                      error={!!errors.tripStartLoc}
+                      helperText={errors.tripStartLoc?.message}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        fetchCityAndDetails(e.target.value);
+                      }}
+                    />
+                  )}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={4} md={3}>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  Trip End Pincode
+                </FormLabel>
+                <Controller
+                  name="tripEndPincode"
+                  control={control}
+                  rules={{ required: text.REQUIRED }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      size="small"
+                      error={!!errors.tripEndPincode}
+                      helperText={errors.tripEndPincode?.message}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        fetchEndCityAndDetails(e.target.value);
+                      }}
+                    />
                   )}
                 />
               </Grid>
@@ -248,7 +348,17 @@ const DriverForm = () => {
                   control={control}
                   rules={{ required: text.REQUIRED }}
                   render={({ field }) => (
-                    <TextField {...field} fullWidth size="small" error={!!errors.tripEndLoc} helperText={errors.tripEndLoc?.message} />
+                    <TextField
+                      {...field}
+                      fullWidth
+                      size="small"
+                      error={!!errors.tripEndLoc}
+                      helperText={errors.tripEndLoc?.message}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        fetchEndCityAndDetails(e.target.value);
+                      }}
+                    />
                   )}
                 />
               </Grid>

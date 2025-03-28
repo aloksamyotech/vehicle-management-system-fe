@@ -25,6 +25,7 @@ const AddFuel = Loadable(lazy(() => import('views/AddFuel')));
 const AddMaintenance = Loadable(lazy(() => import('views/AddMaintenance')));
 const ViewVehiclePage = Loadable(lazy(() => import ('views/ViewVehicle')));
 const ViewBookingsPage = Loadable(lazy(() => import('views/ViewBookings')));
+const Invoice = Loadable(lazy(() => import('views/BookingInvoice')));
 
 // ==============================|| MAIN ROUTES ||============================== //
 
@@ -91,6 +92,10 @@ const MainRoutes = {
     {
       path: '/view-booking/:id',
       element: <ViewBookingsPage />
+    },
+    {
+      path: '/invoice/:id',
+      element: <Invoice />
     },
     {
       path: '/customer',

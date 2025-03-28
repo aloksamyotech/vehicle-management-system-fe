@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
   Grid,
@@ -17,7 +17,6 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
   TextField,
   Divider
 } from '@mui/material';
@@ -25,21 +24,25 @@ import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { text } from 'common/constant';
 import { urls } from 'common/urls';
-import { getApi, postApi } from 'common/apiClient';
+import { getApi, postApi, updateApi } from 'common/apiClient';
 import PaymentDialog from './paymentForm';
 import toast from 'react-hot-toast';
 
 const ViewBookingPage = () => {
-  const paymentData = [{ id: 1, amount: 1200, comments: 'cc', paidOn: '2025-03-13 00:31:37' }];
   const { id } = useParams();
+  const navigate = useNavigate();
+  const [paymentData, setPaymentData] = useState([]);
   const [bookings, setBookings] = useState({});
-
   const [openPaymentDialog, setOpenPaymentDialog] = useState(false);
   const [totalAmount, setTotalAmount] = useState(0);
+  const [bookingId, setBookingId] = useState(0);
+  const [paidAmount, setPaidAmount] = useState(0);
+  const [excess, setExcess] = useState(0);
 
   const fetchBookingData = async () => {
     const response = await getApi(urls.booking.getById.replace(':id', id));
     setBookings(response?.data);
+    setBookingId(response?.data?.id || 0);
   };
 
   useEffect(() => {
@@ -48,13 +51,36 @@ const ViewBookingPage = () => {
     }
   }, [id]);
 
+  const fetchPaymentData = async () => {
+    if (bookingId) {
+      const response = await getApi(urls.payment.getById.replace(':id', bookingId));
+      setPaymentData(response?.data || []);
+
+      const totalPaidAmount = response?.data?.reduce((sum, payment) => sum + payment.paidAmount, 0) || 0;
+      setTotalAmount(bookings.totalAmt || 0);
+      setPaidAmount(totalPaidAmount);
+      setExcess(bookings.totalAmt - totalPaidAmount);
+    }
+  };
+
+  useEffect(() => {
+    if (bookingId) {
+      fetchPaymentData();
+    }
+  }, [bookingId, bookings]);
+
   const handleOpenPaymentDialog = () => {
     setTotalAmount(bookings.totalAmt || 0);
+    setBookingId(bookings.id || 0);
     setOpenPaymentDialog(true);
   };
 
   const handleClosePaymentDialog = () => {
     setOpenPaymentDialog(false);
+  };
+
+  const handleAddPayment = (payment) => {
+    setPaymentData((prevPayments) => [...prevPayments, payment]);
   };
 
   const [openDialog, setOpenDialog] = useState(false);
@@ -63,7 +89,7 @@ const ViewBookingPage = () => {
     description: '',
     vehicleId: '',
     date: '',
-    type: 'expense'
+    type: 'Expense'
   });
 
   const handleOpenDialog = () => {
@@ -87,6 +113,24 @@ const ViewBookingPage = () => {
     setOpenDialog(false);
   };
 
+  const handleDeletePayment = async (paymentId) => {
+    await updateApi(urls.payment.update.replace(':id', paymentId));
+    toast.success(text.PAYMENT_DELETED);
+    fetchPaymentData();
+
+    const updatedPayments = paymentData.filter((payment) => payment.id !== paymentId);
+    setPaymentData(updatedPayments);
+
+    const newPaidAmount = updatedPayments.reduce((sum, payment) => sum + payment.paidAmount, 0);
+    setPaidAmount(newPaidAmount);
+    setExcess(bookings.totalAmt - newPaidAmount);
+  };
+  const handleGenerateInvoice = () => {
+    navigate(`/invoice/${bookingId}`, {
+      state: { excess, paidAmount }
+    });
+  };
+  
   return (
     <Box>
       <CustomBreadcrumbs
@@ -103,8 +147,8 @@ const ViewBookingPage = () => {
             <Grid container spacing={2} padding={2} justifyContent="center">
               {[
                 { title: text.TOTAL_AMOUNT, value: bookings.totalAmt },
-                { title: text.PAID_AMOUNT, value: '1200' },
-                { title: text.EXCESS, value: '0' }
+                { title: text.PAID_AMOUNT, value: paidAmount },
+                { title: text.EXCESS, value: excess }
               ].map((item, index) => (
                 <Grid item xs={12} sm={4} key={index} display="flex" justifyContent="center">
                   <Card sx={{ textAlign: 'center', width: '100%', backgroundColor: '#f8f9fa' }}>
@@ -124,7 +168,7 @@ const ViewBookingPage = () => {
               <Grid container alignItems="center" justifyContent="space-between">
                 <Grid item xs={4} textAlign="left">
                   <Typography variant="body1" fontWeight="bold">
-                    {bookings.tripStartLoc}
+                    {bookings.tripStartLoc}({bookings.tripStartPincode})
                   </Typography>
                   <Typography variant="body2" color="textSecondary">
                     {bookings.tripStartDate}
@@ -139,7 +183,7 @@ const ViewBookingPage = () => {
 
                 <Grid item xs={4} textAlign="right">
                   <Typography variant="body1" fontWeight="bold">
-                    {bookings.tripEndLoc}
+                    {bookings.tripEndLoc}({bookings.tripEndPincode})
                   </Typography>
                   <Typography variant="body2" color="textSecondary">
                     {bookings.tripEndDate}
@@ -152,26 +196,28 @@ const ViewBookingPage = () => {
 
             <Box sx={{ mt: 2, p: 2 }}>
               <Typography variant="h5">{text.PAYEMNT_ACTIVITY}</Typography>
-              <TableContainer>
-                <Table>
+              <TableContainer sx={{ border: '1px solid #ddd', borderRadius: '4px' }}>
+                <Table size="small" aria-label="a dense table" sx={{ border: '1px solid #ddd', borderRadius: '4px' }}>
                   <TableHead>
-                    <TableRow>
-                      <TableCell>#</TableCell>
-                      <TableCell>{text.AMOUNT}</TableCell>
-                      <TableCell>{text.COMMENTS}</TableCell>
-                      <TableCell>{text.PAID_ON}</TableCell>
-                      <TableCell>{text.ACTION}</TableCell>
+                    <TableRow sx={{ backgroundColor: '#f4f4f4', p: 0 }}>
+                      {' '}
+                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>#</TableCell>
+                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{text.AMOUNT}</TableCell>
+                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{text.COMMENTS}</TableCell>
+                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{text.PAID_ON}</TableCell>
+                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{text.ACTION}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {paymentData.map((row, index) => (
                       <TableRow key={row.id}>
-                        <TableCell>{index + 1}</TableCell>
-                        <TableCell>{row.amount}</TableCell>
-                        <TableCell>{row.comments}</TableCell>
-                        <TableCell>{row.paidOn}</TableCell>
-                        <TableCell>
-                          <IconButton color="error">
+                        {' '}
+                        <TableCell sx={{ border: '1px solid #ddd' }}>{index + 1}</TableCell>
+                        <TableCell sx={{ border: '1px solid #ddd' }}>{row.paidAmount}</TableCell>
+                        <TableCell sx={{ border: '1px solid #ddd' }}>{row.notes}</TableCell>
+                        <TableCell sx={{ border: '1px solid #ddd' }}>{row.createdAt}</TableCell>
+                        <TableCell sx={{ border: '1px solid #ddd' }}>
+                          <IconButton color="error" onClick={() => handleDeletePayment(row.id)}>
                             <DeleteIcon />
                           </IconButton>
                         </TableCell>
@@ -185,19 +231,46 @@ const ViewBookingPage = () => {
 
           <Grid item xs={12} md={4}>
             <Box sx={{ p: 2 }}>
-              <Grid container spacing={1} justifyContent="center">
-                <Grid item>
-                  <Button variant="contained" color="primary" onClick={handleOpenPaymentDialog}>
+              <Grid container spacing={2} justifyContent="center">
+                <Grid item xs={12} sm={6}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                    onClick={handleOpenPaymentDialog}
+                    sx={{ p: '2px 2px', width: '100%' }}
+                  >
                     {text.ADD_PAYMENT}
                   </Button>
                 </Grid>
-                <Grid item>
-                  <Button variant="contained" color="secondary" onClick={handleOpenDialog}>
+
+                <Grid item xs={12} sm={6}>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    size="small"
+                    onClick={handleOpenDialog}
+                    sx={{ p: '2px 2px', width: '100%' }}
+                  >
                     {text.TRIP_EXPENSE}
                   </Button>
                 </Grid>
-                <Grid item>
-                  <Button variant="contained" sx={{ background: '#28a745' }}>
+
+                <Grid item xs={12} sm={6}>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    sx={{
+                      background: '#28a745',
+                      p: '2px 2px',
+                      width: '100%',
+                      '&:hover': {
+                        backgroundColor: '#148638',
+                        p: '2px 2px'
+                      }
+                    }}
+                    onClick={handleGenerateInvoice}
+                  >
                     {text.GENERATE_INVOICE}
                   </Button>
                 </Grid>
@@ -266,7 +339,15 @@ const ViewBookingPage = () => {
         </Grid>
       </Card>
 
-      <PaymentDialog open={openPaymentDialog} handleClose={handleClosePaymentDialog} totalAmount={totalAmount} />
+      <PaymentDialog
+        open={openPaymentDialog}
+        handleClose={handleClosePaymentDialog}
+        totalAmount={totalAmount}
+        excess={excess}
+        bookingId={bookingId}
+        handleAddPayment={handleAddPayment}
+        fetchPaymentData={fetchPaymentData}
+      />
     </Box>
   );
 };
