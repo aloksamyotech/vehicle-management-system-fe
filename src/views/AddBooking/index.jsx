@@ -38,17 +38,17 @@ const DriverForm = () => {
   useEffect(() => {
     const fetchVehicles = async () => {
       const response = await getApi(urls.vehicle.get);
-      setVehicles(response.data);
+      setVehicles(response?.data);
     };
 
     const fetchDriver = async () => {
       const response = await getApi(urls.driver.get);
-      setDrivers(response.data);
+      setDrivers(response?.data);
     };
 
     const fetchCustomer = async () => {
       const response = await getApi(urls.customer.get);
-      setCustomers(response.data);
+      setCustomers(response?.data);
     };
 
     fetchVehicles();
@@ -77,7 +77,7 @@ const DriverForm = () => {
       tripEndLoc: '',
       totalKm: '',
       totalAmt: '',
-      tripStatus: ''
+      tripStatus: 'YetToStart'
     },
     mode: 'all'
   });
@@ -269,7 +269,7 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  Trip Start Pincode
+                 {text.TRIP_START_PIN}
                 </FormLabel>
                 <Controller
                   name="tripStartPincode"
@@ -317,7 +317,7 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  Trip End Pincode
+                {text.TRIP_END_PIN}
                 </FormLabel>
                 <Controller
                   name="tripEndPincode"
@@ -401,6 +401,7 @@ const DriverForm = () => {
                 <Controller
                   name="tripStartDate"
                   control={control}
+                  defaultValue={new Date().toISOString().slice(0, 16)}
                   rules={{ required: text.REQUIRED }}
                   render={({ field }) => (
                     <TextField
@@ -408,12 +409,13 @@ const DriverForm = () => {
                       fullWidth
                       size="small"
                       type="datetime-local"
-                      value={field.value ? field.value.split('.')[0] : ''}
+                      value={field.value ? field.value.split('.')[0] : new Date().toISOString().slice(0, 16)}
                       onChange={(e) => {
                         const newStartDate = new Date(e.target.value).toISOString();
                         field.onChange(newStartDate);
                         setMinEndDate(e.target.value);
                       }}
+                      inputProps={{ min: new Date().toISOString().slice(0, 16) }}
                       error={!!errors.tripStartDate}
                       helperText={errors.tripStartDate?.message}
                     />
@@ -451,6 +453,7 @@ const DriverForm = () => {
                   )}
                 />
               </Grid>
+
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
                   {text.TOTAL_AMOUNT}
@@ -488,8 +491,12 @@ const DriverForm = () => {
                   <Controller
                     name="tripStatus"
                     control={control}
+                    defaultValue="YetToStart"
                     render={({ field }) => (
-                      <Select {...field} size="small">
+                      <Select
+                        {...field}
+                        size="small"
+                      >
                         <MenuItem value="YetToStart">{text.YET_TO_START}</MenuItem>
                         <MenuItem value="Completed">{text.COMPLETED}</MenuItem>
                         <MenuItem value="Ongoing">{text.ONGOING}</MenuItem>

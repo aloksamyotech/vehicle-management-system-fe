@@ -9,9 +9,8 @@ import { text } from 'common/constant';
 const InvoicePage = () => {
   const { id } = useParams();
   const location = useLocation();
-  const { excess, paidAmount } = location.state || {};
+  const { excess, paidAmount} = location.state || {};
   const [booking, setBooking] = useState(null);
-  const invoiceNo = `#INV${Math.floor(1000 + Math.random() * 9000)}`;
   const currentDate = new Date().toLocaleDateString();
 
   useEffect(() => {
@@ -66,7 +65,7 @@ const InvoicePage = () => {
           </Typography>
           <Box textAlign="right">
             <Typography variant="h5">
-              {text.INV_NO}: {invoiceNo}
+              {text.INV_NO}: #{booking?.invoiceNo}
             </Typography>
             <Typography variant="h5">
               {text.DATE}: {currentDate}

@@ -45,6 +45,8 @@ export const text = {
   DISTANCE: 'Distance',
   TRIP_START_LOC: 'Trip Start Location',
   TRIP_END_LOC: 'Trip End Location',
+  TRIP_START_PIN: 'Trip Start Pincode',
+  TRIP_END_PIN: 'Trip End Pincode',
   TOTAL_KM: 'Approx Total KM',
   START_DATE: 'Start Date',
   END_DATE: 'End Date',
@@ -82,6 +84,7 @@ export const text = {
 
   //Bookings
   BOOKINGS: 'Bookings',
+  BOOKING_STATUS_UPDATED:'Booking status updated successfully',
   BOOKING_DELETED: 'Booking deleted successfully',
   BOOKING_UPDATED: 'Booking updated successfully',
   BOOKING_ADDED: 'Booking added successfully',
@@ -90,6 +93,7 @@ export const text = {
   UPDATE_BOOKING: 'Update Booking',
   BOOKING_DETAILS: 'Booking Details',
   BOOKING_ID:'Booking ID',
+  BOOKING_EXP_ADDED: 'Booking expense added successfully',
 
   //Customer
   CUSTOMER: 'Customer',
@@ -198,6 +202,7 @@ export const text = {
   //Reports
   REPORTS: 'Reports',
   GENERATE_REPORT: ' Generate Report',
+  UPDATE_STATUS: 'Update Status',
   FROM_TO: 'From To',
   FROM: 'From',
   TO: 'To',

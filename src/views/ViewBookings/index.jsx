@@ -24,8 +24,9 @@ import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { text } from 'common/constant';
 import { urls } from 'common/urls';
-import { getApi, postApi, updateApi } from 'common/apiClient';
+import { getApi, updateApi } from 'common/apiClient';
 import PaymentDialog from './paymentForm';
+import BookingStatusDialog from './bookingstatus';
 import toast from 'react-hot-toast';
 
 const ViewBookingPage = () => {
@@ -38,6 +39,28 @@ const ViewBookingPage = () => {
   const [bookingId, setBookingId] = useState(0);
   const [paidAmount, setPaidAmount] = useState(0);
   const [excess, setExcess] = useState(0);
+  const [status, setStatus] = useState(null);
+  const [openStatusDialog, setOpenStatusDialog] = useState(false);
+  const [selectedBookingId, setSelectedBookingId] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [bookingExpense, setBookingExpense] = useState({
+    tripExpense: '',
+    desc: ''
+  });
+
+  const handleOpenStatusDialog = (id, currentStatus) => {
+    setSelectedBookingId(id);
+    setStatus(currentStatus);
+    setOpenStatusDialog(true);
+  };
+
+  const handleCloseStatusDialog = () => {
+    setOpenStatusDialog(false);
+  };
+
+  const handleStatusUpdate = (newStatus) => {
+    console.log('Status Updated:', newStatus);
+  };
 
   const fetchBookingData = async () => {
     const response = await getApi(urls.booking.getById.replace(':id', id));
@@ -83,29 +106,18 @@ const ViewBookingPage = () => {
     setPaymentData((prevPayments) => [...prevPayments, payment]);
   };
 
-  const [openDialog, setOpenDialog] = useState(false);
-  const [tripExpense, setTripExpense] = useState({
-    amount: '',
-    description: '',
-    vehicleId: '',
-    date: '',
-    type: 'Expense'
-  });
-
   const handleOpenDialog = () => {
-    setTripExpense({
-      amount: '',
-      description: '',
-      vehicleId: bookings?.vehicleId || '',
-      date: new Date().toISOString(),
-      type: 'Expense'
+    setBookingExpense({
+      tripExpense: '',
+      desc: ''
     });
     setOpenDialog(true);
   };
 
   const handleAddExpense = async () => {
-    const response = await postApi(urls.incomeExpense.create, tripExpense);
-    toast.success(text.INC_EXP_ADDED);
+    const response = await updateApi(urls.booking.updateExpense.replace(':id', id), bookingExpense);
+    toast.success(text.BOOKING_EXP_ADDED);
+    fetchBookingData();
     handleCloseDialog();
   };
 
@@ -127,10 +139,10 @@ const ViewBookingPage = () => {
   };
   const handleGenerateInvoice = () => {
     navigate(`/invoice/${bookingId}`, {
-      state: { excess, paidAmount }
+      state: { excess, paidAmount}
     });
   };
-  
+
   return (
     <Box>
       <CustomBreadcrumbs
@@ -143,12 +155,12 @@ const ViewBookingPage = () => {
 
       <Card>
         <Grid container spacing={2}>
-          <Grid item xs={12} md={8}>
+          <Grid item xs={12} md={7}>
             <Grid container spacing={2} padding={2} justifyContent="center">
               {[
                 { title: text.TOTAL_AMOUNT, value: bookings.totalAmt },
                 { title: text.PAID_AMOUNT, value: paidAmount },
-                { title: text.EXCESS, value: excess }
+                { title: text.PENDING_AMOUNT, value: excess }
               ].map((item, index) => (
                 <Grid item xs={12} sm={4} key={index} display="flex" justifyContent="center">
                   <Card sx={{ textAlign: 'center', width: '100%', backgroundColor: '#f8f9fa' }}>
@@ -195,6 +207,27 @@ const ViewBookingPage = () => {
             <Divider />
 
             <Box sx={{ mt: 2, p: 2 }}>
+              <Typography variant="h5">{text.TRIP_EXPENSE}</Typography>
+              <TableContainer sx={{ border: '1px solid #ddd', borderRadius: '4px' }}>
+                <Table size="small" aria-label="a dense table" sx={{ border: '1px solid #ddd', borderRadius: '4px' }}>
+                  <TableHead>
+                    <TableRow sx={{ backgroundColor: '#f4f4f4', p: 0 }}>
+                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{text.AMOUNT}</TableCell>
+                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{text.DESCRIPTION}</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <TableRow>
+                      {' '}
+                      <TableCell sx={{ border: '1px solid #ddd' }}>{bookings.tripExpense || ''}</TableCell>
+                      <TableCell sx={{ border: '1px solid #ddd' }}>{bookings.desc || ''}</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+
+            <Box sx={{ mt: 2, p: 2 }}>
               <Typography variant="h5">{text.PAYEMNT_ACTIVITY}</Typography>
               <TableContainer sx={{ border: '1px solid #ddd', borderRadius: '4px' }}>
                 <Table size="small" aria-label="a dense table" sx={{ border: '1px solid #ddd', borderRadius: '4px' }}>
@@ -228,6 +261,8 @@ const ViewBookingPage = () => {
               </TableContainer>
             </Box>
           </Grid>
+
+          <Divider orientation="vertical" flexItem />
 
           <Grid item xs={12} md={4}>
             <Box sx={{ p: 2 }}>
@@ -274,6 +309,25 @@ const ViewBookingPage = () => {
                     {text.GENERATE_INVOICE}
                   </Button>
                 </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    sx={{
+                      background: '#f4a100',
+                      p: '2px 2px',
+                      width: '100%',
+                      '&:hover': {
+                        backgroundColor: '#cd9015',
+                        p: '2px 2px'
+                      }
+                    }}
+                    onClick={() => handleOpenStatusDialog(bookings.id, bookings.tripStatus)}
+                  >
+                    {text.UPDATE_STATUS}
+                  </Button>
+                </Grid>
               </Grid>
 
               <Typography variant="h6" fontWeight="bold" sx={{ mt: 2 }}>
@@ -312,8 +366,8 @@ const ViewBookingPage = () => {
                   label={text.AMOUNT}
                   variant="outlined"
                   margin="dense"
-                  value={tripExpense.amount}
-                  onChange={(e) => setTripExpense({ ...tripExpense, amount: parseFloat(e.target.value) || 0 })}
+                  value={bookingExpense.tripExpense}
+                  onChange={(e) => setBookingExpense({ ...bookingExpense, tripExpense: parseFloat(e.target.value) || 0 })}
                 />
                 <TextField
                   fullWidth
@@ -322,8 +376,8 @@ const ViewBookingPage = () => {
                   margin="dense"
                   multiline
                   rows={3}
-                  value={tripExpense.description}
-                  onChange={(e) => setTripExpense({ ...tripExpense, description: e.target.value })}
+                  value={bookingExpense.desc}
+                  onChange={(e) => setBookingExpense({ ...bookingExpense, desc: e.target.value })}
                 />
               </DialogContent>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: 2 }}>
@@ -347,6 +401,14 @@ const ViewBookingPage = () => {
         bookingId={bookingId}
         handleAddPayment={handleAddPayment}
         fetchPaymentData={fetchPaymentData}
+      />
+
+      <BookingStatusDialog
+        open={openStatusDialog}
+        handleClose={handleCloseStatusDialog}
+        bookingId={selectedBookingId}
+        status={status}
+        onStatusUpdate={handleStatusUpdate}
       />
     </Box>
   );
