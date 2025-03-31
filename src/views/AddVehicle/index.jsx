@@ -56,7 +56,6 @@ const VehicleForm = () => {
       chasisNo: '',
       engineNo: '',
       manufacturedBy: '',
-      vehicleType: '',
       vehicleColor: '#D6E1F3',
       registrationExpiry: '',
       vehicleGroupId: '',
@@ -134,7 +133,6 @@ const VehicleForm = () => {
                   )}
                 />
               </Grid>
-
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
                   {text.VEHICLE_NAME}
@@ -147,8 +145,8 @@ const VehicleForm = () => {
                     minLength: { value: 3, message: text.MIN_3_CHAR },
                     maxLength: { value: 30, message: text.MAX_30_CHAR },
                     pattern: {
-                      value: /^[A-Za-z\s]+$/,
-                      message: text.ALPHABETS_ONLY
+                      value: /^[A-Za-z0-9\s]+$/,
+                      message: text.ALPHA_NUM
                     }
                   }}
                   render={({ field }) => (
@@ -159,13 +157,8 @@ const VehicleForm = () => {
                       error={!!errors.vehicleName}
                       helperText={errors.vehicleName?.message}
                       onChange={(e) => {
-                        const alphabeticValue = e.target.value.replace(/[^A-Za-z\s]/g, '');
-                        field.onChange(alphabeticValue);
-                      }}
-                      onKeyPress={(e) => {
-                        if (!/[A-Za-z\s]/.test(e.key)) {
-                          e.preventDefault();
-                        }
+                        const alphanumericValue = e.target.value.replace(/[^A-Za-z0-9\s]/g, '');
+                        field.onChange(alphanumericValue);
                       }}
                     />
                   )}
@@ -184,8 +177,8 @@ const VehicleForm = () => {
                     minLength: { value: 4, message: text.MIN_4_CHAR },
                     maxLength: { value: 20, message: text.MAX_20_CHAR },
                     pattern: {
-                      value: /^(19[0-9]{2}|20[0-9]{2}|[A-Za-z0-9 ]+)$/,
-                      message: 'Invalid model format (e.g., "2015" or "XUV500")'
+                      value: /^[A-Za-z0-9\s\-_@#&]+$/,
+                      message: 'Invalid model format (e.g., "2015" or "XUV500@#")'
                     }
                   }}
                   render={({ field }) => (
@@ -264,37 +257,6 @@ const VehicleForm = () => {
                     />
                   )}
                 />
-              </Grid>
-
-              <Grid item xs={12} sm={4} md={3}>
-                <FormControl fullWidth>
-                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                    {text.VEHICLE_TYPE}
-                  </FormLabel>
-                  <Controller
-                    name="vehicleType"
-                    control={control}
-                    rules={{ required: text.REQUIRED }}
-                    render={({ field }) => (
-                      <Select {...field} size="small" displayEmpty>
-                        <MenuItem value="" disabled>
-                          {text.SELECT_VEHICLE_TYPE}
-                        </MenuItem>{' '}
-                        <MenuItem value="car">{text.CAR}</MenuItem>
-                        <MenuItem value="bus">{text.BUS}</MenuItem>
-                        <MenuItem value="taxi">{text.TAXI}</MenuItem>
-                        <MenuItem value="motorcycle">{text.MOTORCYCLE}</MenuItem>
-                        <MenuItem value="truck">{text.TRUCK}</MenuItem>
-                        <MenuItem value="bicycle">{text.BICYCLE}</MenuItem>
-                      </Select>
-                    )}
-                  />
-                  {errors.vehicleType && (
-                    <Typography color="error" sx={{ fontSize: '11px', mt: 0.5, ml: 2 }}>
-                      {errors.vehicleType.message}
-                    </Typography>
-                  )}
-                </FormControl>
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>

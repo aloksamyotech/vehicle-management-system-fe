@@ -34,7 +34,6 @@ const VehiclePage = () => {
         chasisNo: vehicle.chasisNo,
         engineNo: vehicle.engineNo,
         manufacturedBy: vehicle.manufacturedBy,
-        vehicleType: vehicle.vehicleType,
         vehicleColor: vehicle.vehicleColor,
         registrationExpiry: vehicle.registrationExpiry,
         isActive: vehicle.isActive,

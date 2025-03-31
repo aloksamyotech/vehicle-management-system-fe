@@ -46,8 +46,9 @@ export const updateApi = async (url, data, headers = {}) => {
     const response = await axios.put(url, data, { headers: defaultHeaders });
     return response.data;
   } catch (error) {
-    console.error('API Error:', error.response || error.message);
-    throw new Error(error.response ? error.response.data : error.message);
+    const errorMessage = error.response?.data?.message || text.ERROR;
+    toast.error(errorMessage);
+    throw error;
   }
 };
 
@@ -61,8 +62,9 @@ export const updateApiPatch = async (url, data, headers = {}) => {
     const response = await axios.patch(url, data, { headers: defaultHeaders });
     return response.data;
   } catch (error) {
-    console.error('API Error:', error.response?.data || error.message);
-    throw new Error(error.response?.data?.message || text.ERROR);
+    const errorMessage = error.response?.data?.message || text.ERROR;
+    toast.error(errorMessage);
+    throw error;
   }
 };
 

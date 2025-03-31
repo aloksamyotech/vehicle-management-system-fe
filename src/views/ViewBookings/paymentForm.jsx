@@ -1,10 +1,20 @@
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Dialog, DialogTitle, DialogContent, Box, TextField, Button } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, Box, TextField, Button, Snackbar } from '@mui/material';
+import { urls } from 'common/urls';
+import { postApi } from 'common/apiClient';
 import { text } from 'common/constant';
+import toast from 'react-hot-toast';
 
-const PaymentDialog = ({ open, handleClose, totalAmount }) => {
-  const { control, handleSubmit, watch, setValue } = useForm({
+const PaymentDialog = ({ open, handleClose, totalAmount, bookingId, handleAddPayment, excess ,fetchPaymentData}) => {
+  const {
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    reset,
+    formState: { errors }
+  } = useForm({
     defaultValues: {
       paidAmount: 0,
       notes: ''
@@ -12,50 +22,82 @@ const PaymentDialog = ({ open, handleClose, totalAmount }) => {
   });
 
   const paidAmount = watch('paidAmount');
-  const pendingAmount = totalAmount - (paidAmount || 0);
+  const pendingAmount = excess;
 
-  const onSubmit = (data) => {
-    console.log({ totalAmount, ...data, pendingAmount });
+  const [loading, setLoading] = React.useState(false);
+
+  const onSubmit = async (data) => {
+    if (data.paidAmount > totalAmount) {
+      toast.error(text.AMT_ERROR);
+      return;
+    }
+    setLoading(true);
+    const paymentData = {
+      bookingId,
+      paidAmount: data.paidAmount,
+      pendingAmount: pendingAmount,
+      notes: data.notes
+    };
+
+    const response = await postApi(urls.payment.create, paymentData);
+    toast.success(text.PAYMENT_ADDED);
+    fetchPaymentData();
+    handleAddPayment(paymentData);
+    reset();
     handleClose();
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth>
-      <DialogTitle sx={{ fontWeight: 'bold', fontSize: '18px' }}>{text.MAKE_PAYMENT}</DialogTitle>
-      <DialogContent>
-        <TextField label={text.TOTAL_AMOUNT} fullWidth margin="dense" value={totalAmount} disabled />
-        <Controller
-          name="paidAmount"
-          control={control}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              label={text.PAID_AMOUNT}
-              type="number"
-              fullWidth
-              margin="normal"
-              onChange={(e) => {
-                setValue('paidAmount', Number(e.target.value) || 0);
-              }}
-            />
-          )}
-        />
-        <TextField label="Pending Amount" fullWidth margin="normal" value={pendingAmount} disabled />
-        <Controller
-          name="notes"
-          control={control}
-          render={({ field }) => <TextField {...field} label={text.NOTES} fullWidth margin="normal" multiline rows={2} />}
-        />
-      </DialogContent>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', p:2 }}>
-        <Button onClick={handleSubmit(onSubmit)} color="primary" variant="contained">
-          {text.SAVE_PAYMENT}
-        </Button>
-        <Button onClick={handleClose} variant="outlined">
-          {text.CANCEL}
-        </Button>
-      </Box>
-    </Dialog>
+    <>
+      <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ fontWeight: 'bold', fontSize: '18px' }}>{text.MAKE_PAYMENT}</DialogTitle>
+        <DialogContent>
+          <TextField label={text.TOTAL_AMOUNT} fullWidth margin="dense" value={totalAmount} disabled />
+
+          <Controller
+            name="paidAmount"
+            control={control}
+            rules={{
+              required: text.REQUIRED,
+              validate: {
+                lessThanTotal: (value) => value <= totalAmount || text.AMT_ERROR
+              }
+            }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label={text.PAID_AMOUNT}
+                type="number"
+                fullWidth
+                margin="normal"
+                onChange={(e) => {
+                  setValue('paidAmount', parseFloat(e.target.value) || 0);
+                }}
+                error={!!errors.paidAmount}
+                helperText={errors.paidAmount?.message || ''}
+              />
+            )}
+          />
+
+          <TextField label="Pending Amount" fullWidth margin="normal" value={pendingAmount} disabled />
+
+          <Controller
+            name="notes"
+            control={control}
+            render={({ field }) => <TextField {...field} label={text.NOTES} fullWidth margin="normal" multiline rows={2} />}
+          />
+        </DialogContent>
+
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 2 }}>
+          <Button onClick={handleSubmit(onSubmit)} color="primary" variant="contained" disabled={loading}>
+            {loading ? 'Saving...' : text.SAVE_PAYMENT}
+          </Button>
+          <Button onClick={handleClose} variant="outlined">
+            {text.CANCEL}
+          </Button>
+        </Box>
+      </Dialog>
+    </>
   );
 };
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Box, Grid, Typography, Divider, IconButton } from '@mui/material';
-import { DataGrid} from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -12,7 +12,7 @@ import { gridSpacing } from 'config';
 import dayjs from 'dayjs';
 import CustomToolbar from 'common/customToolbar';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
-import {text} from "common/constant";
+import { text } from 'common/constant';
 
 const BookingPage = () => {
   const navigate = useNavigate();
@@ -29,6 +29,8 @@ const BookingPage = () => {
         tripEndDate: booking.tripEndDate,
         tripStartLoc: booking.tripStartLoc,
         tripEndLoc: booking.tripEndLoc,
+        tripStartPincode: booking.tripStartPincode,
+        tripEndPincode: booking.tripEndPincode,
         totalKm: booking.totalKm,
         totalAmt: booking.totalAmt,
         tripType: booking.tripType,
@@ -37,8 +39,8 @@ const BookingPage = () => {
         customer: booking.customer?.name || 'N/A',
         vehicleId: booking.vehicle.id,
         vehicle: booking.vehicle?.vehicleName || 'N/A',
-        driverId: booking.driver.id,
-        driver: booking.driver?.name || 'N/A'
+        driverId: booking.driver?.id || null,
+        driver: booking.driver ? booking.driver.name : 'Yet to Assign'
       }));
       setRows(formattedData);
     } catch (error) {
@@ -51,6 +53,24 @@ const BookingPage = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const renderDriverButton = (driver) => {
+    return (
+      <Button
+        variant="contained"
+        style={{
+          backgroundColor: driver === 'Yet to Assign' ? '#dc3545' : '#5bc0de',
+          color: driver === 'Yet to Assign' ? 'white' : '#000',
+          fontWeight: 700,
+          fontSize: '10px',
+          padding: '0',
+          width: 'auto'
+,        }}
+      >
+        {driver}
+      </Button>
+    );
+  };
 
   const columns = [
     { field: 'sNo', headerName: text.S_NO, width: 80 },
@@ -69,7 +89,14 @@ const BookingPage = () => {
       )
     },
     { field: 'tripType', headerName: text.TYPE, width: 120 },
-    { field: 'driver', headerName: text.DRIVER, width: 150 },
+    {
+      field: 'driver',
+      headerName: 'Driver',
+      width: 150,
+      renderCell: (params) => {
+        return params.value === 'Yet to Assign' ? renderDriverButton('Yet to Assign') : params.value;
+      }
+    },
     {
       field: 'tripStatus',
       headerName: text.STATUS,
@@ -109,7 +136,7 @@ const BookingPage = () => {
         const navigate = useNavigate();
         return (
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <IconButton color="primary" sx={{ py: 2 }} onClick={() => navigate(`/view-booking/${params.row.id}`)}>
+            <IconButton color="primary" sx={{ py: 3 }} onClick={() => navigate(`/view-booking/${params.row.id}`)}>
               <VisibilityIcon />
             </IconButton>
             <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5, alignSelf: 'center' }} />
@@ -130,14 +157,14 @@ const BookingPage = () => {
   ];
 
   const handleDelete = async (id) => {
-      await deleteApi(urls.booking.delete.replace(':id', id));
-      toast.success(text.BOOKING_DELETED);
-      fetchData();
+    await deleteApi(urls.booking.delete.replace(':id', id));
+    toast.success(text.BOOKING_DELETED);
+    fetchData();
   };
 
   return (
     <>
-     <CustomBreadcrumbs title={text.BOOKINGS} links={[{ name: text.BOOKINGS, path: '/booking' }]} />
+      <CustomBreadcrumbs title={text.BOOKINGS} links={[{ name: text.BOOKINGS, path: '/booking' }]} />
 
       <Grid container spacing={gridSpacing}>
         <Grid item xs={12}>
