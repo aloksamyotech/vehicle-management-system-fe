@@ -24,12 +24,14 @@ import { postApi, getApi } from 'common/apiClient';
 import toast from 'react-hot-toast';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { text } from 'common/constant';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 const AddMaintenanceForm = () => {
   const navigate = useNavigate();
   const [vehicles, setVehicles] = useState([]);
   const [partsList, setPartsList] = useState([]);
-  const [minEndDate, setMinEndDate] = useState('');
+  const [minEndDate, setMinEndDate] = useState(new Date());
   const {
     register,
     handleSubmit,
@@ -149,7 +151,7 @@ const AddMaintenanceForm = () => {
                   />
                 </FormControl>
               </Grid>
-
+              {/* 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
                   {text.START_DATE}
@@ -204,6 +206,66 @@ const AddMaintenanceForm = () => {
                       error={!!errors.endDate}
                       helperText={errors.endDate?.message}
                     />
+                  )}
+                />
+              </Grid> */}
+
+              <Grid item xs={12} sm={4} md={3}>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  {text.START_DATE}
+                </FormLabel>
+                <Controller
+                  name="startDate"
+                  control={control}
+                  defaultValue={new Date()}
+                  rules={{ required: text.REQUIRED }}
+                  render={({ field, fieldState: { error } }) => (
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <DatePicker
+                        {...field}
+                        renderInput={(props) => <TextField {...props} fullWidth size="small" error={!!error} helperText={error?.message} />}
+                        value={field.value}
+                        onChange={(newValue) => {
+                          field.onChange(newValue);
+                          setMinEndDate(newValue);
+                        }}
+                        minDateTime={new Date()}
+                        PopperProps={{ placement: 'top-start' }}
+                      />
+                    </LocalizationProvider>
+                  )}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={4} md={3}>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  {text.END_DATE}
+                </FormLabel>
+                <Controller
+                  name="endDate"
+                  control={control}
+                  defaultValue={new Date()}
+                  rules={{
+                    required: text.REQUIRED,
+                    validate: (value) => {
+                      const mainStartDate = new Date(getValues('startDate'));
+                      const mainEndDate = new Date(value);
+                      return mainEndDate >= mainStartDate || text.END_DATE_AFTER_START;
+                    }
+                  }}
+                  render={({ field, fieldState: { error } }) => (
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <DatePicker
+                        {...field}
+                        renderInput={(props) => <TextField {...props} fullWidth size="small" error={!!error} helperText={error?.message} />}
+                        value={field.value}
+                        onChange={(newValue) => {
+                          field.onChange(newValue);
+                        }}
+                        minDateTime={minEndDate}
+                        PopperProps={{ placement: 'top-start' }}
+                      />
+                    </LocalizationProvider>
                   )}
                 />
               </Grid>

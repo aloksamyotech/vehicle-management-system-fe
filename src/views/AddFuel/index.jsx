@@ -23,6 +23,8 @@ import { postApi, getApi, updateApiPatch } from 'common/apiClient';
 import toast from 'react-hot-toast';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { text } from 'common/constant';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 const FuelExpenseForm = () => {
   const { id } = useParams();
@@ -178,18 +180,20 @@ const FuelExpenseForm = () => {
                 <Controller
                   name="fillDate"
                   control={control}
+                  defaultValue={new Date()}
                   rules={{ required: text.REQUIRED }}
                   render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      size="small"
-                      type="date"
-                      value={field.value ? field.value.split('T')[0] : ''}
-                      onChange={(e) => field.onChange(new Date(e.target.value).toISOString())}
-                      error={!!errors.fillDate}
-                      helperText={errors.fillDate?.message}
-                    />
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <DatePicker
+                        {...field}
+                        disablePast
+                        value={field.value ? new Date(field.value) : null} 
+                        onChange={(newValue) => field.onChange(newValue)}
+                        renderInput={(params) => (
+                          <TextField {...params} fullWidth size="small" error={!!errors.fillDate} helperText={errors.fillDate?.message} />
+                        )}
+                      />
+                    </LocalizationProvider>
                   )}
                 />
               </Grid>

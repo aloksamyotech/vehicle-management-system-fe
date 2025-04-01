@@ -4,8 +4,6 @@ import {
   Grid,
   Button,
   TextField,
-  MenuItem,
-  Select,
   Autocomplete,
   FormControl,
   Box,
@@ -22,6 +20,8 @@ import { postApi, getApi, updateApiPatch } from 'common/apiClient';
 import toast from 'react-hot-toast';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { text } from 'common/constant';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 const VehicleForm = () => {
   const { id } = useParams();
@@ -76,6 +76,14 @@ const VehicleForm = () => {
       });
     }
   }, [initialData, setValue]);
+
+   useEffect(() => {
+      if (initialData) {
+        const expDate = initialData.registrationExpiry ? new Date(initialData.registrationExpiry) : new Date();
+  
+        setValue('registrationExpiry', expDate);
+      }
+    }, [initialData, setValue]);
 
   const onSubmit = async (data) => {
     const { sNo, group, gpsApiUrl, apiUsername, apiPassword, ...filteredData } = data;
@@ -280,29 +288,32 @@ const VehicleForm = () => {
                     required: text.REQUIRED,
                     validate: (value) => {
                       if (!value) return text.REQUIRED;
-                      const selectedDate = new Date(value);
-                      const today = new Date();
-                      today.setHours(0, 0, 0, 0);
-                      return selectedDate >= today;
+                      return new Date(value) > new Date();
                     }
                   }}
                   render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      type="date"
-                      size="small"
-                      value={field.value ? field.value.split('T')[0] : ''}
-                      onChange={(e) => field.onChange(new Date(e.target.value).toISOString())}
-                      error={!!errors.registrationExpiry}
-                      helperText={errors.registrationExpiry?.message}
-                      inputProps={{
-                        min: new Date().toISOString().split('T')[0]
-                      }}
-                    />
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <DatePicker
+                        {...field}
+                        renderInput={(props) => (
+                          <TextField
+                            {...props}
+                            fullWidth
+                            size="small"
+                            error={!!errors.registrationExpiry}
+                            helperText={errors.registrationExpiry?.message}
+                          />
+                        )}
+                        value={field.value || null}
+                        onChange={(newValue) => field.onChange(newValue)}
+                        minDate={new Date()}
+                        PopperProps={{ placement: 'top-start' }}
+                      />
+                    </LocalizationProvider>
                   )}
                 />
               </Grid>
+
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth required>
                   <FormLabel

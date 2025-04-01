@@ -8,6 +8,8 @@ import { postApi, updateApiPatch } from 'common/apiClient';
 import toast from 'react-hot-toast';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { text } from 'common/constant';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 const DriverForm = () => {
   const { id } = useParams();
@@ -43,7 +45,11 @@ const DriverForm = () => {
   useEffect(() => {
     if (initialData) {
       Object.keys(initialData).forEach((key) => {
-        setValue(key, initialData[key]);
+        if (key === 'licenseExpiry' || key === 'dateOfJoining') {
+          setValue(key, initialData[key] ? new Date(initialData[key]) : null);
+        } else {
+          setValue(key, initialData[key]);
+        }
       });
     }
   }, [initialData, setValue]);
@@ -59,7 +65,7 @@ const DriverForm = () => {
       toast.success(text.DRIVER_ADDED);
     }
 
-    reset();
+    reset(filteredData);
     navigate('/drivers');
   };
 
@@ -79,7 +85,7 @@ const DriverForm = () => {
             <Grid container spacing={gridSpacing}>
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                {text.DRIVER_NAME}
+                  {text.DRIVER_NAME}
                 </FormLabel>
                 <Controller
                   name="name"
@@ -186,7 +192,7 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-              {text.LICENSE_NO}
+                  {text.LICENSE_NO}
                 </FormLabel>
                 <Controller
                   name="licenseNo"
@@ -220,10 +226,9 @@ const DriverForm = () => {
                   )}
                 />
               </Grid>
-
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                {text.LICENSE_EXP_DATE}
+                  {text.LICENSE_EXP_DATE}
                 </FormLabel>
                 <Controller
                   name="licenseExpiry"
@@ -232,33 +237,66 @@ const DriverForm = () => {
                     required: text.REQUIRED,
                     validate: (value) => {
                       if (!value) return text.REQUIRED;
-                      const selectedDate = new Date(value);
-                      const today = new Date();
-                      today.setHours(0, 0, 0, 0);
-                      return selectedDate >= today;
+                      return new Date(value) > new Date() ? true : text.EXPIRY_DATE_FUTURE;
                     }
                   }}
                   render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      size="small"
-                      type="date"
-                      value={field.value ? field.value.split('T')[0] : ''}
-                      onChange={(e) => field.onChange(new Date(e.target.value).toISOString())}
-                      error={!!errors.licenseExpiry}
-                      helperText={errors.licenseExpiry?.message}
-                      inputProps={{
-                        min: new Date().toISOString().split('T')[0]
-                      }}
-                    />
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <DatePicker
+                        {...field}
+                        renderInput={(props) => (
+                          <TextField
+                            {...props}
+                            fullWidth
+                            size="small"
+                            error={!!errors.licenseExpiry}
+                            helperText={errors.licenseExpiry?.message}
+                          />
+                        )}
+                        value={field.value || null}
+                        onChange={(newValue) => field.onChange(newValue)}
+                        minDate={new Date()}
+                        PopperProps={{ placement: 'top-start' }}
+                      />
+                    </LocalizationProvider>
                   )}
                 />
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                 {text.TOTAL_EXP}
+                  {text.DATE_OF_JOINING}
+                </FormLabel>
+                <Controller
+                  name="dateOfJoining"
+                  control={control}
+                  rules={{ required: text.REQUIRED }}
+                  render={({ field }) => (
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <DatePicker
+                        {...field}
+                        renderInput={(props) => (
+                          <TextField
+                            {...props}
+                            fullWidth
+                            size="small"
+                            error={!!errors.dateOfJoining}
+                            helperText={errors.dateOfJoining?.message}
+                          />
+                        )}
+                        value={field.value || null}
+                        onChange={(newValue) => field.onChange(newValue)}
+                        disableFuture
+                        PopperProps={{ placement: 'top-start' }}
+                      />
+                    </LocalizationProvider>
+                  )}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={4} md={3}>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  {text.TOTAL_EXP}
                 </FormLabel>
                 <Controller
                   name="totalExp"
@@ -286,29 +324,6 @@ const DriverForm = () => {
                         if (value < 1) value = 1;
                         field.onChange(value);
                       }}
-                    />
-                  )}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                {text.DATE_OF_JOINING}
-                </FormLabel>
-                <Controller
-                  name="dateOfJoining"
-                  control={control}
-                  rules={{ required: text.REQUIRED }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      size="small"
-                      type="date"
-                      value={field.value ? field.value.split('T')[0] : ''}
-                      onChange={(e) => field.onChange(new Date(e.target.value).toISOString())}
-                      error={!!errors.dateOfJoining}
-                      helperText={errors.dateOfJoining?.message}
                     />
                   )}
                 />
@@ -356,7 +371,7 @@ const DriverForm = () => {
                   rules={{
                     required: text.REQUIRED,
                     minLength: { value: 3, message: text.MIN_3_CHAR },
-                    maxLength: { value: 100, message: text.MAX_100_CHAR}
+                    maxLength: { value: 100, message: text.MAX_100_CHAR }
                   }}
                   render={({ field }) => (
                     <TextField

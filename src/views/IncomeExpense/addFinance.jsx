@@ -5,6 +5,8 @@ import toast from 'react-hot-toast';
 import { postApi, getApi, updateApiPatch } from 'common/apiClient';
 import { urls } from 'common/urls';
 import { text } from 'common/constant';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 const IncomeExpenseForm = ({ initialData, onSave, refreshData, onCancel }) => {
   const [vehicles, setVehicles] = useState([]);
@@ -132,18 +134,20 @@ const IncomeExpenseForm = ({ initialData, onSave, refreshData, onCancel }) => {
           <Controller
             name="date"
             control={control}
+            defaultValue={new Date()}
             rules={{ required: text.REQUIRED }}
             render={({ field }) => (
-              <TextField
-                {...field}
-                fullWidth
-                type="date"
-                size="small"
-                value={field.value ? field.value.split('T')[0] : ''}
-                onChange={(e) => field.onChange(new Date(e.target.value).toISOString())}
-                error={!!errors.date}
-                helperText={errors.date?.message}
-              />
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DatePicker
+                  {...field}
+                  disablePast
+                  value={field.value ? new Date(field.value) : null}
+                  onChange={(newValue) => field.onChange(newValue)}
+                  renderInput={(params) => (
+                    <TextField {...params} fullWidth size="small" error={!!errors.date} helperText={errors.date?.message} />
+                  )}
+                />
+              </LocalizationProvider>
             )}
           />
         </Grid>

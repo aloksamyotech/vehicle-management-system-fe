@@ -5,6 +5,8 @@ import toast from 'react-hot-toast';
 import { postApi, getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import { text } from 'common/constant';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
   const [vehicles, setVehicles] = useState([]);
@@ -74,27 +76,36 @@ const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
         </Grid>
 
         <Grid item xs={12}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-            {text.DATE}
-          </FormLabel>
-          <Controller
-            name="reminderDate"
-            control={control}
-            rules={{ required: text.REQUIRED }}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                fullWidth
-                type="date"
-                size="small"
-                value={field.value ? field.value.split('T')[0] : ''}
-                inputProps={{ min: new Date().toISOString().split('T')[0] }}
-                onChange={(e) => field.onChange(new Date(e.target.value).toISOString())}
-                error={!!errors.reminderDate}
-                helperText={errors.reminderDate?.message}
-              />
-            )}
-          />
+          <FormControl fullWidth>
+            <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+              {text.DATE}
+            </FormLabel>
+            <Controller
+              name="reminderDate"
+              control={control}
+              rules={{ required: text.REQUIRED }}
+              render={({ field }) => (
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <DatePicker
+                    {...field}
+                    value={field.value ? new Date(field.value) : null}
+                    onChange={(newValue) => field.onChange(newValue ? newValue.toISOString() : null)}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        fullWidth
+                        size="small"
+                        error={!!errors.reminderDate}
+                        helperText={errors.reminderDate?.message}
+                      />
+                    )}
+                    inputFormat="yyyy-MM-dd"
+                    minDate={new Date()}
+                  />
+                </LocalizationProvider>
+              )}
+            />
+          </FormControl>
         </Grid>
 
         <Grid item xs={12}>

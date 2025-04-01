@@ -28,6 +28,7 @@ import { getApi, updateApi } from 'common/apiClient';
 import PaymentDialog from './paymentForm';
 import BookingStatusDialog from './bookingstatus';
 import toast from 'react-hot-toast';
+import dayjs from 'dayjs';
 
 const ViewBookingPage = () => {
   const { id } = useParams();
@@ -45,7 +46,7 @@ const ViewBookingPage = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [bookingExpense, setBookingExpense] = useState({
     tripExpense: '',
-    desc: ''
+    desc: '',
   });
 
   const handleOpenStatusDialog = (id, currentStatus) => {
@@ -183,7 +184,7 @@ const ViewBookingPage = () => {
                     {bookings.tripStartLoc}({bookings.tripStartPincode})
                   </Typography>
                   <Typography variant="body2" color="textSecondary">
-                    {bookings.tripStartDate}
+                  {bookings.tripStartDate ? dayjs(bookings.tripStartDate).format('YYYY-MM-DD HH:mm') : 'N/A'}
                   </Typography>
                 </Grid>
 
@@ -198,7 +199,7 @@ const ViewBookingPage = () => {
                     {bookings.tripEndLoc}({bookings.tripEndPincode})
                   </Typography>
                   <Typography variant="body2" color="textSecondary">
-                    {bookings.tripEndDate}
+                    {bookings.tripEndDate ? dayjs(bookings.tripEndDate).format('YYYY-MM-DD HH:mm') : 'N/A'}
                   </Typography>
                 </Grid>
               </Grid>

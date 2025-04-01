@@ -51,7 +51,6 @@ const ViewVehiclePage = () => {
     { label: text.CHASIS_NO, value: vehicles.chasisNo },
     { label: text.ENGINE_NO, value: vehicles.engineNo },
     { label: text.MANUFACTURED_BY, value: vehicles.manufacturedBy },
-    { label: text.VEHICLE_TYPE, value: vehicles.vehicleType },
     { label: text.GPS_API, value: 'https://codeforts.com/vms/api' },
     { label: text.API_USERNAME, value: 'KDH 678T' },
     { label: text.API_PASS, value: '278561' },

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Box, Grid, Typography, IconButton, Divider, Modal } from '@mui/material';
-import { DataGrid} from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IncomeExpenseForm from './addFinance.jsx';
@@ -50,7 +50,8 @@ const FinanceIndex = () => {
       headerName: text.DATE,
       width: 150,
       renderCell: (params) => {
-        return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
+        const date = params.value ? new Date(params.value) : null;
+        return date ? date.toLocaleDateString() : 'N/A';
       }
     },
     { field: 'description', headerName: text.DESCRIPTION, width: 300 },
@@ -119,9 +120,9 @@ const FinanceIndex = () => {
   };
 
   const handleDelete = async (id) => {
-      await deleteApi(urls.incomeExpense.delete.replace(':id', id));
-      toast.success(text.INC_EXP_DELETED);
-      fetchData();
+    await deleteApi(urls.incomeExpense.delete.replace(':id', id));
+    toast.success(text.INC_EXP_DELETED);
+    fetchData();
   };
 
   return (

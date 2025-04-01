@@ -46,7 +46,8 @@ const FuelReminderIndex = () => {
       headerName: text.DATE,
       width: 150,
       renderCell: (params) => {
-        return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
+        const date =  params.value ? new Date(params.value) : null;
+        return date ? date.toLocaleDateString() : 'N/A';
       }
     },
     { field: 'message', headerName: text.MESSAGE, width: 400 },

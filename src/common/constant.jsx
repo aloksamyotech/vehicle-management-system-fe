@@ -64,6 +64,7 @@ export const text = {
   GEOFENCE: 'Geofence',
   NOTIFICATIONS: 'Notifications',
   BASIC_INFO: 'Basic Info',
+  EXPIRY_DATE_FUTURE: 'EXpiry date must be in future.',
 
   //Payment
   AMT_ERROR: 'Paid amount cannot exceed total amount',

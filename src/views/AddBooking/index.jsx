@@ -23,6 +23,8 @@ import toast from 'react-hot-toast';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { text } from 'common/constant';
 import axios from 'axios';
+import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 const DriverForm = () => {
   const { id } = useParams();
@@ -33,7 +35,7 @@ const DriverForm = () => {
   const [vehicles, setVehicles] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [customers, setCustomers] = useState([]);
-  const [minEndDate, setMinEndDate] = useState('');
+  const [minEndDate, setMinEndDate] = useState(new Date());
 
   useEffect(() => {
     const fetchVehicles = async () => {
@@ -85,6 +87,17 @@ const DriverForm = () => {
   useEffect(() => {
     if (initialData) {
       Object.keys(initialData).forEach((key) => setValue(key, initialData[key]));
+    }
+  }, [initialData, setValue]);
+
+  useEffect(() => {
+    if (initialData) {
+      const startDate = initialData.tripStartDate ? new Date(initialData.tripStartDate) : new Date();
+      const endDate = initialData.tripEndDate ? new Date(initialData.tripEndDate) : new Date(startDate.getTime() + 3600000);
+
+      setValue('tripStartDate', startDate);
+      setValue('tripEndDate', endDate);
+      setMinEndDate(startDate);
     }
   }, [initialData, setValue]);
 
@@ -269,7 +282,7 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                 {text.TRIP_START_PIN}
+                  {text.TRIP_START_PIN}
                 </FormLabel>
                 <Controller
                   name="tripStartPincode"
@@ -317,7 +330,7 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                {text.TRIP_END_PIN}
+                  {text.TRIP_END_PIN}
                 </FormLabel>
                 <Controller
                   name="tripEndPincode"
@@ -401,24 +414,22 @@ const DriverForm = () => {
                 <Controller
                   name="tripStartDate"
                   control={control}
-                  defaultValue={new Date().toISOString().slice(0, 16)}
+                  defaultValue={new Date()}
                   rules={{ required: text.REQUIRED }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      size="small"
-                      type="datetime-local"
-                      value={field.value ? field.value.split('.')[0] : new Date().toISOString().slice(0, 16)}
-                      onChange={(e) => {
-                        const newStartDate = new Date(e.target.value).toISOString();
-                        field.onChange(newStartDate);
-                        setMinEndDate(e.target.value);
-                      }}
-                      inputProps={{ min: new Date().toISOString().slice(0, 16) }}
-                      error={!!errors.tripStartDate}
-                      helperText={errors.tripStartDate?.message}
-                    />
+                  render={({ field, fieldState: { error } }) => (
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <DateTimePicker
+                        {...field}
+                        renderInput={(props) => <TextField {...props} fullWidth size="small" error={!!error} helperText={error?.message} />}
+                        value={field.value}
+                        onChange={(newValue) => {
+                          field.onChange(newValue);
+                          setMinEndDate(newValue);
+                        }}
+                        minDateTime={new Date()}
+                        PopperProps={{ placement: 'top-start' }}
+                      />
+                    </LocalizationProvider>
                   )}
                 />
               </Grid>
@@ -430,6 +441,7 @@ const DriverForm = () => {
                 <Controller
                   name="tripEndDate"
                   control={control}
+                  defaultValue={new Date()}
                   rules={{
                     required: text.REQUIRED,
                     validate: (value) => {
@@ -438,18 +450,19 @@ const DriverForm = () => {
                       return endDate >= startDate || text.END_DATE_AFTER_START;
                     }
                   }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      size="small"
-                      type="datetime-local"
-                      inputProps={{ min: minEndDate }}
-                      value={field.value ? field.value.split('.')[0] : ''}
-                      onChange={(e) => field.onChange(new Date(e.target.value).toISOString())}
-                      error={!!errors.tripEndDate}
-                      helperText={errors.tripEndDate?.message}
-                    />
+                  render={({ field, fieldState: { error } }) => (
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <DateTimePicker
+                        {...field}
+                        renderInput={(props) => <TextField {...props} fullWidth size="small" error={!!error} helperText={error?.message} />}
+                        value={field.value}
+                        onChange={(newValue) => {
+                          field.onChange(newValue);
+                        }}
+                        minDateTime={minEndDate}
+                        PopperProps={{ placement: 'top-start' }}
+                      />
+                    </LocalizationProvider>
                   )}
                 />
               </Grid>
@@ -493,10 +506,7 @@ const DriverForm = () => {
                     control={control}
                     defaultValue="YetToStart"
                     render={({ field }) => (
-                      <Select
-                        {...field}
-                        size="small"
-                      >
+                      <Select {...field} size="small">
                         <MenuItem value="YetToStart">{text.YET_TO_START}</MenuItem>
                         <MenuItem value="Completed">{text.COMPLETED}</MenuItem>
                         <MenuItem value="Ongoing">{text.ONGOING}</MenuItem>

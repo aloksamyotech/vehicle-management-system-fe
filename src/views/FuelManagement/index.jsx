@@ -51,7 +51,8 @@ const FuelRecords = () => {
       headerName: text.FILL_DATE,
       width: 150,
       renderCell: (params) => {
-        return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
+        const date =  params.value ? new Date(params.value) : null;
+        return date ? date.toLocaleDateString() : 'N/A';
       }
     },
     { field: 'vehicle', headerName: text.VEHICLE, width: 200 },
@@ -87,9 +88,9 @@ const FuelRecords = () => {
   ];
 
   const handleDelete = async (id) => {
-      await deleteApi(urls.fuel.delete.replace(':id', id));
-      toast.success('Fuel deleted successfully');
-      fetchData();
+    await deleteApi(urls.fuel.delete.replace(':id', id));
+    toast.success('Fuel deleted successfully');
+    fetchData();
   };
 
   return (

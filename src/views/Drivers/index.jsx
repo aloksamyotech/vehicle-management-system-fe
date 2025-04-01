@@ -49,9 +49,9 @@ const DriverManagementPage = () => {
   };
 
   const handleDelete = async (id) => {
-      await deleteApi(urls.driver.delete.replace(':id', id));
-      toast.success(text.DRIVER_DELETED);
-      fetchDrivers();
+    await deleteApi(urls.driver.delete.replace(':id', id));
+    toast.success(text.DRIVER_DELETED);
+    fetchDrivers();
   };
 
   const columns = [
@@ -70,7 +70,8 @@ const DriverManagementPage = () => {
       headerName: text.LICENSE_EXP_DATE,
       width: 180,
       renderCell: (params) => {
-        return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
+        const date = params.value ? new Date(params.value) : null;
+        return date ? date.toLocaleDateString() : 'N/A';
       }
     },
     {
@@ -78,7 +79,8 @@ const DriverManagementPage = () => {
       headerName: text.DATE_OF_JOINING,
       width: 150,
       renderCell: (params) => {
-        return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
+        const date = params.value ? new Date(params.value) : null;
+        return date ? date.toLocaleDateString() : 'N/A';
       }
     },
     { field: 'doc', headerName: text.DOCUMENT, width: 100 },

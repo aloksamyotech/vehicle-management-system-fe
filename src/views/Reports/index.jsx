@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Tabs, Tab, Card, CardContent, TextField, MenuItem, Autocomplete, Button, Grid } from '@mui/material';
+import { Box, Typography, Tabs, Tab, Card, CardContent, TextField, FormLabel, Autocomplete, Button, Grid } from '@mui/material';
 import { urls } from 'common/urls';
 import { getApi } from 'common/apiClient';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
@@ -7,11 +7,15 @@ import { DataGrid } from '@mui/x-data-grid';
 import toast from 'react-hot-toast';
 import { ThumbUp, ThumbDown, Assessment } from '@mui/icons-material';
 import { text } from 'common/constant';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 const Reports = () => {
   const [tabIndex, setTabIndex] = useState(0);
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [startDateError, setStartDateError] = useState(false);
+  const [endDateError, setEndDateError] = useState(false);
   const [vehicles, setVehicles] = useState([]);
   const [selectedVehicle, setSelectedVehicle] = useState('');
   const [drivers, setDrivers] = useState([]);
@@ -21,6 +25,7 @@ const Reports = () => {
   const [fuel, setFuel] = useState([]);
   const [driverReport, setDriverReport] = useState([]);
   const [summary, setSummary] = useState('');
+  const [tripExpenses, setTripExpenses] = useState([]);
 
   useEffect(() => {
     const fetchVehicles = async () => {
@@ -91,8 +96,29 @@ const Reports = () => {
     }
   };
 
+  const fetchTripExpenses = async () => {
+    const queryParams = {
+      startDate,
+      endDate,
+      vehicleId: selectedVehicle
+    };
+
+    const response = await getApi(urls.tripExpense.report, queryParams);
+    setTripExpenses(response.data || []);
+    if (response.data.length === 0) {
+      toast.error(text.NO_DATA_FOUND);
+    }
+  };
+
   const handleGenerateReport = async () => {
-    const tabFunctions = [fetchVehicleBookings, fetchVehicleIncomeExpense, fetchVehicleFuel, fetchDriverBookings];
+    if (!startDate || !endDate) {
+      setStartDateError(!startDate);
+      setEndDateError(!endDate);
+      toast.error('Please select both start and end dates');
+      return;
+    }
+
+    const tabFunctions = [fetchVehicleBookings, fetchVehicleIncomeExpense, fetchVehicleFuel, fetchDriverBookings, fetchTripExpenses];
 
     await tabFunctions[tabIndex]();
 
@@ -100,6 +126,8 @@ const Reports = () => {
     setEndDate('');
     setSelectedVehicle('');
     setSelectedDriver('');
+    setStartDateError(false);
+    setEndDateError(false);
   };
 
   useEffect(() => {
@@ -164,77 +192,116 @@ const Reports = () => {
             fontWeight: tabIndex === 3 ? 'bold' : 'normal'
           }}
         />
+
+        <Tab
+          label={text.TRIP_EXPENSE}
+          sx={{
+            backgroundColor: tabIndex === 4 ? '#1482d7' : 'transparent',
+            color: tabIndex === 4 ? '#fff !important' : '#000',
+            borderRadius: '8px',
+            fontWeight: tabIndex === 4 ? 'bold' : 'normal'
+          }}
+        />
       </Tabs>
 
       <Box sx={{ mt: 2 }}>
         <Card>
           <CardContent>
             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-              <TextField
-                label="Report From"
-                size="small"
-                type="date"
-                InputLabelProps={{ shrink: true }}
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                sx={{ flex: 1, minWidth: 200 }}
-                inputProps={{
-                  max: endDate
-                }}
-              />
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={12} sm={3} md={2}>
+                    <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                   {text.FROM}
+                    </FormLabel>
+                    <DatePicker
+                      value={startDate}
+                      onChange={(newValue) => setStartDate(newValue)}
+                      minDate={new Date()}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          size="small"
+                          error={startDateError}
+                          sx={{ flex: 1, minWidth: 200 }}
+                          inputProps={{
+                            max: endDate ? endDate.toISOString().split('T')[0] : ''
+                          }}
+                        />
+                      )}
+                    />
+                  </Grid>
 
-              <TextField
-                label="Report To"
-                size="small"
-                type="date"
-                InputLabelProps={{ shrink: true }}
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                sx={{ flex: 1, minWidth: 200 }}
-                inputProps={{
-                  min: startDate
-                }}
-              />
+                  <Grid item xs={12} sm={3} md={2}>
+                    <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                     {text.TO}
+                    </FormLabel>
+                    <DatePicker
+                      value={endDate}
+                      onChange={(newValue) => {
+                        setEndDate(newValue);
+                        setEndDateError(false);
+                      }}
+                      minDate={startDate || new Date()}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          size="small"
+                          error={endDateError}
+                          sx={{ flex: 1, minWidth: 200 }}
+                        />
+                      )}
+                    />
+                  </Grid>
 
-              {(tabIndex === 0 || tabIndex === 1 || tabIndex === 2) && (
-                <Autocomplete
-                  size="small"
-                  options={vehicles}
-                  getOptionLabel={(option) => option.vehicleName || ''}
-                  isOptionEqualToValue={(option, value) => option.id === value}
-                  value={vehicles.find((v) => v.id === selectedVehicle) || null}
-                  onChange={(_, newValue) => setSelectedVehicle(newValue?.id || '')}
-                  renderInput={(params) => <TextField {...params} label={text.SELECT_VEHICLE} sx={{ flex: 1, minWidth: 180 }} />}
-                />
-              )}
+                  {(tabIndex === 0 || tabIndex === 1 || tabIndex === 2) && (
+                    <Grid item xs={12} sm={4} md={4} sx={{ mt: '20px' }}>
+                      <Autocomplete
+                        size="small"
+                        options={vehicles}
+                        getOptionLabel={(option) => option.vehicleName || ''}
+                        isOptionEqualToValue={(option, value) => option.id === value}
+                        value={vehicles.find((v) => v.id === selectedVehicle) || null}
+                        onChange={(_, newValue) => setSelectedVehicle(newValue?.id || '')}
+                        renderInput={(params) => <TextField {...params} label={text.SELECT_VEHICLE} sx={{ flex: 1, minWidth: 180 }} />}
+                      />
+                    </Grid>
+                  )}
 
-              {tabIndex === 3 && (
-                <Autocomplete
-                  size="small"
-                  options={drivers}
-                  getOptionLabel={(option) => option.name || ''}
-                  isOptionEqualToValue={(option, value) => option.id === value}
-                  value={drivers.find((d) => d.id === selectedDriver) || null}
-                  onChange={(_, newValue) => setSelectedDriver(newValue?.id || '')}
-                  renderInput={(params) => <TextField {...params} label={text.SELECT_DRIVER} sx={{ flex: 1, minWidth: 180 }} />}
-                />
-              )}
-              <Button
-                variant="outlined"
-                onClick={handleGenerateReport}
-                sx={{
-                  borderColor: '#17a2b8',
-                  color: '#17a2b8',
-                  backgroundColor: 'white',
-                  '&:hover': {
-                    backgroundColor: '#17a2b8',
-                    borderColor: '#17a2b8',
-                    color: '#fff'
-                  }
-                }}
-              >
-                {text.GENERATE_REPORT}
-              </Button>
+                  {tabIndex === 3 && (
+                    <Grid item xs={12} sm={4} md={4} sx={{ mt: '20px' }}>
+                      <Autocomplete
+                        size="small"
+                        options={drivers}
+                        getOptionLabel={(option) => option.name || ''}
+                        isOptionEqualToValue={(option, value) => option.id === value}
+                        value={drivers.find((d) => d.id === selectedDriver) || null}
+                        onChange={(_, newValue) => setSelectedDriver(newValue?.id || '')}
+                        renderInput={(params) => <TextField {...params} label={text.SELECT_DRIVER} sx={{ flex: 1, minWidth: 180 }} />}
+                      />
+                    </Grid>
+                  )}
+
+                  <Grid item xs={12} sm={3} md={2} sx={{ mt: '20px' }}>
+                    <Button
+                      variant="outlined"
+                      onClick={handleGenerateReport}
+                      sx={{
+                        borderColor: '#17a2b8',
+                        color: '#17a2b8',
+                        backgroundColor: 'white',
+                        '&:hover': {
+                          backgroundColor: '#17a2b8',
+                          borderColor: '#17a2b8',
+                          color: '#fff'
+                        }
+                      }}
+                    >
+                      {text.GENERATE_REPORT}
+                    </Button>
+                  </Grid>
+                </Grid>
+              </LocalizationProvider>
             </Box>
 
             {tabIndex === 0 && bookings.length > 0 && (
@@ -537,6 +604,61 @@ const Reports = () => {
                         return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
                       }
                     }
+                  ]}
+                  disableRowSelectionOnClick
+                  sx={{
+                    '.MuiDataGrid-columnHeaderTitle': { fontWeight: 'bold', fontSize: '16px' },
+                    '.MuiDataGrid-cell': { fontSize: '16px' }
+                  }}
+                  getRowHeight={() => 75}
+                  initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
+                  pageSizeOptions={[10]}
+                />
+              </Card>
+            )}
+
+            {tabIndex === 4 && tripExpenses.length > 0 && (
+              <Card sx={{ mt: '20px' }}>
+                <DataGrid
+                  rows={tripExpenses.map((row, index) => ({
+                    id: index + 1,
+                    sNo: index + 1,
+                    vehicle: row.vehicle?.vehicleName || 'N/A',
+                    driver: row.driver?.name || 'N/A',
+                    date: row.date,
+                    description: row.description,
+                    amount: row.amount,
+                    tripType: row.tripType,
+                    tripStartLoc: row.tripStartLoc,
+                    tripEndLoc: row.tripEndLoc
+                  }))}
+                  columns={[
+                    { field: 'sNo', headerName: text.S_NO, width: 70 },
+                    { field: 'vehicle', headerName: text.VEHICLE, width: 150 },
+                    { field: 'driver', headerName: text.DRIVER, width: 150 },
+                    {
+                      field: 'date',
+                      headerName: text.DATE,
+                      width: 150,
+                      renderCell: (params) => {
+                        return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
+                      }
+                    },
+                    { field: 'tripType', headerName: text.TYPE, width: 120 },
+                    {
+                      field: 'trip',
+                      headerName: text.FROM_TO,
+                      width: 200,
+                      renderCell: (params) => (
+                        <Box>
+                          <Typography>{params.row.tripStartLoc ? params.row.tripStartLoc : 'N/A'}</Typography>
+                          <Typography>to</Typography>
+                          <Typography>{params.row.tripEndLoc ? params.row.tripEndLoc : 'N/A'}</Typography>
+                        </Box>
+                      )
+                    },
+                    { field: 'description', headerName: text.DESCRIPTION, width: 200 },
+                    { field: 'amount', headerName: text.AMOUNT, width: 150 }
                   ]}
                   disableRowSelectionOnClick
                   sx={{
