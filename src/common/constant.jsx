@@ -65,6 +65,7 @@ export const text = {
   NOTIFICATIONS: 'Notifications',
   BASIC_INFO: 'Basic Info',
   EXPIRY_DATE_FUTURE: 'EXpiry date must be in future.',
+  SELECT_START_END_DATE: 'Please select both start and end dates',
 
   //Payment
   AMT_ERROR: 'Paid amount cannot exceed total amount',
@@ -95,6 +96,7 @@ export const text = {
   BOOKING_DETAILS: 'Booking Details',
   BOOKING_ID:'Booking ID',
   BOOKING_EXP_ADDED: 'Booking expense added successfully',
+  BOOKING_EXP_DELETED: 'Booking expense deleted successfully',
 
   //Customer
   CUSTOMER: 'Customer',

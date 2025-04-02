@@ -28,6 +28,7 @@ const DriverForm = () => {
     defaultValues: {
       name: '',
       mobileNo: '',
+      email: '',
       age: '',
       licenseNo: '',
       licenseExpiry: '',
@@ -116,6 +117,23 @@ const DriverForm = () => {
                         }
                       }}
                     />
+                  )}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={4} md={3}>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                  {text.EMAIL}
+                </FormLabel>
+                <Controller
+                  name="email"
+                  control={control}
+                  rules={{
+                    required: text.REQUIRED,
+                    pattern: { value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, message: text.INVALID_FORMAT }
+                  }}
+                  render={({ field }) => (
+                    <TextField fullWidth size="small" type="email" {...field} error={!!errors.email} helperText={errors.email?.message} />
                   )}
                 />
               </Grid>

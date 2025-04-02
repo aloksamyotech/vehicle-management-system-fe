@@ -22,7 +22,7 @@ const NavItem = ({ item, level }) => {
   const customization = useSelector((state) => state.customization);
   const dispatch = useDispatch();
   const Icon = item.icon;
-  const itemIcon = item.icon ? <Icon color="inherit" /> : <ArrowForwardIcon color="inherit" fontSize={level > 0 ? 'inherit' : 'default'} />;
+  const itemIcon = item.icon ? <Icon color="white" /> : <ArrowForwardIcon color="white" fontSize={level > 0 ? 'inherit' : 'default'} />;
 
   let itemTarget = '';
   if (item.target) {
@@ -49,10 +49,44 @@ const NavItem = ({ item, level }) => {
       target={itemTarget}
       {...listItemProps}
     >
-      <ListItemIcon sx={{ minWidth: 25 }}>{itemIcon}</ListItemIcon>
+      <ListItemIcon
+        sx={{
+          ml:'15px',
+          minWidth: 25,
+          color: 'white',
+          '&.MuiListItemIcon-root': {
+            color: 'white !important'
+          },
+          '&.Mui-selected &': {
+            color: 'white !important'
+          },
+          '&.Mui-selected:hover &': {
+            color: 'white !important'
+          }
+        }}
+      >
+        {itemIcon}
+      </ListItemIcon>
       <ListItemText
         primary={
-          <Typography sx={{ pl: 1.4 }} variant={customization.isOpen === item.id ? 'subtitle1' : 'body1'} color="inherit">
+          <Typography
+            variant={customization.isOpen === item.id ? 'subtitle1' : 'body1'}
+            color="inherit"
+            sx={{
+              ml: 2,
+              fontSize: '0.95rem',
+              color: 'white',
+              '&.MuiListItemIcon-root': {
+                color: 'white !important'
+              },
+              '&.Mui-selected &': {
+                color: 'white !important'
+              },
+              '&.Mui-selected:hover &': {
+                color: 'white !important'
+              }
+            }}
+          >
             {item.title}
           </Typography>
         }

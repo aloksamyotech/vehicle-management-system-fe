@@ -32,16 +32,12 @@ const NavCollapse = ({ menu, level }) => {
       case 'item':
         return <NavItem key={item.id} item={item} level={level + 1} />;
       default:
-        return (
-          <Typography key={item.id} variant="h6" color="error" align="center">
-           
-          </Typography>
-        );
+        return <Typography key={item.id} variant="h6" color="error" align="center"></Typography>;
     }
   });
 
   const Icon = menu.icon;
-  const menuIcon = menu.icon ? <Icon /> : <ArrowForwardIcon fontSize={level > 0 ? 'inherit' : 'default'} />;
+  const menuIcon = menu.icon ? <Icon /> : <ArrowForwardIcon fontSize={level > 0 ? 'white' : 'default'} />;
 
   return (
     <>
@@ -55,10 +51,44 @@ const NavCollapse = ({ menu, level }) => {
         selected={selected === menu.id}
         onClick={handleClick}
       >
-        <ListItemIcon sx={{ minWidth: !menu.icon ? '25px' : 'unset' }}>{menuIcon}</ListItemIcon>
+        <ListItemIcon
+          sx={{
+            ml:'15px',
+            minWidth: 25,
+            color: 'white',
+            '&.MuiListItemIcon-root': {
+              color: 'white !important'
+            },
+            '&.Mui-selected &': {
+              color: 'white !important'
+            },
+            '&.Mui-selected:hover &': {
+              color: 'white !important'
+            }
+          }}
+        >
+          {menuIcon}
+        </ListItemIcon>
         <ListItemText
           primary={
-            <Typography variant={selected === menu.id ? 'subtitle1' : 'body1'} color="inherit" sx={{ pl: 1.9 }}>
+            <Typography
+              variant={selected === menu.id ? 'subtitle1' : 'body1'}
+              color="inherit"
+              sx={{
+                ml: 2,
+                fontSize: '0.95rem',
+                color: 'white',
+                '&.MuiListItemIcon-root': {
+                  color: 'white !important'
+                },
+                '&.Mui-selected &': {
+                  color: 'white !important'
+                },
+                '&.Mui-selected:hover &': {
+                  color: 'white !important'
+                }
+              }}
+            >
               {menu.title}
             </Typography>
           }

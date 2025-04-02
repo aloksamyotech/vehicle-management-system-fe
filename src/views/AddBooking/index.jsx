@@ -36,6 +36,8 @@ const DriverForm = () => {
   const [drivers, setDrivers] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [minEndDate, setMinEndDate] = useState(new Date());
+  const [totalKm, setTotalKm] = useState('');
+  const [isAutoCalculated, setIsAutoCalculated] = useState(true);
 
   useEffect(() => {
     const fetchVehicles = async () => {
@@ -61,6 +63,7 @@ const DriverForm = () => {
   const {
     control,
     handleSubmit,
+    watch,
     setValue,
     reset,
     getValues,
@@ -140,6 +143,61 @@ const DriverForm = () => {
         console.error(text.ERROR_FETCHING, error);
       }
     }
+  };
+
+  const fetchCoordinates = async (pincode) => {
+    try {
+      const response = await axios.get(`https://nominatim.openstreetmap.org/search?postalcode=${pincode}&country=India&format=json`);
+      const data = response.data[0];
+
+      if (data) {
+        return { lat: parseFloat(data.lat), lon: parseFloat(data.lon) };
+      }
+      return null;
+    } catch (error) {
+      console.error(text.ERROR_FETCHING, error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    if (watch('tripStartPincode') && watch('tripEndPincode') && isAutoCalculated) {
+      calculateDistance();
+    }
+  }, [watch('tripStartPincode'), watch('tripEndPincode')]);
+
+  const calculateDistance = async () => {
+    const startPincode = watch('tripStartPincode');
+    const endPincode = watch('tripEndPincode');
+
+    if (startPincode && endPincode) {
+      const startCoords = await fetchCoordinates(startPincode);
+      const endCoords = await fetchCoordinates(endPincode);
+
+      if (startCoords && endCoords) {
+        let distance = getDistance(startCoords.lat, startCoords.lon, endCoords.lat, endCoords.lon);
+
+        distance = parseFloat(distance.toFixed(2));
+
+        if (isAutoCalculated) {
+          setTotalKm(distance);
+          setValue('totalKm', distance);
+        }
+      }
+    }
+  };
+
+  const getDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
   };
 
   const onSubmit = async (data) => {
@@ -396,7 +454,24 @@ const DriverForm = () => {
                       type="number"
                       size="small"
                       inputProps={{ step: '0.01', min: 0.1, max: 100000 }}
-                      onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                      value={totalKm}
+                      onChange={(e) => {
+                        setIsAutoCalculated(false);
+                        let value = parseFloat(e.target.value);
+
+                        if (!isNaN(value)) {
+                          setTotalKm(value);
+                          field.onChange(value);
+                        }
+                      }}
+                      onBlur={() => {
+                        if (!totalKm) {
+                          setIsAutoCalculated(true);
+                          calculateDistance();
+                        } else {
+                          setTotalKm(parseFloat(totalKm));
+                        }
+                      }}
                     />
                   )}
                 />
@@ -487,7 +562,13 @@ const DriverForm = () => {
                       type="number"
                       size="small"
                       inputProps={{ step: '0.01', min: 0.1, max: 100000 }}
-                      onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                      onChange={(e) => {
+                        let value = parseFloat(e.target.value);
+                        if (!isNaN(value)) {
+                          value = parseFloat(value);
+                        }
+                        field.onChange(value);
+                      }}
                     />
                   )}
                 />

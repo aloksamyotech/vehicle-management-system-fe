@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Button, Box, Grid, Divider, IconButton } from '@mui/material';
+import { Card, Switch, Box, Grid, Divider, IconButton, Stack, Typography } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { gridSpacing } from 'config.js';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { getApi, deleteApi } from 'common/apiClient';
+import { getApi, deleteApi, updateApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import CustomToolbar from 'common/customToolbar';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { text } from 'common/constant';
+import ToggleSwitch from 'common/toggleSwitch';
 
 const DriverManagementPage = () => {
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ const DriverManagementPage = () => {
       const formattedData = response.data.map((driver, index) => ({
         id: driver.id,
         name: driver.name,
+        email: driver.email,
         mobileNo: driver.mobileNo,
         age: driver.age,
         licenseNo: driver.licenseNo,
@@ -63,6 +65,7 @@ const DriverManagementPage = () => {
       renderCell: (params) => <img src={params.row.image} alt="driver" style={{ width: 50, height: 50, borderRadius: '50%' }} />
     },
     { field: 'name', headerName: text.NAME, width: 150 },
+    { field: 'email', headerName: text.EMAIL, width: 200 },
     { field: 'mobileNo', headerName: text.MOBILE, width: 150 },
     { field: 'licenseNo', headerName: text.LICENSE_NO, width: 150 },
     {
@@ -87,22 +90,20 @@ const DriverManagementPage = () => {
     {
       field: 'status',
       headerName: text.STATUS,
-      width: 100,
+      width: 200,
       renderCell: (params) => {
         const isActive = params.row.status === 'Active';
+
         return (
-          <Button
-            variant="contained"
-            style={{
-              backgroundColor: isActive ? '#30aa4c' : '#dc3545',
-              color: 'white',
-              fontWeight: 700,
-              fontSize: '10px',
-              padding: '0'
-            }}
-          >
-            {params.row.status}
-          </Button>
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mt: '15px' }}>
+            <Typography sx={{ fontWeight: 600, color: isActive ? 'green' : 'gray' }}>{text.ACTIVE}</Typography>
+            <ToggleSwitch
+              checked={isActive}
+              onChange={() => handleStatusToggle(params.row.id, params.row.status, params.api)}
+              color="success"
+            />
+            <Typography sx={{ fontWeight: 600, color: !isActive ? 'red' : 'gray' }}>{text.INACTIVE}</Typography>
+          </Stack>
         );
       }
     },
@@ -128,6 +129,19 @@ const DriverManagementPage = () => {
       )
     }
   ];
+
+  const handleStatusToggle = async (id, currentStatus, api) => {
+    try {
+      const updatedStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
+      const updateUrl = urls.driver.updateStatus.replace(':id', id);
+      await updateApi(updateUrl, { status: updatedStatus });
+
+      api.updateRows([{ id, status: updatedStatus }]);
+      toast.success(`Status updated to ${updatedStatus}!`);
+    } catch (error) {
+      console.error(text.ERROR_UPDATING, error);
+    }
+  };
 
   return (
     <>

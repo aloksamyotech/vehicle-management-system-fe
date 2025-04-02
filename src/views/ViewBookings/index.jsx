@@ -24,7 +24,7 @@ import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { text } from 'common/constant';
 import { urls } from 'common/urls';
-import { getApi, updateApi } from 'common/apiClient';
+import { getApi, updateApi, postApi } from 'common/apiClient';
 import PaymentDialog from './paymentForm';
 import BookingStatusDialog from './bookingstatus';
 import toast from 'react-hot-toast';
@@ -44,9 +44,10 @@ const ViewBookingPage = () => {
   const [openStatusDialog, setOpenStatusDialog] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
+  const [tripExpense, setTripExpense] = useState([]);
   const [bookingExpense, setBookingExpense] = useState({
-    tripExpense: '',
-    desc: '',
+    amount: '',
+    description: ''
   });
 
   const handleOpenStatusDialog = (id, currentStatus) => {
@@ -109,17 +110,41 @@ const ViewBookingPage = () => {
 
   const handleOpenDialog = () => {
     setBookingExpense({
-      tripExpense: '',
-      desc: ''
+      amount: '',
+      description: ''
     });
     setOpenDialog(true);
   };
 
   const handleAddExpense = async () => {
-    const response = await updateApi(urls.booking.updateExpense.replace(':id', id), bookingExpense);
+    const expenseData = {
+      ...bookingExpense,
+      bookingId
+    };
+
+    const response = await postApi(urls.tripExpense.create, expenseData);
     toast.success(text.BOOKING_EXP_ADDED);
     fetchBookingData();
     handleCloseDialog();
+  };
+
+  const fetchTripExpenseData = async () => {
+    if (bookingId) {
+      const response = await getApi(urls.tripExpense.getById.replace(':id', bookingId));
+      setTripExpense(response?.data || []);
+    }
+  };
+
+  useEffect(() => {
+    if (bookingId) {
+      fetchTripExpenseData();
+    }
+  }, [bookingId, bookings]);
+
+  const handleDeleteExpense = async (expenseId) => {
+    await updateApi(urls.tripExpense.update.replace(':id', expenseId));
+    toast.success(text.BOOKING_EXP_DELETED);
+    fetchTripExpenseData();
   };
 
   const handleCloseDialog = () => {
@@ -138,9 +163,10 @@ const ViewBookingPage = () => {
     setPaidAmount(newPaidAmount);
     setExcess(bookings.totalAmt - newPaidAmount);
   };
+
   const handleGenerateInvoice = () => {
     navigate(`/invoice/${bookingId}`, {
-      state: { excess, paidAmount}
+      state: { excess, paidAmount }
     });
   };
 
@@ -184,7 +210,7 @@ const ViewBookingPage = () => {
                     {bookings.tripStartLoc}({bookings.tripStartPincode})
                   </Typography>
                   <Typography variant="body2" color="textSecondary">
-                  {bookings.tripStartDate ? dayjs(bookings.tripStartDate).format('YYYY-MM-DD HH:mm') : 'N/A'}
+                    {bookings.tripStartDate ? dayjs(bookings.tripStartDate).format('YYYY-MM-DD HH:mm') : 'N/A'}
                   </Typography>
                 </Grid>
 
@@ -213,16 +239,28 @@ const ViewBookingPage = () => {
                 <Table size="small" aria-label="a dense table" sx={{ border: '1px solid #ddd', borderRadius: '4px' }}>
                   <TableHead>
                     <TableRow sx={{ backgroundColor: '#f4f4f4', p: 0 }}>
+                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>#</TableCell>
                       <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{text.AMOUNT}</TableCell>
-                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{text.DESCRIPTION}</TableCell>
+                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{text.COMMENTS}</TableCell>
+                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{text.PAID_ON}</TableCell>
+                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{text.ACTION}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    <TableRow>
-                      {' '}
-                      <TableCell sx={{ border: '1px solid #ddd' }}>{bookings.tripExpense || ''}</TableCell>
-                      <TableCell sx={{ border: '1px solid #ddd' }}>{bookings.desc || ''}</TableCell>
-                    </TableRow>
+                    {tripExpense.map((row, index) => (
+                      <TableRow key={row.id}>
+                        {' '}
+                        <TableCell sx={{ border: '1px solid #ddd' }}>{index + 1}</TableCell>
+                        <TableCell sx={{ border: '1px solid #ddd' }}>{row.amount}</TableCell>
+                        <TableCell sx={{ border: '1px solid #ddd' }}>{row.description}</TableCell>
+                        <TableCell sx={{ border: '1px solid #ddd' }}>{dayjs(row.createdAt).format('DD-MM-YYYY')}</TableCell>
+                        <TableCell sx={{ border: '1px solid #ddd' }}>
+                          <IconButton color="error" onClick={() => handleDeleteExpense(row.id)}>
+                            <DeleteIcon />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               </TableContainer>
@@ -249,7 +287,7 @@ const ViewBookingPage = () => {
                         <TableCell sx={{ border: '1px solid #ddd' }}>{index + 1}</TableCell>
                         <TableCell sx={{ border: '1px solid #ddd' }}>{row.paidAmount}</TableCell>
                         <TableCell sx={{ border: '1px solid #ddd' }}>{row.notes}</TableCell>
-                        <TableCell sx={{ border: '1px solid #ddd' }}>{row.createdAt}</TableCell>
+                        <TableCell sx={{ border: '1px solid #ddd' }}>{dayjs(row.createdAt).format('DD-MM-YYYY')}</TableCell>
                         <TableCell sx={{ border: '1px solid #ddd' }}>
                           <IconButton color="error" onClick={() => handleDeletePayment(row.id)}>
                             <DeleteIcon />
@@ -367,8 +405,8 @@ const ViewBookingPage = () => {
                   label={text.AMOUNT}
                   variant="outlined"
                   margin="dense"
-                  value={bookingExpense.tripExpense}
-                  onChange={(e) => setBookingExpense({ ...bookingExpense, tripExpense: parseFloat(e.target.value) || 0 })}
+                  value={bookingExpense.amount}
+                  onChange={(e) => setBookingExpense({ ...bookingExpense, amount: parseFloat(e.target.value) || 0 })}
                 />
                 <TextField
                   fullWidth
@@ -377,8 +415,8 @@ const ViewBookingPage = () => {
                   margin="dense"
                   multiline
                   rows={3}
-                  value={bookingExpense.desc}
-                  onChange={(e) => setBookingExpense({ ...bookingExpense, desc: e.target.value })}
+                  value={bookingExpense.description}
+                  onChange={(e) => setBookingExpense({ ...bookingExpense, description: e.target.value })}
                 />
               </DialogContent>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: 2 }}>

@@ -27,114 +27,100 @@ const Reports = () => {
   const [summary, setSummary] = useState('');
   const [tripExpenses, setTripExpenses] = useState([]);
 
+  // Store Original Data to filter later
+  const [allBookings, setAllBookings] = useState([]);
+  const [allIncomeExpense, setAllIncomeExpense] = useState([]);
+  const [allFuel, setAllFuel] = useState([]);
+  const [allDriverReport, setAllDriverReport] = useState([]);
+  const [allTripExpenses, setAllTripExpenses] = useState([]);
+
   useEffect(() => {
-    const fetchVehicles = async () => {
-      const response = await getApi(urls.vehicle.get);
-      setVehicles(response.data);
+    const fetchData = async () => {
+      const [vehiclesRes, driversRes, bookingsRes, incomeExpenseRes, fuelRes, driverReportRes, tripExpensesRes] = await Promise.all([
+        getApi(urls.vehicle.get),
+        getApi(urls.driver.get),
+        getApi(urls.booking.report),
+        getApi(urls.incomeExpense.report),
+        getApi(urls.fuel.report),
+        getApi(urls.booking.driverReport),
+        getApi(urls.tripExpense.report)
+      ]);
+
+      setVehicles(vehiclesRes.data);
+      setDrivers(driversRes.data);
+      setBookings(bookingsRes.data || []);
+      setAllBookings(bookingsRes.data || []);
+
+      setIncomeExpense(incomeExpenseRes.data.incomeExpenseDetails || []);
+      setAllIncomeExpense(incomeExpenseRes.data.incomeExpenseDetails || []);
+
+      setFuel(fuelRes.data || []);
+      setAllFuel(fuelRes.data || []);
+
+      setDriverReport(driverReportRes.data || []);
+      setAllDriverReport(driverReportRes.data || []);
+
+      setTripExpenses(tripExpensesRes.data || []);
+      setAllTripExpenses(tripExpensesRes.data || []);
     };
 
-    const fetchDrivers = async () => {
-      const response = await getApi(urls.driver.get);
-      setDrivers(response.data);
-    };
-
-    fetchVehicles();
-    fetchDrivers();
+    fetchData();
   }, []);
 
-  const fetchVehicleBookings = async () => {
-    const queryParams = {
-      startDate,
-      endDate,
-      vehicleId: selectedVehicle
-    };
+  const filterData = () => {
+    let filteredBookings = allBookings;
+    let filteredIncomeExpense = allIncomeExpense;
+    let filteredFuel = allFuel;
+    let filteredDriverReport = allDriverReport;
+    let filteredTripExpenses = allTripExpenses;
 
-    const response = await getApi(urls.booking.report, queryParams);
-    setBookings(response.data || []);
-    if (response.data.length === 0) {
-      toast.error(text.NO_DATA_FOUND);
-    }
-  };
-
-  const fetchVehicleIncomeExpense = async () => {
-    const queryParams = {
-      startDate,
-      endDate,
-      vehicleId: selectedVehicle
-    };
-
-    const response = await getApi(urls.incomeExpense.report, queryParams);
-    setIncomeExpense(response.data.incomeExpenseDetails || []);
-    setSummary(response.data.summary || null);
-  };
-
-  const fetchVehicleFuel = async () => {
-    const queryParams = {
-      startDate,
-      endDate,
-      vehicleId: selectedVehicle
-    };
-
-    const response = await getApi(urls.fuel.report, queryParams);
-    setFuel(response.data || []);
-    if (response.data.length === 0) {
-      toast.error(text.NO_DATA_FOUND);
-    }
-  };
-
-  const fetchDriverBookings = async () => {
-    const queryParams = {
-      startDate,
-      endDate,
-      driverId: selectedDriver
-    };
-
-    const response = await getApi(urls.booking.driverReport, queryParams);
-    setDriverReport(response.data || []);
-    if (response.data.length === 0) {
-      toast.error(text.NO_DATA_FOUND);
-    }
-  };
-
-  const fetchTripExpenses = async () => {
-    const queryParams = {
-      startDate,
-      endDate,
-      vehicleId: selectedVehicle
-    };
-
-    const response = await getApi(urls.tripExpense.report, queryParams);
-    setTripExpenses(response.data || []);
-    if (response.data.length === 0) {
-      toast.error(text.NO_DATA_FOUND);
-    }
-  };
-
-  const handleGenerateReport = async () => {
-    if (!startDate || !endDate) {
-      setStartDateError(!startDate);
-      setEndDateError(!endDate);
-      toast.error('Please select both start and end dates');
-      return;
+    if (selectedVehicle) {
+      filteredBookings = filteredBookings.filter((item) => item.vehicleId === selectedVehicle);
+      filteredIncomeExpense = filteredIncomeExpense.filter((item) => item.vehicleId === selectedVehicle);
+      filteredFuel = filteredFuel.filter((item) => item.vehicleId === selectedVehicle);
+      filteredTripExpenses = filteredTripExpenses.filter((item) => item.vehicleId === selectedVehicle);
     }
 
-    const tabFunctions = [fetchVehicleBookings, fetchVehicleIncomeExpense, fetchVehicleFuel, fetchDriverBookings, fetchTripExpenses];
+    if (selectedDriver) {
+      filteredDriverReport = filteredDriverReport.filter((item) => item.driverId === selectedDriver);
+    }
 
-    await tabFunctions[tabIndex]();
+    if (startDate && endDate) {
+      filteredBookings = filteredBookings.filter(
+        (item) => new Date(item.date) >= new Date(startDate) && new Date(item.date) <= new Date(endDate)
+      );
+      filteredIncomeExpense = filteredIncomeExpense.filter(
+        (item) => new Date(item.date) >= new Date(startDate) && new Date(item.date) <= new Date(endDate)
+      );
+      filteredFuel = filteredFuel.filter((item) => new Date(item.date) >= new Date(startDate) && new Date(item.date) <= new Date(endDate));
+      filteredDriverReport = filteredDriverReport.filter(
+        (item) => new Date(item.date) >= new Date(startDate) && new Date(item.date) <= new Date(endDate)
+      );
+      filteredTripExpenses = filteredTripExpenses.filter(
+        (item) => new Date(item.date) >= new Date(startDate) && new Date(item.date) <= new Date(endDate)
+      );
+    }
 
-    setStartDate('');
-    setEndDate('');
+    setBookings(filteredBookings);
+    setIncomeExpense(filteredIncomeExpense);
+    setFuel(filteredFuel);
+    setDriverReport(filteredDriverReport);
+    setTripExpenses(filteredTripExpenses);
+  };
+
+  const handleGenerateReport = () => {
+    filterData();
+  };
+
+  useEffect(() => {
+    setStartDate(null);
+    setEndDate(null);
     setSelectedVehicle('');
     setSelectedDriver('');
     setStartDateError(false);
     setEndDateError(false);
-  };
 
-  useEffect(() => {
-    setStartDate('');
-    setEndDate('');
-    setSelectedVehicle('');
-    setSelectedDriver('');
+    filterData();
   }, [tabIndex]);
 
   return (
@@ -192,16 +178,6 @@ const Reports = () => {
             fontWeight: tabIndex === 3 ? 'bold' : 'normal'
           }}
         />
-
-        <Tab
-          label={text.TRIP_EXPENSE}
-          sx={{
-            backgroundColor: tabIndex === 4 ? '#1482d7' : 'transparent',
-            color: tabIndex === 4 ? '#fff !important' : '#000',
-            borderRadius: '8px',
-            fontWeight: tabIndex === 4 ? 'bold' : 'normal'
-          }}
-        />
       </Tabs>
 
       <Box sx={{ mt: 2 }}>
@@ -212,29 +188,24 @@ const Reports = () => {
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={12} sm={3} md={2}>
                     <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                   {text.FROM}
+                      {text.FROM}
                     </FormLabel>
                     <DatePicker
                       value={startDate}
-                      onChange={(newValue) => setStartDate(newValue)}
-                      minDate={new Date()}
+                      onChange={(newValue) => {
+                        setStartDate(newValue);
+                        setStartDateError(false);
+                      }}
+                      maxDate={endDate || new Date()}
                       renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          size="small"
-                          error={startDateError}
-                          sx={{ flex: 1, minWidth: 200 }}
-                          inputProps={{
-                            max: endDate ? endDate.toISOString().split('T')[0] : ''
-                          }}
-                        />
+                        <TextField {...params} size="small" error={startDateError} sx={{ flex: 1, minWidth: 200 }} />
                       )}
                     />
                   </Grid>
 
                   <Grid item xs={12} sm={3} md={2}>
                     <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                     {text.TO}
+                      {text.TO}
                     </FormLabel>
                     <DatePicker
                       value={endDate}
@@ -243,14 +214,7 @@ const Reports = () => {
                         setEndDateError(false);
                       }}
                       minDate={startDate || new Date()}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          size="small"
-                          error={endDateError}
-                          sx={{ flex: 1, minWidth: 200 }}
-                        />
-                      )}
+                      renderInput={(params) => <TextField {...params} size="small" error={endDateError} sx={{ flex: 1, minWidth: 200 }} />}
                     />
                   </Grid>
 
@@ -591,8 +555,18 @@ const Reports = () => {
                         return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
                       }
                     },
-                    { field: 'tripStartLoc', headerName: text.FROM, width: 150 },
-                    { field: 'tripEndLoc', headerName: text.TO, width: 150 },
+                    {
+                      field: 'trip',
+                      headerName: text.FROM_TO,
+                      width: 220,
+                      renderCell: (params) => (
+                        <Box>
+                          <Typography>{params.row.tripStartLoc ? params.row.tripStartLoc : 'N/A'}</Typography>
+                          <Typography>to</Typography>
+                          <Typography>{params.row.tripEndLoc ? params.row.tripEndLoc : 'N/A'}</Typography>
+                        </Box>
+                      )
+                    },
                     { field: 'totalKm', headerName: text.DISTANCE, width: 150 },
                     { field: 'vehicle', headerName: text.VEHICLE, width: 150 },
                     { field: 'driver', headerName: text.DRIVER, width: 150 },
