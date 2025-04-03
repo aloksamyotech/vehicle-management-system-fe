@@ -9,8 +9,10 @@ import toast from 'react-hot-toast';
 import CustomToolbar from 'common/customToolbar';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { text } from 'common/constant';
+import { useTranslation } from 'react-i18next';
 
 const NewComponent = () => {
+  const { t } = useTranslation();
   const [openModal, setOpenModal] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [rows, setRows] = useState([]);
@@ -30,7 +32,7 @@ const NewComponent = () => {
       }));
       setRows(modifiedRows);
     } catch (error) {
-      toast.error(text.ERROR_FETCHING);
+      toast.error(t('text.ERROR_FETCHING'));
     } finally {
       setLoading(false);
     }
@@ -52,17 +54,17 @@ const NewComponent = () => {
 
   const handleDelete = async (id) => {
     await deleteApi(urls.vehicleGroup.delete.replace(':id', id));
-    toast.success(text.GROUP_DELETED);
+    toast.success(t('text.GROUP_DELETED'));
     fetchData();
   };
 
   const columns = [
-    { field: 'sno', headerName: text.S_NO, width: 80 },
-    { field: 'name', headerName: text.NAME, width: 180 },
-    { field: 'description', headerName: text.DESCRIPTION, width: 350 },
+    { field: 'sno', headerName: t('text.S_NO'), width: 80 },
+    { field: 'name', headerName: t('text.NAME'), width: 180 },
+    { field: 'description', headerName: t('text.DESCRIPTION'), width: 350 },
     {
       field: 'createdAt',
-      headerName: text.CREATED_AT,
+      headerName: t('text.CREATED_AT'),
       width: 150,
       renderCell: (params) => {
         return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
@@ -70,7 +72,7 @@ const NewComponent = () => {
     },
     {
       field: 'actions',
-      headerName: text.ACTION,
+      headerName: t('text.ACTION'),
       width: 100,
       sortable: false,
       renderCell: (params) => (
@@ -89,7 +91,7 @@ const NewComponent = () => {
 
   return (
     <>
-      <CustomBreadcrumbs title={text.VEHICLE_GROUP} links={[{ name: text.VEHICLE_GROUP, path: '/vehiclegroup' }]} />
+      <CustomBreadcrumbs title={t('text.VEHICLE_GROUP')} links={[{ name: t('text.VEHICLE_GROUP'), path: '/vehiclegroup' }]} />
 
       <Card>
         <Box sx={{ height: 'auto', width: '100%' }}>

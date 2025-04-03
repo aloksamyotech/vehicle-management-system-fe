@@ -9,8 +9,10 @@ import { ThumbUp, ThumbDown, Assessment } from '@mui/icons-material';
 import { text } from 'common/constant';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { useTranslation } from 'react-i18next';
 
 const Reports = () => {
+   const { t } = useTranslation();
   const [tabIndex, setTabIndex] = useState(0);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -26,8 +28,6 @@ const Reports = () => {
   const [driverReport, setDriverReport] = useState([]);
   const [summary, setSummary] = useState('');
   const [tripExpenses, setTripExpenses] = useState([]);
-
-  // Store Original Data to filter later
   const [allBookings, setAllBookings] = useState([]);
   const [allIncomeExpense, setAllIncomeExpense] = useState([]);
   const [allFuel, setAllFuel] = useState([]);
@@ -125,7 +125,7 @@ const Reports = () => {
 
   return (
     <Box>
-      <CustomBreadcrumbs title={text.REPORTS} links={[{ name: text.REPORTS, path: '/reports' }]} />
+      <CustomBreadcrumbs title={t('text.REPORTS')} links={[{ name: t('text.REPORTS'), path: '/reports' }]} />
 
       <Tabs
         value={tabIndex}
@@ -140,7 +140,7 @@ const Reports = () => {
         }}
       >
         <Tab
-          label={text.BOOKINGS}
+          label={t('text.BOOKINGS')}
           sx={{
             backgroundColor: tabIndex === 0 ? '#1482d7' : 'transparent',
             color: tabIndex === 0 ? '#fff !important' : '#000',
@@ -150,7 +150,7 @@ const Reports = () => {
         />
 
         <Tab
-          label={text.incomeExpense}
+          label={t('text.INCOME_EXPENSE')}
           sx={{
             backgroundColor: tabIndex === 1 ? '#1482d7' : 'transparent',
             color: tabIndex === 1 ? '#fff !important' : '#000',
@@ -160,7 +160,7 @@ const Reports = () => {
         />
 
         <Tab
-          label={text.FUEL}
+          label={t('text.FUEL')}
           sx={{
             backgroundColor: tabIndex === 2 ? '#1482d7' : 'transparent',
             color: tabIndex === 2 ? '#fff !important' : '#000',
@@ -170,7 +170,7 @@ const Reports = () => {
         />
 
         <Tab
-          label={text.DRIVER}
+          label={t('text.DRIVER')}
           sx={{
             backgroundColor: tabIndex === 3 ? '#1482d7' : 'transparent',
             color: tabIndex === 3 ? '#fff !important' : '#000',
@@ -188,7 +188,7 @@ const Reports = () => {
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={12} sm={3} md={2}>
                     <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                      {text.FROM}
+                      {t('text.FROM')}
                     </FormLabel>
                     <DatePicker
                       value={startDate}
@@ -205,7 +205,7 @@ const Reports = () => {
 
                   <Grid item xs={12} sm={3} md={2}>
                     <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                      {text.TO}
+                      {t('text.TO')}
                     </FormLabel>
                     <DatePicker
                       value={endDate}
@@ -227,7 +227,7 @@ const Reports = () => {
                         isOptionEqualToValue={(option, value) => option.id === value}
                         value={vehicles.find((v) => v.id === selectedVehicle) || null}
                         onChange={(_, newValue) => setSelectedVehicle(newValue?.id || '')}
-                        renderInput={(params) => <TextField {...params} label={text.SELECT_VEHICLE} sx={{ flex: 1, minWidth: 180 }} />}
+                        renderInput={(params) => <TextField {...params} label={t('text.SELECT_VEHICLE')} sx={{ flex: 1, minWidth: 180 }} />}
                       />
                     </Grid>
                   )}
@@ -241,7 +241,7 @@ const Reports = () => {
                         isOptionEqualToValue={(option, value) => option.id === value}
                         value={drivers.find((d) => d.id === selectedDriver) || null}
                         onChange={(_, newValue) => setSelectedDriver(newValue?.id || '')}
-                        renderInput={(params) => <TextField {...params} label={text.SELECT_DRIVER} sx={{ flex: 1, minWidth: 180 }} />}
+                        renderInput={(params) => <TextField {...params} label={t('text.SELECT_DRIVER')} sx={{ flex: 1, minWidth: 180 }} />}
                       />
                     </Grid>
                   )}
@@ -261,7 +261,7 @@ const Reports = () => {
                         }
                       }}
                     >
-                      {text.GENERATE_REPORT}
+                      {t('text.GENERATE_REPORT')}
                     </Button>
                   </Grid>
                 </Grid>
@@ -285,14 +285,14 @@ const Reports = () => {
                     tripEndLoc: row.tripEndLoc
                   }))}
                   columns={[
-                    { field: 'sNo', headerName: text.S_NO, width: 70 },
-                    { field: 'customer', headerName: text.CUSTOMER, width: 150 },
-                    { field: 'vehicle', headerName: text.VEHICLE, width: 150 },
-                    { field: 'tripType', headerName: text.TYPE, width: 150 },
-                    { field: 'driver', headerName: text.DRIVER, width: 150 },
+                    { field: 'sNo', headerName: t('text.S_NO'), width: 70 },
+                    { field: 'customer', headerName: t('text.CUSTOMER'), width: 150 },
+                    { field: 'vehicle', headerName: t('text.VEHICLE'), width: 150 },
+                    { field: 'tripType', headerName: t('text.TYPE'), width: 150 },
+                    { field: 'driver', headerName: t('text.DRIVER'), width: 150 },
                     {
                       field: 'trip',
-                      headerName: text.FROM_TO,
+                      headerName: t('text.FROM_TO'),
                       width: 200,
                       renderCell: (params) => (
                         <Box>
@@ -302,11 +302,11 @@ const Reports = () => {
                         </Box>
                       )
                     },
-                    { field: 'totalKm', headerName: text.DISTANCE, width: 100 },
-                    { field: 'totalAmt', headerName: text.AMOUNT, width: 100 },
+                    { field: 'totalKm', headerName: t('text.DISTANCE'), width: 100 },
+                    { field: 'totalAmt', headerName: t('text.AMOUNT'), width: 100 },
                     {
                       field: 'tripStatus',
-                      headerName: text.STATUS,
+                      headerName: t('text.STATUS'),
                       width: 120,
                       renderCell: (params) => {
                         const status = params.row.tripStatus;
@@ -367,7 +367,7 @@ const Reports = () => {
                         <ThumbUp sx={{ color: 'white', fontSize: 30 }} />
                       </Box>
                       <Box>
-                        <Typography variant="h5">{text.TOTAL_INCOME}</Typography>
+                        <Typography variant="h5">{t('text.TOTAL_INCOME')}</Typography>
                         <Typography variant="h6" fontWeight="bold">
                           {summary?.income || 0}
                         </Typography>
@@ -392,7 +392,7 @@ const Reports = () => {
                         <ThumbDown sx={{ color: 'black', fontSize: 30 }} />
                       </Box>
                       <Box>
-                        <Typography variant="h5">{text.TOTAL_EXPENSE}</Typography>
+                        <Typography variant="h5">{t('text.TOTAL_EXPENSE')}</Typography>
                         <Typography variant="h6" fontWeight="bold">
                           {summary?.expense || 0}
                         </Typography>
@@ -438,21 +438,21 @@ const Reports = () => {
                       type: row.type
                     }))}
                     columns={[
-                      { field: 'sNo', headerName: text.S_NO, width: 70 },
-                      { field: 'vehicle', headerName: text.VEHICLE, width: 200 },
+                      { field: 'sNo', headerName: t('text.S_NO'), width: 70 },
+                      { field: 'vehicle', headerName: t('text.VEHICLE'), width: 200 },
                       {
                         field: 'date',
-                        headerName: text.DATE,
+                        headerName: t('text.DATE'),
                         width: 150,
                         renderCell: (params) => {
                           return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
                         }
                       },
-                      { field: 'description', headerName: text.DESCRIPTION, width: 200 },
-                      { field: 'amount', headerName: text.AMOUNT, width: 150 },
+                      { field: 'description', headerName: t('text.DESCRIPTION'), width: 200 },
+                      { field: 'amount', headerName: t('text.AMOUNT'), width: 150 },
                       {
                         field: 'type',
-                        headerName: text.TYPE,
+                        headerName: t('text.TYPE'),
                         width: 120,
                         renderCell: (params) => {
                           const isExpense = params.row.type === 'Expense';
@@ -502,21 +502,21 @@ const Reports = () => {
                     comments: row.comments
                   }))}
                   columns={[
-                    { field: 'sNo', headerName: text_S_No, width: 70 },
+                    { field: 'sNo', headerName: t('text_S_No'), width: 70 },
                     {
                       field: 'fillDate',
-                      headerName: text.FILL_DATE,
+                      headerName: t('text.FILL_DATE'),
                       width: 150,
                       renderCell: (params) => {
                         return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
                       }
                     },
-                    { field: 'vehicle', headerName: text.VEHICLE, width: 150 },
-                    { field: 'quantity', headerName: text.QUANTITY, width: 100 },
-                    { field: 'amount', headerName: text.TOTAL_AMOUNT, width: 150 },
-                    { field: 'driver', headerName: text.FUEL_FILL_BY, width: 150 },
-                    { field: 'odometerReading', headerName: text.ODOMETER_READING, width: 150 },
-                    { field: 'comments', headerName: text.COMMENTS, width: 150 }
+                    { field: 'vehicle', headerName: t('text.VEHICLE'), width: 150 },
+                    { field: 'quantity', headerName: t('text.QUANTITY'), width: 100 },
+                    { field: 'amount', headerName: t('text.TOTAL_AMOUNT'), width: 150 },
+                    { field: 'driver', headerName: t('text.FUEL_FILL_BY'), width: 150 },
+                    { field: 'odometerReading', headerName: t('text.ODOMETER_READING'), width: 150 },
+                    { field: 'comments', headerName: t('text.COMMENTS'), width: 150 }
                   ]}
                   disableRowSelectionOnClick
                   sx={{
@@ -546,10 +546,10 @@ const Reports = () => {
                     tripEndLoc: row.tripEndLoc
                   }))}
                   columns={[
-                    { field: 'sNo', headerName: text.S_NO, width: 70 },
+                    { field: 'sNo', headerName: t('text.S_NO'), width: 70 },
                     {
                       field: 'tripStartDate',
-                      headerName: text.BOOKING_DATE,
+                      headerName: t('text.BOOKING_DATE'),
                       width: 150,
                       renderCell: (params) => {
                         return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
@@ -557,7 +557,7 @@ const Reports = () => {
                     },
                     {
                       field: 'trip',
-                      headerName: text.FROM_TO,
+                      headerName: t('text.FROM_TO'),
                       width: 220,
                       renderCell: (params) => (
                         <Box>
@@ -567,12 +567,12 @@ const Reports = () => {
                         </Box>
                       )
                     },
-                    { field: 'totalKm', headerName: text.DISTANCE, width: 150 },
-                    { field: 'vehicle', headerName: text.VEHICLE, width: 150 },
-                    { field: 'driver', headerName: text.DRIVER, width: 150 },
+                    { field: 'totalKm', headerName: t('text.DISTANCE'), width: 150 },
+                    { field: 'vehicle', headerName: t('text.VEHICLE'), width: 150 },
+                    { field: 'driver', headerName: t('text.DRIVER'), width: 150 },
                     {
                       field: 'createdAt',
-                      headerName: text.CREATED_AT,
+                      headerName: t('text.CREATED_AT'),
                       width: 150,
                       renderCell: (params) => {
                         return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
@@ -607,21 +607,21 @@ const Reports = () => {
                     tripEndLoc: row.tripEndLoc
                   }))}
                   columns={[
-                    { field: 'sNo', headerName: text.S_NO, width: 70 },
-                    { field: 'vehicle', headerName: text.VEHICLE, width: 150 },
-                    { field: 'driver', headerName: text.DRIVER, width: 150 },
+                    { field: 'sNo', headerName: t('text.S_NO'), width: 70 },
+                    { field: 'vehicle', headerName: t('text.VEHICLE'), width: 150 },
+                    { field: 'driver', headerName: t('text.DRIVER'), width: 150 },
                     {
                       field: 'date',
-                      headerName: text.DATE,
+                      headerName: t('text.DATE'),
                       width: 150,
                       renderCell: (params) => {
                         return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
                       }
                     },
-                    { field: 'tripType', headerName: text.TYPE, width: 120 },
+                    { field: 'tripType', headerName: t('text.TYPE'), width: 120 },
                     {
                       field: 'trip',
-                      headerName: text.FROM_TO,
+                      headerName: t('text.FROM_TO'),
                       width: 200,
                       renderCell: (params) => (
                         <Box>
@@ -631,8 +631,8 @@ const Reports = () => {
                         </Box>
                       )
                     },
-                    { field: 'description', headerName: text.DESCRIPTION, width: 200 },
-                    { field: 'amount', headerName: text.AMOUNT, width: 150 }
+                    { field: 'description', headerName: t('text.DESCRIPTION'), width: 200 },
+                    { field: 'amount', headerName: t('text.AMOUNT'), width: 150 }
                   ]}
                   disableRowSelectionOnClick
                   sx={{

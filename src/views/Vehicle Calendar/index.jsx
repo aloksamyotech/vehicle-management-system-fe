@@ -8,8 +8,10 @@ import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { text } from 'common/constant';
+import { useTranslation } from 'react-i18next';
 
 const VehicleAvailability = () => {
+     const { t } = useTranslation();
   const [events, setEvents] = useState([]);
   const [vehicles, setVehicles] = useState([]);
   const [selectedVehicleId, setSelectedVehicleId] = useState('');
@@ -51,7 +53,7 @@ const VehicleAvailability = () => {
 
         setEvents([...bookingEvents, ...maintenanceEvents]);
       } catch (error) {
-        console.error(text.ERROR_FETCHING, error);
+        console.error(t('text.ERROR_FETCHING'));
       }
     };
 
@@ -62,11 +64,11 @@ const VehicleAvailability = () => {
 
   return (
     <>
-      <CustomBreadcrumbs title={text.CALENDAR} links={[{ name: text.CALENDAR, path: '/vehicleavailability' }]} />
+      <CustomBreadcrumbs title={t('text.CALENDAR')} links={[{ name: t('text.CALENDAR'), path: '/vehicleavailability' }]} />
 
       <Card style={{ height: 'auto', marginTop: '20px', padding: '10px' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, marginBottom: '10px' }}>
-          <Typography sx={{ fontWeight: 'bold' }}>{text.SELECT_VEHICLE}:</Typography>
+          <Typography sx={{ fontWeight: 'bold' }}>{t('text.SELECT_VEHICLE')}:</Typography>
           <Select
             value={selectedVehicleId}
             onChange={(e) => setSelectedVehicleId(e.target.value)}
@@ -74,7 +76,7 @@ const VehicleAvailability = () => {
             size="small"
             sx={{ width: '200px' }}
           >
-            <MenuItem value="">{text.ALL_VEHICLE}</MenuItem>
+            <MenuItem value="">{t('text.ALL_VEHICLE')}</MenuItem>
             {vehicles.map((vehicle) => (
               <MenuItem key={vehicle.id} value={vehicle.id}>
                 {vehicle.registrationNo} - {vehicle.vehicleName}

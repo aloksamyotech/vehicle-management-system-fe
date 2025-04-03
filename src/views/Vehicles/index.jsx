@@ -12,8 +12,10 @@ import { urls } from 'common/urls';
 import CustomToolbar from 'common/customToolbar';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { text } from 'common/constant';
+import { useTranslation } from 'react-i18next';
 
 const VehiclePage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [vehicles, setVehicles] = useState([]);
@@ -44,22 +46,22 @@ const VehiclePage = () => {
       }));
       setVehicles(formattedData);
     } catch (error) {
-      toast.error(text.ERROR_FETCHING);
+      toast.error(t('text.ERROR_FETCHING'));
     } finally {
       setLoading(false);
     }
   };
 
   const columns = [
-    { field: 'sNo', headerName: text.S_NO, width: 80 },
-    { field: 'vehicleName', headerName: text.VEHICLE_NAME, width: 150, editable: true },
-    { field: 'registrationNo', headerName: text.RES_NO, width: 180, editable: true },
-    { field: 'model', headerName: text.MODEL, width: 100, editable: true },
-    { field: 'chasisNo', headerName: text.CHASIS_NO, width: 150, editable: true },
-    { field: 'group', headerName: text.GROUP, width: 150, editable: true },
+    { field: 'sNo', headerName: t('text.S_NO'), width: 80 },
+    { field: 'vehicleName', headerName: t('text.VEHICLE_NAME'), width: 150, editable: true },
+    { field: 'registrationNo', headerName: t('text.RES_NO'), width: 180, editable: true },
+    { field: 'model', headerName: t('text.MODEL'), width: 100, editable: true },
+    { field: 'chasisNo', headerName: t('text.CHASIS_NO'), width: 150, editable: true },
+    { field: 'group', headerName: t('text.GROUP'), width: 150, editable: true },
     {
       field: 'isActive',
-      headerName: text.STATUS,
+      headerName: t('text.STATUS'),
       width: 100,
       renderCell: (params) => {
         return (
@@ -80,7 +82,7 @@ const VehiclePage = () => {
     },
     {
       field: 'actions',
-      headerName: text.ACTION,
+      headerName: t('text.ACTION'),
       width: 150,
       sortable: false,
       renderCell: (params) => {
@@ -110,13 +112,13 @@ const VehiclePage = () => {
 
   const handleDelete = async (id) => {
     await deleteApi(urls.vehicle.delete.replace(':id', id));
-    toast.success(text.VEHICLE_DELETED);
+    toast.success(t('text.VEHICLE_DELETED'));
     fetchVehicles();
   };
 
   return (
     <>
-      <CustomBreadcrumbs title={text.VEHICLE_INFO} links={[{ name: text.VEHICLE_MNGT, path: '/vehicle' }]} />
+      <CustomBreadcrumbs title={t('text.VEHICLE_INFO')} links={[{ name: t('text.VEHICLE_MNGT'), path: '/vehicle' }]} />
 
       <Grid container spacing={gridSpacing}>
         <Grid item xs={12}>

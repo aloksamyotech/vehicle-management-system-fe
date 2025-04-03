@@ -14,6 +14,8 @@ import App from 'layout/App';
 import reducer from 'store/reducer';
 import * as serviceWorker from 'serviceWorker';
 import { Toaster } from 'react-hot-toast';
+import { I18nextProvider } from 'react-i18next';
+import i18n from 'i18n';
 
 const store = configureStore({ reducer });
 
@@ -23,9 +25,11 @@ const root = createRoot(document.getElementById('root'));
 
 root.render(
   <Provider store={store}>
-     <Toaster position="top-center" />
+    <Toaster position="top-center" />
     <BrowserRouter basename={import.meta.env.VITE_APP_BASE_NAME}>
-      <App />
+      <I18nextProvider i18n={i18n}>
+        <App />
+      </I18nextProvider>
     </BrowserRouter>
   </Provider>
 );

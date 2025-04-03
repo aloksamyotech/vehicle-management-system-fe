@@ -5,11 +5,13 @@ import { urls } from 'common/urls';
 import { Box, Card, CardContent, Typography, Grid, Divider, Button } from '@mui/material';
 import { jsPDF } from 'jspdf';
 import { text } from 'common/constant';
+import { useTranslation } from 'react-i18next';
 
 const InvoicePage = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const location = useLocation();
-  const { excess, paidAmount} = location.state || {};
+  const { excess, paidAmount } = location.state || {};
   const [booking, setBooking] = useState(null);
   const currentDate = new Date().toLocaleDateString();
 
@@ -61,38 +63,38 @@ const InvoicePage = () => {
       <Card sx={{ maxWidth: 800, mx: 'auto', p: 3 }}>
         <CardContent>
           <Typography variant="h4" fontWeight="bold">
-            {text.INVOICE}
+            {t('text.INVOICE')}
           </Typography>
           <Box textAlign="right">
             <Typography variant="h5">
-              {text.INV_NO}: #{booking?.invoiceNo}
+              {t('text.INV_NO')}: #{booking?.invoiceNo}
             </Typography>
             <Typography variant="h5">
-              {text.DATE}: {currentDate}
+              {t('text.DATE')}: {currentDate}
             </Typography>
           </Box>
 
           <Typography variant="h6" fontWeight="bold" mt={3}>
-            {text.BOOKING_DETAILS}
+            {t('text.BOOKING_DETAILS')}
           </Typography>
           <Divider sx={{ mb: 2 }} />
           <Grid container spacing={2}>
             <Grid item xs={6}>
-              <Typography variant="h6">{text.BOOKING_ID}:</Typography>
+              <Typography variant="h6">{t('text.BOOKING_ID')}:</Typography>
               <Typography>{booking?.id || ''}</Typography>
-              <Typography variant="h6">{text.VEHICLE_NAME}:</Typography>
+              <Typography variant="h6">{t('text.VEHICLE_NAME')}:</Typography>
               <Typography>{booking?.vehicle?.vehicleName || ''}</Typography>
-              <Typography variant="h6">{text.STATUS}:</Typography>
+              <Typography variant="h6">{t('text.STATUS')}:</Typography>
               <Typography>{booking?.tripStatus || ''}</Typography>
-              <Typography variant="h6">{text.DRIVER_NAME}:</Typography>
+              <Typography variant="h6">{t('text.DRIVER_NAME')}:</Typography>
               <Typography>{booking?.driver?.name || 'N/A'}</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="h6">{text.TRIP_START_LOC}:</Typography>
+              <Typography variant="h6">{t('text.TRIP_START_LOC')}:</Typography>
               <Typography>
                 {booking?.tripStartDate || ''} | {booking?.tripStartLoc || ''}
               </Typography>
-              <Typography variant="h6">{text.TRIP_END_LOC}:</Typography>
+              <Typography variant="h6">{t('text.TRIP_END_LOC')}:</Typography>
               <Typography>
                 {booking?.tripEndDate || ''} | {booking?.tripEndLoc || ''}
               </Typography>
@@ -100,40 +102,40 @@ const InvoicePage = () => {
           </Grid>
 
           <Typography variant="h6" fontWeight="bold" mt={3}>
-            {text.CUSTOMER_INFO}
+            {t('text.CUSTOMER_INFO')}
           </Typography>
           <Divider sx={{ mb: 2 }} />
           <Grid container spacing={2}>
             <Grid item xs={6}>
-              <Typography variant="h6">{text.NAME}:</Typography>
+              <Typography variant="h6">{t('text.NAME')}:</Typography>
               <Typography>{booking?.customer?.name || 'N/A'}</Typography>
 
-              <Typography variant="h6">{text.EMAIL}:</Typography>
+              <Typography variant="h6">{t('text.EMAIL')}:</Typography>
               <Typography>{booking?.customer?.email || 'N/A'}</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="h6">{text.PHONE}:</Typography>
+              <Typography variant="h6">{t('text.PHONE')}:</Typography>
               <Typography>{booking?.customer?.mobileNo || 'N/A'}</Typography>
 
-              <Typography variant="h6">{text.ADDRESS}:</Typography>
+              <Typography variant="h6">{t('text.ADDRESS')}:</Typography>
               <Typography>{booking?.customer?.address || 'N/A'}</Typography>
             </Grid>
           </Grid>
 
           <Typography variant="h6" fontWeight="bold" mt={3}>
-            {text.PAYMENT_INFO}
+            {t('text.PAYMENT_INFO')}
           </Typography>
           <Divider sx={{ mb: 2 }} />
           <Grid container spacing={2}>
             <Grid item xs={6}>
-              <Typography variant="h6">{text.PAID_AMOUNT}:</Typography>
+              <Typography variant="h6">{t('text.PAID_AMOUNT')}:</Typography>
               <Typography>₹{paidAmount || ''}</Typography>
               <Typography variant="h5">
-                {text.TOTAL_AMOUNT}: ₹{booking?.totalAmt || ''}
+                {t('text.TOTAL_AMOUNT')}: ₹{booking?.totalAmt || ''}
               </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="h6">{text.PENDING_AMOUNT}:</Typography>
+              <Typography variant="h6">{t('text.PENDING_AMOUNT')}:</Typography>
               <Typography>₹{excess || ''}</Typography>
             </Grid>
           </Grid>
@@ -152,7 +154,7 @@ const InvoicePage = () => {
                 '&:hover': { backgroundColor: 'darkgreen' }
               }}
             >
-              {text.DOWNLOAD}
+              {t('text.DOWNLOAD')}
             </Button>
           </Box>
         </CardContent>

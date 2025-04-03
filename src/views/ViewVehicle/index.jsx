@@ -22,13 +22,14 @@ import { text } from 'common/constant';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
+import { useTranslation } from 'react-i18next';
 
 const ViewVehiclePage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [vehicles, setVehicles] = useState({});
   const [tabIndex, setTabIndex] = useState(0);
-
+ const { t } = useTranslation();
   const fetchVehicles = async () => {
     const response = await getApi(urls.vehicle.getById.replace(':id', id));
     setVehicles(response?.data);
@@ -45,42 +46,42 @@ const ViewVehiclePage = () => {
   };
 
   const vehicleData = [
-    { label: text.RES_NO, value: vehicles.registrationNo },
-    { label: text.NAME, value: vehicles.vehicleName },
-    { label: text.MODEL, value: vehicles.model },
-    { label: text.CHASIS_NO, value: vehicles.chasisNo },
-    { label: text.ENGINE_NO, value: vehicles.engineNo },
-    { label: text.MANUFACTURED_BY, value: vehicles.manufacturedBy },
-    { label: text.GPS_API, value: 'https://codeforts.com/vms/api' },
-    { label: text.API_USERNAME, value: 'KDH 678T' },
-    { label: text.API_PASS, value: '278561' },
-    { label: text.CREATED_DATE, value: vehicles.createdAt },
-    { label: text.MODIFIED_DATE, value: vehicles.updatedAt },
-    { label: text.DOCUMENT, value: vehicles.doc }
+    { label: t('text.RES_NO'), value: vehicles.registrationNo },
+    { label: t('text.NAME'), value: vehicles.vehicleName },
+    { label: t('text.MODEL'), value: vehicles.model },
+    { label: t('text.CHASIS_NO'), value: vehicles.chasisNo },
+    { label: t('text.ENGINE_NO'), value: vehicles.engineNo },
+    { label: t('text.MANUFACTURED_BY'), value: vehicles.manufacturedBy },
+    { label: t('text.GPS_API'), value: 'https://codeforts.com/vms/api' },
+    { label: t('text.API_USERNAME'), value: 'KDH 678T' },
+    { label: t('text.API_PASS'), value: '278561' },
+    { label: t('text.CREATED_DATE'), value: vehicles.createdAt },
+    { label: t('text.MODIFIED_DATE'), value: vehicles.updatedAt },
+    { label: t('text.DOCUMENT'), value: vehicles.doc }
   ];
 
   const bookingColumns = [
     { field: 'sNo', headerName: '#', width: 50 },
-    { field: 'driver', headerName: text.DRIVER, width: 120 },
-    { field: 'customer', headerName: text.CUSTOMER, width: 120 },
+    { field: 'driver', headerName: t('text.DRIVER'), width: 120 },
+    { field: 'customer', headerName: t('text.CUSTOMER'), width: 120 },
     {
       field: 'fromTo',
-      headerName: text.FROM_TO,
+      headerName: t('text.FROM_TO'),
       width: 200,
       renderCell: (params) => (
         <Box>
           <Typography>{params.row?.tripStartLoc}</Typography>
 
-          <Typography>{text.TO}</Typography>
+          <Typography>{t('text.TO')}</Typography>
 
           <Typography>{params.row?.tripEndLoc}</Typography>
         </Box>
       )
     },
-    { field: 'totalAmt', headerName: text.AMOUNT, width: 150 },
+    { field: 'totalAmt', headerName: t('text.AMOUNT'), width: 150 },
     {
       field: 'tripStatus',
-      headerName: text.STATUS,
+      headerName: t('text.STATUS'),
       width: 100,
       renderCell: (params) => {
         const status = params.row?.tripStatus;
@@ -109,7 +110,7 @@ const ViewVehiclePage = () => {
     },
     {
       field: 'action',
-      headerName: text.ACTION,
+      headerName: t('text.ACTION'),
       width: 100,
       renderCell: (params) => {
         return (
@@ -137,11 +138,11 @@ const ViewVehiclePage = () => {
 
   const geofenceColumns = [
     { field: 'id', headerName: '#', width: 50 },
-    { field: 'name', headerName: text.NAME, width: 150 },
-    { field: 'description', headerName: text.DESCRIPTION, width: 250 },
+    { field: 'name', headerName: t('text.NAME'), width: 150 },
+    { field: 'description', headerName:t('text.DESCRIPTION'), width: 250 },
     {
       field: 'action',
-      headerName: text.ACTION,
+      headerName: t('text.ACTION'),
       width: 100,
       renderCell: () => (
         <IconButton color="primary">
@@ -162,17 +163,17 @@ const ViewVehiclePage = () => {
     { field: 'id', headerName: '#', width: 50 },
     {
       field: 'date',
-      headerName: text.DATE,
+      headerName: t('text.DATE'),
       width: 150,
       renderCell: (params) => {
         return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
       }
     },
-    { field: 'description', headerName: text.DESCRIPTION, width: 200 },
-    { field: 'amount', headerName: text.AMOUNT, width: 100 },
+    { field: 'description', headerName: t('text.DESCRIPTION'), width: 200 },
+    { field: 'amount', headerName: t('text.AMOUNT'), width: 100 },
     {
       field: 'type',
-      headerName: text.TYPE,
+      headerName: t('text.TYPE'),
       width: 120,
       renderCell: (params) => {
         const isActive = params.row?.type === 'Expense';
@@ -195,7 +196,7 @@ const ViewVehiclePage = () => {
     },
     {
       field: 'action',
-      headerName: text.ACTION,
+      headerName: t('text.ACTION'),
       width: 100,
       renderCell: () => (
         <IconButton color="primary" sx={{ py: 2 }} onClick={() => navigate('/finance')}>
@@ -217,10 +218,10 @@ const ViewVehiclePage = () => {
   return (
     <Box>
       <CustomBreadcrumbs
-        title={text.VEHICLE_DETAILS}
+        title={t('text.VEHICLE_DETAILS')}
         links={[
-          { name: text.VEHICLE, path: '/vehicles' },
-          { name: text.VEHICLE_DETAILS, path: '' }
+          { name:t('text.VEHICLE'), path: '/vehicles' },
+          { name: t('text.VEHICLE_DETAILS'), path: '' }
         ]}
       />
 
@@ -260,7 +261,7 @@ const ViewVehiclePage = () => {
             <Box sx={{ width: '100%' }}>
               <Grid container spacing={1}>
                 <Grid item xs={6}>
-                  <Typography sx={{ fontWeight: 'bold', textAlign: 'left' }}>{text.BOOKINGS}:</Typography>
+                  <Typography sx={{ fontWeight: 'bold', textAlign: 'left' }}>{t('text.BOOKINGS')}:</Typography>
                 </Grid>
                 <Grid item xs={6}>
                   <Typography sx={{ textAlign: 'right' }}>0</Typography>
@@ -271,7 +272,7 @@ const ViewVehiclePage = () => {
                 </Grid>
 
                 <Grid item xs={6}>
-                  <Typography sx={{ fontWeight: 'bold', textAlign: 'left' }}>{text.GEOFENCE}:</Typography>
+                  <Typography sx={{ fontWeight: 'bold', textAlign: 'left' }}>{t('text.GEOFENCE')}:</Typography>
                 </Grid>
                 <Grid item xs={6}>
                   <Typography sx={{ textAlign: 'right' }}>4</Typography>
@@ -282,7 +283,7 @@ const ViewVehiclePage = () => {
                 </Grid>
 
                 <Grid item xs={6}>
-                  <Typography sx={{ fontWeight: 'bold', textAlign: 'left' }}>{text.NOTIFICATIONS}:</Typography>
+                  <Typography sx={{ fontWeight: 'bold', textAlign: 'left' }}>{t('text.NOTIFICATIONS')}:</Typography>
                 </Grid>
                 <Grid item xs={6}>
                   <Typography sx={{ textAlign: 'right' }}>0</Typography>
@@ -306,7 +307,7 @@ const ViewVehiclePage = () => {
               }}
             >
               <Tab
-                label={text.BASIC_INFO}
+                label={t('text.BASIC_INFO')}
                 sx={{
                   backgroundColor: tabIndex === 0 ? '#1482d7' : 'transparent',
                   color: tabIndex === 0 ? '#fff !important' : '#000',
@@ -315,7 +316,7 @@ const ViewVehiclePage = () => {
                 }}
               />
               <Tab
-                label={text.BOOKINGS}
+                label={t('text.BOOKINGS')}
                 sx={{
                   backgroundColor: tabIndex === 1 ? '#1482d7' : 'transparent',
                   color: tabIndex === 1 ? '#fff !important' : '#000',
@@ -325,7 +326,7 @@ const ViewVehiclePage = () => {
               />
 
               <Tab
-                label={text.GEOFENCE}
+                label={t('text.GEOFENCE')}
                 sx={{
                   backgroundColor: tabIndex === 2 ? '#1482d7' : 'transparent',
                   color: tabIndex === 2 ? '#fff !important' : '#000',
@@ -335,7 +336,7 @@ const ViewVehiclePage = () => {
               />
 
               <Tab
-                label={text.incomeExpense}
+                label={t('text.INCOME_EXPENSE')}
                 sx={{
                   backgroundColor: tabIndex === 3 ? '#1482d7' : 'transparent',
                   color: tabIndex === 3 ? '#fff !important' : '#000',
@@ -405,7 +406,7 @@ const ViewVehiclePage = () => {
                     />
                   </Box>
                 ) : (
-                  <Typography>{text.NO_DATE_AVAILABLE}</Typography>
+                  <Typography>{t('text.NO_DATE_AVAILABLE')}</Typography>
                 )}
               </>
             )}
@@ -457,7 +458,7 @@ const ViewVehiclePage = () => {
                     />
                   </Box>
                 ) : (
-                  <Typography>{text.NO_DATE_AVAILABLE}</Typography>
+                  <Typography>{t('text.NO_DATE_AVAILABLE')}</Typography>
                 )}
               </>
             )}

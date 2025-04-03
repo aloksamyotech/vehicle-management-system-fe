@@ -5,8 +5,10 @@ import { urls } from 'common/urls';
 import { postApi } from 'common/apiClient';
 import { text } from 'common/constant';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 const PaymentDialog = ({ open, handleClose, totalAmount, bookingId, handleAddPayment, excess ,fetchPaymentData}) => {
+    const { t } = useTranslation();
   const {
     control,
     handleSubmit,
@@ -28,7 +30,7 @@ const PaymentDialog = ({ open, handleClose, totalAmount, bookingId, handleAddPay
 
   const onSubmit = async (data) => {
     if (data.paidAmount > totalAmount) {
-      toast.error(text.AMT_ERROR);
+      toast.error(t('text.AMT_ERROR'));
       return;
     }
     setLoading(true);
@@ -40,7 +42,7 @@ const PaymentDialog = ({ open, handleClose, totalAmount, bookingId, handleAddPay
     };
 
     const response = await postApi(urls.payment.create, paymentData);
-    toast.success(text.PAYMENT_ADDED);
+    toast.success(t('text.PAYMENT_ADDED'));
     fetchPaymentData();
     handleAddPayment(paymentData);
     reset();
@@ -50,23 +52,23 @@ const PaymentDialog = ({ open, handleClose, totalAmount, bookingId, handleAddPay
   return (
     <>
       <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth>
-        <DialogTitle sx={{ fontWeight: 'bold', fontSize: '18px' }}>{text.MAKE_PAYMENT}</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 'bold', fontSize: '18px' }}>{t('text.MAKE_PAYMENT')}</DialogTitle>
         <DialogContent>
-          <TextField label={text.TOTAL_AMOUNT} fullWidth margin="dense" value={totalAmount} disabled />
+          <TextField label={t('text.TOTAL_AMOUNT')} fullWidth margin="dense" value={totalAmount} disabled />
 
           <Controller
             name="paidAmount"
             control={control}
             rules={{
-              required: text.REQUIRED,
+              required: t('text.REQUIRED'),
               validate: {
-                lessThanTotal: (value) => value <= totalAmount || text.AMT_ERROR
+                lessThanTotal: (value) => value <= totalAmount || t('text.AMT_ERROR')
               }
             }}
             render={({ field }) => (
               <TextField
                 {...field}
-                label={text.PAID_AMOUNT}
+                label={t('text.PAID_AMOUNT')}
                 type="number"
                 fullWidth
                 margin="normal"
@@ -84,16 +86,16 @@ const PaymentDialog = ({ open, handleClose, totalAmount, bookingId, handleAddPay
           <Controller
             name="notes"
             control={control}
-            render={({ field }) => <TextField {...field} label={text.NOTES} fullWidth margin="normal" multiline rows={2} />}
+            render={({ field }) => <TextField {...field} label={t('text.NOTES')} fullWidth margin="normal" multiline rows={2} />}
           />
         </DialogContent>
 
         <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 2 }}>
           <Button onClick={handleSubmit(onSubmit)} color="primary" variant="contained" disabled={loading}>
-            {loading ? 'Saving...' : text.SAVE_PAYMENT}
+            {loading ? 'Saving...' : t("text.SAVE_PAYMENT")}
           </Button>
           <Button onClick={handleClose} variant="outlined">
-            {text.CANCEL}
+            {t('text.CANCEL')}
           </Button>
         </Box>
       </Dialog>

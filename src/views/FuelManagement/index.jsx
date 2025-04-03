@@ -10,8 +10,10 @@ import { urls } from 'common/urls';
 import CustomToolbar from 'common/customToolbar';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { text } from 'common/constant';
+import { useTranslation } from 'react-i18next';
 
 const FuelRecords = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -38,32 +40,32 @@ const FuelRecords = () => {
       }));
       setRows(formattedData);
     } catch (error) {
-      toast.error(text.ERROR_FETCHING);
+      toast.error(t('text.ERROR_FETCHING'));
     } finally {
       setLoading(false);
     }
   };
 
   const columns = [
-    { field: 'sNo', headerName: text.S_NO, width: 80 },
+    { field: 'sNo', headerName: t('text.S_NO'), width: 80 },
     {
       field: 'fillDate',
-      headerName: text.FILL_DATE,
+      headerName: t('text.FILL_DATE'),
       width: 150,
       renderCell: (params) => {
-        const date =  params.value ? new Date(params.value) : null;
+        const date = params.value ? new Date(params.value) : null;
         return date ? date.toLocaleDateString() : 'N/A';
       }
     },
-    { field: 'vehicle', headerName: text.VEHICLE, width: 200 },
-    { field: 'quantity', headerName: text.QUANTITY, width: 120 },
-    { field: 'amount', headerName: text.TOTAL_AMOUNT, width: 150 },
-    { field: 'driver', headerName: text.FUEL_FILL_BY, width: 150 },
-    { field: 'odometerReading', headerName: text.ODOMETER_READING, width: 150 },
-    { field: 'comments', headerName: text.COMMENTS, width: 200 },
+    { field: 'vehicle', headerName: t('text.VEHICLE'), width: 200 },
+    { field: 'quantity', headerName: t('text.QUANTITY'), width: 120 },
+    { field: 'amount', headerName: t('text.TOTAL_AMOUNT'), width: 150 },
+    { field: 'driver', headerName: t('text.FUEL_FILL_BY'), width: 150 },
+    { field: 'odometerReading', headerName: t('text.ODOMETER_READING'), width: 150 },
+    { field: 'comments', headerName: t('text.COMMENTS'), width: 200 },
     {
       field: 'actions',
-      headerName: text.ACTION,
+      headerName: t('text.ACTION'),
       width: 100,
       sortable: false,
       renderCell: (params) => {
@@ -89,13 +91,13 @@ const FuelRecords = () => {
 
   const handleDelete = async (id) => {
     await deleteApi(urls.fuel.delete.replace(':id', id));
-    toast.success('Fuel deleted successfully');
+    toast.success(t('text.FUEL_DELETED'));
     fetchData();
   };
 
   return (
     <>
-      <CustomBreadcrumbs title={text.FUEL_MGNT} links={[{ name: text.FUEL_MGNT, path: '/fuel' }]} />
+      <CustomBreadcrumbs title={t('text.FUEL_MGNT')} links={[{ name: t('text.FUEL_MGNT'), path: '/fuel' }]} />
 
       <Grid container spacing={2}>
         <Grid item xs={12}>

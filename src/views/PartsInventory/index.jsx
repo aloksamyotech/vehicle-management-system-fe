@@ -10,8 +10,10 @@ import toast from 'react-hot-toast';
 import CustomToolbar from 'common/customToolbar';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { text } from 'common/constant';
+import { useTranslation } from 'react-i18next';
 
 const PartsInventory = () => {
+  const { t } = useTranslation();
   const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
   const [editData, setEditData] = useState(null);
@@ -31,20 +33,20 @@ const PartsInventory = () => {
       }));
       setRows(modifiedRows);
     } catch (error) {
-      toast.error(text.ERROR_FETCHING);
+      toast.error(t('text.ERROR_FETCHING'));
     } finally {
       setLoading(false);
     }
   };
 
   const columns = [
-    { field: 'sno', headerName: text.S_NO, width: 80 },
-    { field: 'name', headerName: text.NAME, width: 200 },
-    { field: 'description', headerName: text.DESCRIPTION, width: 350 },
-    { field: 'stock', headerName: text.stock, width: 120 },
+    { field: 'sno', headerName: t('text.S_NO'), width: 80 },
+    { field: 'name', headerName: t('text.NAME'), width: 200 },
+    { field: 'description', headerName: t('text.DESCRIPTION'), width: 350 },
+    { field: 'stock', headerName: t('text.STOCK'), width: 120 },
     {
       field: 'status',
-      headerName: text.STATUS,
+      headerName: t('text.STATUS'),
       width: 100,
       renderCell: (params) => {
         const isActive = params.row.status === 'Active';
@@ -66,7 +68,7 @@ const PartsInventory = () => {
     },
     {
       field: 'actions',
-      headerName: text.ACTION,
+      headerName: t('text.ACTION'),
       width: 100,
       sortable: false,
       renderCell: (params) => (
@@ -99,13 +101,13 @@ const PartsInventory = () => {
 
   const handleDelete = async (id) => {
     await deleteApi(urls.partsInventory.delete.replace(':id', id));
-    toast.success(text.PARTS_DELETED);
+    toast.success(t('text.PARTS_DELETED'));
     fetchData();
   };
 
   return (
     <>
-      <CustomBreadcrumbs title={text.PartsInventory} links={[{ name: text.PartsInventory, path: '/partsinventory' }]} />
+      <CustomBreadcrumbs title={t('text.PARTS_INVENTORY')} links={[{ name: t('text.PARTS_INVENTORY'), path: '/partsinventory' }]} />
 
       <Grid container spacing={2}>
         <Grid item xs={12}>
@@ -157,7 +159,7 @@ const PartsInventory = () => {
           }}
         >
           <Typography variant="h4" sx={{ mb: 2 }}>
-            {editData?.id ? text.edit : text.add} {text.parts}
+            {editData?.id ? t('text.EDIT') : t('text.ADD')} {t('text.PART')}
           </Typography>
           <AddPartForm initialData={editData} onSave={handleClose} onCancel={handleClose} refreshData={refreshData} />
         </Box>

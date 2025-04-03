@@ -12,8 +12,10 @@ import CustomToolbar from 'common/customToolbar';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { text } from 'common/constant';
 import ToggleSwitch from 'common/toggleSwitch';
+import { useTranslation } from 'react-i18next';
 
 const DriverManagementPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [drivers, setDrivers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -44,7 +46,7 @@ const DriverManagementPage = () => {
       }));
       setDrivers(formattedData);
     } catch (error) {
-      toast.error(text.ERROR_FETCHING);
+      toast.error(t('text.ERROR_FETCHING'));
     } finally {
       setLoading(false);
     }
@@ -52,25 +54,25 @@ const DriverManagementPage = () => {
 
   const handleDelete = async (id) => {
     await deleteApi(urls.driver.delete.replace(':id', id));
-    toast.success(text.DRIVER_DELETED);
+    toast.success(t('text.DRIVER_DELETED'));
     fetchDrivers();
   };
 
   const columns = [
-    { field: 'sNo', headerName: text.S_NO, width: 80 },
+    { field: 'sNo', headerName: t('text.S_NO'), width: 80 },
     {
       field: 'image',
-      headerName: text.PHOTO,
+      headerName: t('text.PHOTO'),
       width: 120,
       renderCell: (params) => <img src={params.row.image} alt="driver" style={{ width: 50, height: 50, borderRadius: '50%' }} />
     },
-    { field: 'name', headerName: text.NAME, width: 150 },
-    { field: 'email', headerName: text.EMAIL, width: 200 },
-    { field: 'mobileNo', headerName: text.MOBILE, width: 150 },
-    { field: 'licenseNo', headerName: text.LICENSE_NO, width: 150 },
+    { field: 'name', headerName: t('text.NAME'), width: 150 },
+    { field: 'email', headerName: t('text.EMAIL'), width: 200 },
+    { field: 'mobileNo', headerName: t('text.MOBILE'), width: 150 },
+    { field: 'licenseNo', headerName: t('text.LICENSE_NO'), width: 150 },
     {
       field: 'licenseExpiry',
-      headerName: text.LICENSE_EXP_DATE,
+      headerName: t('text.LICENSE_EXP_DATE'),
       width: 180,
       renderCell: (params) => {
         const date = params.value ? new Date(params.value) : null;
@@ -79,37 +81,37 @@ const DriverManagementPage = () => {
     },
     {
       field: 'dateOfJoining',
-      headerName: text.DATE_OF_JOINING,
+      headerName: t('text.DATE_OF_JOINING'),
       width: 150,
       renderCell: (params) => {
         const date = params.value ? new Date(params.value) : null;
         return date ? date.toLocaleDateString() : 'N/A';
       }
     },
-    { field: 'doc', headerName: text.DOCUMENT, width: 100 },
+    { field: 'doc', headerName: t('text.DOCUMENT'), width: 100 },
     {
       field: 'status',
-      headerName: text.STATUS,
+      headerName: t('text.STATUS'),
       width: 200,
       renderCell: (params) => {
         const isActive = params.row.status === 'Active';
 
         return (
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mt: '15px' }}>
-            <Typography sx={{ fontWeight: 600, color: isActive ? 'green' : 'gray' }}>{text.ACTIVE}</Typography>
+            <Typography sx={{ fontWeight: 600, color: isActive ? 'green' : 'gray' }}>{t('text.ACTIVE')}</Typography>
             <ToggleSwitch
               checked={isActive}
               onChange={() => handleStatusToggle(params.row.id, params.row.status, params.api)}
               color="success"
             />
-            <Typography sx={{ fontWeight: 600, color: !isActive ? 'red' : 'gray' }}>{text.INACTIVE}</Typography>
+            <Typography sx={{ fontWeight: 600, color: !isActive ? 'red' : 'gray' }}>{t('text.INACTIVE')}</Typography>
           </Stack>
         );
       }
     },
     {
       field: 'actions',
-      headerName: text.ACTION,
+      headerName: t('text.ACTION'),
       width: 100,
       sortable: false,
       renderCell: (params) => (
@@ -139,13 +141,13 @@ const DriverManagementPage = () => {
       api.updateRows([{ id, status: updatedStatus }]);
       toast.success(`Status updated to ${updatedStatus}!`);
     } catch (error) {
-      console.error(text.ERROR_UPDATING, error);
+      console.error(t('text.ERROR_UPDATING'));
     }
   };
 
   return (
     <>
-      <CustomBreadcrumbs title={text.DRIVER_INFO} links={[{ name: text.DRIVER_MGNT, path: '/driver' }]} />
+      <CustomBreadcrumbs title={t('text.DRIVER_INFO')} links={[{ name: t('text.DRIVER_MGNT'), path: '/driver' }]} />
 
       <Grid container spacing={gridSpacing}>
         <Grid item xs={12}>

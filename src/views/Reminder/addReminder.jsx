@@ -7,8 +7,10 @@ import { urls } from 'common/urls';
 import { text } from 'common/constant';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { useTranslation } from 'react-i18next';
 
 const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
+  const { t } = useTranslation();
   const [vehicles, setVehicles] = useState([]);
   const {
     control,
@@ -35,7 +37,7 @@ const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
 
   const onSubmit = async (data) => {
     const response = await postApi(urls.reminder.create, data);
-    toast.success(text.REM_ADDED);
+    toast.success(t('text.REM_ADDED'));
 
     onSave(response.data);
     refreshData();
@@ -48,12 +50,12 @@ const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
         <Grid item xs={12}>
           <FormControl fullWidth>
             <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-              {text.VEHICLE}
+              {t('text.VEHICLE')}
             </FormLabel>
             <Controller
               name="vehicleId"
               control={control}
-              rules={{ required: text.REQUIRED }}
+              rules={{ required: t('text.REQUIRED') }}
               render={({ field }) => (
                 <Autocomplete
                   options={vehicles}
@@ -64,7 +66,7 @@ const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
                     <TextField
                       {...params}
                       size="small"
-                      placeholder={text.SELECT_VEHICLE}
+                      placeholder={t('text.SELECT_VEHICLE')}
                       error={!!errors.vehicleId}
                       helperText={errors.vehicleId?.message}
                     />
@@ -78,12 +80,12 @@ const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
         <Grid item xs={12}>
           <FormControl fullWidth>
             <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-              {text.DATE}
+              {t('text.DATE')}
             </FormLabel>
             <Controller
               name="reminderDate"
               control={control}
-              rules={{ required: text.REQUIRED }}
+              rules={{ required: t('text.REQUIRED') }}
               render={({ field }) => (
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                   <DatePicker
@@ -109,13 +111,13 @@ const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
         </Grid>
 
         <Grid item xs={12}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.MESSAGE}</FormLabel>
+          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{t('text.MESSAGE')}</FormLabel>
           <Controller
             name="message"
             control={control}
             rules={{
-              required: text.REQUIRED,
-              maxLength: { value: 200, message: text.MAX_200_CHAR }
+              required: t('text.REQUIRED'),
+              maxLength: { value: 200, message: t('text.MAX_200_CHAR') }
             }}
             render={({ field }) => (
               <TextField
@@ -134,10 +136,10 @@ const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
         <Button type="submit" variant="contained" disabled={isSubmitting}>
-          {isSubmitting ? 'Saving...' : text.add} {text.REM}
+          {isSubmitting ? 'Saving...' : t('text.ADD')} {t('text.REM')}
         </Button>
         <Button variant="outlined" onClick={onCancel} disabled={isSubmitting}>
-          {text.CANCEL}
+          {t('text.CANCEL')}
         </Button>
       </Box>
     </Box>

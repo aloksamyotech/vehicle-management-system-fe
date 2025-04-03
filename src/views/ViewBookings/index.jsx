@@ -29,8 +29,10 @@ import PaymentDialog from './paymentForm';
 import BookingStatusDialog from './bookingstatus';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
 
 const ViewBookingPage = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [paymentData, setPaymentData] = useState([]);
@@ -123,7 +125,7 @@ const ViewBookingPage = () => {
     };
 
     const response = await postApi(urls.tripExpense.create, expenseData);
-    toast.success(text.BOOKING_EXP_ADDED);
+    toast.success(t('text.BOOKING_EXP_ADDED'));
     fetchBookingData();
     handleCloseDialog();
   };
@@ -143,7 +145,7 @@ const ViewBookingPage = () => {
 
   const handleDeleteExpense = async (expenseId) => {
     await updateApi(urls.tripExpense.update.replace(':id', expenseId));
-    toast.success(text.BOOKING_EXP_DELETED);
+    toast.success(t('text.BOOKING_EXP_DELETED'));
     fetchTripExpenseData();
   };
 
@@ -153,7 +155,7 @@ const ViewBookingPage = () => {
 
   const handleDeletePayment = async (paymentId) => {
     await updateApi(urls.payment.update.replace(':id', paymentId));
-    toast.success(text.PAYMENT_DELETED);
+    toast.success(t('text.PAYMENT_DELETED'));
     fetchPaymentData();
 
     const updatedPayments = paymentData.filter((payment) => payment.id !== paymentId);
@@ -173,10 +175,10 @@ const ViewBookingPage = () => {
   return (
     <Box>
       <CustomBreadcrumbs
-        title={text.BOOKING_DETAILS}
+        title={t('text.BOOKING_DETAILS')}
         links={[
-          { name: text.BOOKINGS, path: '/booking' },
-          { name: text.BOOKING_DETAILS, path: '' }
+          { name: t('text.BOOKINGS'), path: '/booking' },
+          { name: t('text.BOOKING_DETAILS'), path: '' }
         ]}
       />
 
@@ -185,9 +187,9 @@ const ViewBookingPage = () => {
           <Grid item xs={12} md={7}>
             <Grid container spacing={2} padding={2} justifyContent="center">
               {[
-                { title: text.TOTAL_AMOUNT, value: bookings.totalAmt },
-                { title: text.PAID_AMOUNT, value: paidAmount },
-                { title: text.PENDING_AMOUNT, value: excess }
+                 { title: t('text.TOTAL_AMOUNT'), value: bookings.totalAmt },
+                 { title: t('text.PAID_AMOUNT'), value: paidAmount },
+                 { title: t('text.PENDING_AMOUNT'), value: excess }
               ].map((item, index) => (
                 <Grid item xs={12} sm={4} key={index} display="flex" justifyContent="center">
                   <Card sx={{ textAlign: 'center', width: '100%', backgroundColor: '#f8f9fa' }}>
@@ -203,7 +205,7 @@ const ViewBookingPage = () => {
             </Grid>
 
             <Box sx={{ p: 2 }}>
-              <Typography variant="h5">{text.OVERVIEW}:</Typography>
+              <Typography variant="h5">{t('text.OVERVIEW')}:</Typography>
               <Grid container alignItems="center" justifyContent="space-between">
                 <Grid item xs={4} textAlign="left">
                   <Typography variant="body1" fontWeight="bold">
@@ -216,7 +218,7 @@ const ViewBookingPage = () => {
 
                 <Grid item xs={4} textAlign="center">
                   <Typography variant="body1" fontWeight="bold">
-                    {text.TO}
+                    {t('text.TO')}
                   </Typography>
                 </Grid>
 
@@ -234,16 +236,16 @@ const ViewBookingPage = () => {
             <Divider />
 
             <Box sx={{ mt: 2, p: 2 }}>
-              <Typography variant="h5">{text.TRIP_EXPENSE}</Typography>
+              <Typography variant="h5">{t('text.TRIP_EXPENSE')}</Typography>
               <TableContainer sx={{ border: '1px solid #ddd', borderRadius: '4px' }}>
                 <Table size="small" aria-label="a dense table" sx={{ border: '1px solid #ddd', borderRadius: '4px' }}>
                   <TableHead>
                     <TableRow sx={{ backgroundColor: '#f4f4f4', p: 0 }}>
                       <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>#</TableCell>
-                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{text.AMOUNT}</TableCell>
-                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{text.COMMENTS}</TableCell>
-                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{text.PAID_ON}</TableCell>
-                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{text.ACTION}</TableCell>
+                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{t('text.AMOUNT')}</TableCell>
+                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{t('text.COMMENTS')}</TableCell>
+                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{t('text.PAID_ON')}</TableCell>
+                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{t('text.ACTION')}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -267,17 +269,17 @@ const ViewBookingPage = () => {
             </Box>
 
             <Box sx={{ mt: 2, p: 2 }}>
-              <Typography variant="h5">{text.PAYEMNT_ACTIVITY}</Typography>
+              <Typography variant="h5">{t('text.PAYEMNT_ACTIVITY')}</Typography>
               <TableContainer sx={{ border: '1px solid #ddd', borderRadius: '4px' }}>
                 <Table size="small" aria-label="a dense table" sx={{ border: '1px solid #ddd', borderRadius: '4px' }}>
                   <TableHead>
                     <TableRow sx={{ backgroundColor: '#f4f4f4', p: 0 }}>
                       {' '}
                       <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>#</TableCell>
-                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{text.AMOUNT}</TableCell>
-                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{text.COMMENTS}</TableCell>
-                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{text.PAID_ON}</TableCell>
-                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{text.ACTION}</TableCell>
+                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{t('text.AMOUNT')}</TableCell>
+                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{t('text.COMMENTS')}</TableCell>
+                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{t('text.PAID_ON')}</TableCell>
+                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{t('text.ACTION')}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -314,7 +316,7 @@ const ViewBookingPage = () => {
                     onClick={handleOpenPaymentDialog}
                     sx={{ p: '2px 2px', width: '100%' }}
                   >
-                    {text.ADD_PAYMENT}
+                    {t('text.ADD_PAYMENT')}
                   </Button>
                 </Grid>
 
@@ -326,7 +328,7 @@ const ViewBookingPage = () => {
                     onClick={handleOpenDialog}
                     sx={{ p: '2px 2px', width: '100%' }}
                   >
-                    {text.TRIP_EXPENSE}
+                    {t('text.TRIP_EXPENSE')}
                   </Button>
                 </Grid>
 
@@ -345,7 +347,7 @@ const ViewBookingPage = () => {
                     }}
                     onClick={handleGenerateInvoice}
                   >
-                    {text.GENERATE_INVOICE}
+                    {t('text.GENERATE_INVOICE')}
                   </Button>
                 </Grid>
 
@@ -364,13 +366,13 @@ const ViewBookingPage = () => {
                     }}
                     onClick={() => handleOpenStatusDialog(bookings.id, bookings.tripStatus)}
                   >
-                    {text.UPDATE_STATUS}
+                    {t('text.UPDATE_STATUS')}
                   </Button>
                 </Grid>
               </Grid>
 
               <Typography variant="h6" fontWeight="bold" sx={{ mt: 2 }}>
-                {text.CUSTOMER_INFO}
+                {t('text.CUSTOMER_INFO')}
               </Typography>
               <Typography variant="body2">{bookings?.customer?.name}</Typography>
               <Typography variant="body2">{bookings?.customer?.mobileNo}</Typography>
@@ -378,13 +380,13 @@ const ViewBookingPage = () => {
               <Typography variant="body2">{bookings?.customer?.address}</Typography>
 
               <Typography variant="h6" fontWeight="bold" sx={{ mt: 2 }}>
-                {text.DRIVER_INFO}
+                {t('text.DRIVER_INFO')}
               </Typography>
               <Typography variant="body2">{bookings?.driver?.name}</Typography>
               <Typography variant="body2">{bookings?.driver?.mobileNo}</Typography>
               <Typography variant="body2">{bookings?.driver?.address}</Typography>
               <Typography variant="h6" fontWeight="bold" sx={{ mt: 2 }}>
-                {text.TRACKING_URL}
+                {t('text.TRACKING_URL')}
               </Typography>
               <Typography variant="body2" color="primary">
                 <a href="https://codeforts.com/vms/triptracking/67d226feda21d" target="_blank" rel="noopener noreferrer">
@@ -393,16 +395,16 @@ const ViewBookingPage = () => {
               </Typography>
 
               <Button variant="contained" sx={{ mt: 2, background: '#28a745' }}>
-                {text.SHARE_TO_CUSTOMER}
+                {t('text.SHARE_TO_CUSTOMER')}
               </Button>
             </Box>
 
             <Dialog open={openDialog} onClose={handleCloseDialog}>
-              <DialogTitle sx={{ fontWeight: 'bold', fontSize: '18px' }}>{text.ADD_TRIP_EXPENSE}</DialogTitle>
+              <DialogTitle sx={{ fontWeight: 'bold', fontSize: '18px' }}>{t('text.ADD_TRIP_EXPENSE')}</DialogTitle>
               <DialogContent>
                 <TextField
                   fullWidth
-                  label={text.AMOUNT}
+                  label={t('text.AMOUNT')}
                   variant="outlined"
                   margin="dense"
                   value={bookingExpense.amount}
@@ -410,7 +412,7 @@ const ViewBookingPage = () => {
                 />
                 <TextField
                   fullWidth
-                  label={text.DESCRIPTION}
+                  label={t('text.DESCRIPTION')}
                   variant="outlined"
                   margin="dense"
                   multiline
@@ -421,10 +423,10 @@ const ViewBookingPage = () => {
               </DialogContent>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: 2 }}>
                 <Button type="submit" variant="contained" onClick={handleAddExpense}>
-                  {text.ADD_EXPENSE}
+                  {t('text.ADD_EXPENSE')}
                 </Button>
                 <Button variant="outlined" onClick={handleCloseDialog}>
-                  {text.CANCEL}
+                  {t('text.CANCEL')}
                 </Button>
               </Box>
             </Dialog>

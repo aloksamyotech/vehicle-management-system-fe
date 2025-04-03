@@ -20,6 +20,7 @@ import CampaignIcon from '@mui/icons-material/Campaign';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import SummarizeIcon from '@mui/icons-material/Summarize';
+import i18n from 'i18n';
 
 const icons = {
   NavigationOutlinedIcon: NavigationOutlinedIcon,
@@ -46,6 +47,8 @@ const icons = {
 };
 
 export default {
+  title: i18n.t('Dashboard-Menu'),
+
   items: [
     {
       id: 'navigation',
@@ -54,33 +57,33 @@ export default {
       children: [
         {
           id: 'dashboard',
-          title: 'Dashboard',
+          title: i18n.t('DASHBOARD'),
           type: 'item',
           icon: icons['HomeIcon'],
           url: '/dashboard/default'
         },
         {
           id: 'availability',
-          title: 'Availability',
+          title: i18n.t('Availability'),
           type: 'item',
           icon: icons['CalendarMonthIcon'],
           url: '/vehicleavailability'
         },
         {
           id: 'vehicle',
-          title: 'Vehicles',
+          title: i18n.t('Vehicles'),
           type: 'collapse',
           icon: icons['LocalShippingIcon'],
           children: [
             {
               id: 'vehicles',
-              title: 'Vehicle List',
+              title: i18n.t('Vehicle List'),
               type: 'item',
               url: '/vehicles'
             },
             {
               id: 'vehiclegroup',
-              title: 'Vehicle Group',
+              title: i18n.t('Vehicle Group'),
               type: 'item',
               url: '/vehiclegroup'
             }
@@ -88,96 +91,96 @@ export default {
         },
         {
           id: 'drivers',
-          title: 'Drivers',
+          title: i18n.t('Drivers'),
           type: 'item',
           url: '/drivers',
           icon: icons['ContactEmergencyIcon']
         },
         {
           id: 'booking',
-          title: 'Bookings',
+          title: i18n.t('Bookings'),
           type: 'item',
           url: '/booking',
           icon: icons['BookOnlineIcon']
         },
         {
           id: 'customer',
-          title: 'Customer',
+          title: i18n.t('Customer'),
           type: 'item',
           url: '/customer',
           icon: icons['Person2Icon']
         },
         {
           id: 'maintenance',
-          title: 'Maintenance',
+          title: i18n.t('Maintenance'),
           type: 'item',
           url: '/maintenance',
           icon: icons['BuildIcon']
         },
         {
           id: 'partsinventory',
-          title: 'Parts Inventory',
+          title: i18n.t('Parts Inventory'),
           type: 'item',
           url: '/partsinventory',
           icon: icons['InventoryIcon']
         },
         {
           id: 'fuel',
-          title: 'Fuel',
+          title: i18n.t('Fuel'),
           type: 'item',
           url: '/fuel',
           icon: icons['LocalGasStationIcon']
         },
         {
           id: 'reminder',
-          title: 'Reminder',
+          title: i18n.t('Reminder'),
           type: 'item',
           url: '/reminder',
           icon: icons['CampaignIcon']
         },
         {
           id: 'finance',
-          title: 'Income & Expense',
+          title: i18n.t('Income & Expense'),
           type: 'item',
           url: '/finance',
           icon: icons['AttachMoneyIcon']
         },
         {
           id: 'reports',
-          title: 'Reports',
+          title: i18n.t('Reports'),
           type: 'item',
           url: '/reports',
           icon: icons['SummarizeIcon']
         },
         {
           id: 'users',
-          title: 'User Management',
+          title: i18n.t('User Management'),
           type: 'item',
           url: '/users',
           icon: icons['VerifiedUserIcon']
         },
-        {
-          id: 'auth',
-          title: 'Authentication',
-          type: 'collapse',
-          icon: icons['SecurityOutlinedIcon'],
-          children: [
-            {
-              id: 'login-1',
-              title: 'Login',
-              type: 'item',
-              url: '/login',
-              target: true
-            },
-            {
-              id: 'register',
-              title: 'Register',
-              type: 'item',
-              url: '/register',
-              target: true
-            }
-          ]
-        }
+        // {
+        //   id: 'auth',
+        //   title: 'Authentication',
+        //   type: 'collapse',
+        //   icon: icons['SecurityOutlinedIcon'],
+        //   children: [
+        //     {
+        //       id: 'login-1',
+        //       title: 'Login',
+        //       type: 'item',
+        //       url: '/login',
+        //       target: true
+        //     },
+        //     {
+        //       id: 'register',
+        //       title: 'Register',
+        //       type: 'item',
+        //       url: '/register',
+        //       target: true
+        //     }
+        //   ]
+        // }
       ]
     }
   ]

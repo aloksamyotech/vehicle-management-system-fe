@@ -7,8 +7,10 @@ import { urls } from 'common/urls';
 import { text } from 'common/constant';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { useTranslation } from 'react-i18next';
 
 const IncomeExpenseForm = ({ initialData, onSave, refreshData, onCancel }) => {
+  const { t } = useTranslation();
   const [vehicles, setVehicles] = useState([]);
   const {
     register,
@@ -54,11 +56,11 @@ const IncomeExpenseForm = ({ initialData, onSave, refreshData, onCancel }) => {
 
     if (initialData?.id) {
       response = await updateApiPatch(urls.incomeExpense.update.replace(':id', initialData.id), financeData);
-      toast.success(text.INC_EXP_UPDATED);
+      toast.success(t('text.INC_EXP_UPDATED'));
     } else {
       response = await postApi(urls.incomeExpense.create, financeData);
       console.log(response);
-      toast.success(text.INC_EXP_ADDED);
+      toast.success(t('text.INC_EXP_ADDED'));
     }
 
     onSave(response.data);
@@ -72,12 +74,12 @@ const IncomeExpenseForm = ({ initialData, onSave, refreshData, onCancel }) => {
         <Grid item xs={6}>
           <FormControl fullWidth>
             <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-              {text.VEHICLE}
+              {t('text.VEHICLE')}
             </FormLabel>
             <Controller
               name="vehicleId"
               control={control}
-              rules={{ required: text.REQUIRED }}
+              rules={{ required: t('text.REQUIRED') }}
               render={({ field }) => (
                 <Autocomplete
                   options={vehicles}
@@ -89,7 +91,7 @@ const IncomeExpenseForm = ({ initialData, onSave, refreshData, onCancel }) => {
                     <TextField
                       {...params}
                       size="small"
-                      placeholder={text.SELECT_VEHICLE}
+                      placeholder={t('text.SELECT_VEHICLE')}
                       error={!!errors.vehicleId}
                       helperText={errors.vehicleId?.message}
                     />
@@ -103,19 +105,19 @@ const IncomeExpenseForm = ({ initialData, onSave, refreshData, onCancel }) => {
         <Grid item xs={6}>
           <FormControl fullWidth size="small">
             <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-              {text.TYPE}
+              {t('text.TYPE')}
             </FormLabel>
             <Controller
               name="type"
               control={control}
-              rules={{ required: text.REQUIRED }}
+              rules={{ required: t('text.REQUIRED') }}
               render={({ field }) => (
                 <Select {...field} displayEmpty size="small" error={!!errors.type}>
                   <MenuItem value="" disabled>
-                    {text.SELECT_TYPE}
+                    {t('text.SELECT_TYPE')}
                   </MenuItem>
-                  <MenuItem value="Income">{text.INCOME}</MenuItem>
-                  <MenuItem value="Expense">{text.EXPENSE}</MenuItem>
+                  <MenuItem value="Income">{t('text.INCOME')}</MenuItem>
+                  <MenuItem value="Expense">{t('text.EXPENSE')}</MenuItem>
                 </Select>
               )}
             />
@@ -129,13 +131,13 @@ const IncomeExpenseForm = ({ initialData, onSave, refreshData, onCancel }) => {
 
         <Grid item xs={6}>
           <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-            {text.DATE}
+            {t('text.DATE')}
           </FormLabel>
           <Controller
             name="date"
             control={control}
             defaultValue={new Date()}
-            rules={{ required: text.REQUIRED }}
+            rules={{ required: t('text.REQUIRED') }}
             render={({ field }) => (
               <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <DatePicker
@@ -154,14 +156,14 @@ const IncomeExpenseForm = ({ initialData, onSave, refreshData, onCancel }) => {
 
         <Grid item xs={6}>
           <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-            {text.AMOUNT}
+            {t('text.AMOUNT')}
           </FormLabel>
           <Controller
             name="amount"
             control={control}
             rules={{
-              required: text.REQUIRED,
-              min: { value: 0.01, message: text.GREATER_THAN_0 }
+              required: t('text.REQUIRED'),
+              min: { value: 0.01, message: t('text.GREATER_THAN_0') }
             }}
             render={({ field }) => (
               <TextField
@@ -183,15 +185,15 @@ const IncomeExpenseForm = ({ initialData, onSave, refreshData, onCancel }) => {
         </Grid>
 
         <Grid item xs={12}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.DESCRIPTION}</FormLabel>
+          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{t('text.DESCRIPTION')}</FormLabel>
           <Controller
             name="description"
             control={control}
             rules={{
               validate: (value) => {
-                if (!value.trim()) return text.REQUIRED;
+                if (!value.trim()) return t('text.REQUIRED');
                 const wordCount = value.trim().split(/\s+/).length;
-                return wordCount <= 100 || text.MAX_100_CHAR;
+                return wordCount <= 100 || t('text.MAX_100_CHAR');
               }
             }}
             render={({ field }) => (
@@ -220,10 +222,10 @@ const IncomeExpenseForm = ({ initialData, onSave, refreshData, onCancel }) => {
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
         <Button type="submit" variant="contained" color="primary" disabled={isSubmitting}>
-          {initialData?.id ? text.update : text.add} {text.incomeExpense}
+          {initialData?.id ? t('text.UPDATE') : t('text.ADD')} {t('text.INCOME_EXPENSE')}
         </Button>
         <Button variant="outlined" onClick={onCancel} disabled={isSubmitting}>
-          {text.CANCEL}
+          {t('text.CANCEL')}
         </Button>
       </Box>
     </Box>

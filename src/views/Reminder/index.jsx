@@ -9,8 +9,10 @@ import toast from 'react-hot-toast';
 import CustomToolbar from 'common/customToolbar';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { text } from 'common/constant.jsx';
+import { useTranslation } from 'react-i18next';
 
 const FuelReminderIndex = () => {
+  const { t } = useTranslation();
   const [modalOpen, setModalOpen] = useState(false);
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -32,28 +34,28 @@ const FuelReminderIndex = () => {
       }));
       setRows(formattedData);
     } catch (error) {
-      toast.error(text.ERROR_FETCHING);
+      toast.error(t('text.ERROR_FETCHING'));
     } finally {
       setLoading(false);
     }
   };
 
   const columns = [
-    { field: 'sNo', headerName: text.S_NO, width: 80 },
-    { field: 'group', headerName: text.VEHICLE, width: 250 },
+    { field: 'sNo', headerName: t('text.S_NO'), width: 80 },
+    { field: 'group', headerName: t('text.VEHICLE'), width: 250 },
     {
       field: 'reminderDate',
-      headerName: text.DATE,
+      headerName: t('text.DATE'),
       width: 150,
       renderCell: (params) => {
-        const date =  params.value ? new Date(params.value) : null;
+        const date = params.value ? new Date(params.value) : null;
         return date ? date.toLocaleDateString() : 'N/A';
       }
     },
-    { field: 'message', headerName: text.MESSAGE, width: 400 },
+    { field: 'message', headerName: t('text.MESSAGE'), width: 400 },
     {
       field: 'actions',
-      headerName: text.ACTION,
+      headerName: t('text.ACTION'),
       width: 100,
       sortable: false,
       renderCell: (params) => (
@@ -78,13 +80,13 @@ const FuelReminderIndex = () => {
 
   const handleDelete = async (id) => {
     await deleteApi(urls.reminder.delete.replace(':id', id));
-    toast.success(text.REM_DELETED);
+    toast.success(t('text.REM_DELETED'));
     fetchData();
   };
 
   return (
     <>
-      <CustomBreadcrumbs title={text.REM_INFO} links={[{ name: text.REM, path: '/reminder' }]} />
+      <CustomBreadcrumbs title={t('text.REM_INFO')} links={[{ name: t('text.REM'), path: '/reminder' }]} />
 
       <Grid container spacing={2}>
         <Grid item xs={12}>
@@ -127,7 +129,7 @@ const FuelReminderIndex = () => {
           }}
         >
           <Typography variant="h4" sx={{ mb: 2 }}>
-            {text.ADD_REM}
+            {t('text.ADD_REM')}
           </Typography>
           <FuelReminderForm onSave={handleClose} onCancel={handleClose} refreshData={refreshData} />
         </Box>
