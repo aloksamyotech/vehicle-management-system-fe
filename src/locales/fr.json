@@ -262,5 +262,11 @@
   "Reminder": "Rappel",
   "Income & Expense": "Revenu & Dépense",
   "Reports": "Rapports",
-  "User Management": "Gestion des utilisateurs"
+  "User Management": "Gestion des utilisateurs",
+
+  "text.LOGOUT_SUCCESS": "Déconnexion réussie !",
+  "text.LOGIN_SUCCESS": "Connexion réussie !",
+  "text.LOGIN": "Se connecter",
+  "text.PASSWORD": "Mot de passe",
+  "text.EMAIL_USERNAME": "Adresse e-mail"
 }

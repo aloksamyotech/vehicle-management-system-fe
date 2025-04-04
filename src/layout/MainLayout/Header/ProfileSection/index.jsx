@@ -1,29 +1,21 @@
 import React from 'react';
-
-// material-ui
+import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import { Fade, Button, ClickAwayListener, Paper, Popper, List, ListItemText, ListItemIcon, ListItemButton } from '@mui/material';
-
-// assets
 import PersonTwoToneIcon from '@mui/icons-material/PersonTwoTone';
-import DraftsTwoToneIcon from '@mui/icons-material/DraftsTwoTone';
-import LockOpenTwoTone from '@mui/icons-material/LockOpenTwoTone';
 import SettingsTwoToneIcon from '@mui/icons-material/SettingsTwoTone';
 import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
 import LogoutIcon from '@mui/icons-material/Logout';
-
-// ==============================|| PROFILE SECTION ||============================== //
+import { text } from 'common/constant';
+import { useTranslation } from 'react-i18next';
+import toast from 'react-hot-toast';
 
 const ProfileSection = () => {
+  const { t } = useTranslation();
   const theme = useTheme();
-
-  const [selectedIndex, setSelectedIndex] = React.useState(1);
+  const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef(null);
-
-  const handleListItemClick = (event, index) => {
-    setSelectedIndex(index);
-  };
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
@@ -33,54 +25,22 @@ const ProfileSection = () => {
     if (anchorRef.current && anchorRef.current.contains(event.target)) {
       return;
     }
-
     setOpen(false);
   };
 
-  const prevOpen = React.useRef(open);
-  React.useEffect(() => {
-    if (prevOpen.current === true && open === false) {
-      anchorRef.current.focus();
-    }
-
-    prevOpen.current = open;
-  }, [open]);
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    toast.success(t('text.LOGOUT_SUCCESS'));
+    navigate('/login');
+  };
 
   return (
     <>
-      <Button
-        sx={{ minWidth: { sm: 50, xs: 35 } }}
-        ref={anchorRef}
-        aria-controls={open ? 'menu-list-grow' : undefined}
-        aria-haspopup="true"
-        aria-label="Profile"
-        onClick={handleToggle}
-        color="inherit"
-      >
+      <Button sx={{ minWidth: { sm: 50, xs: 35 } }} ref={anchorRef} onClick={handleToggle} color="inherit">
         <AccountCircleTwoToneIcon sx={{ fontSize: '1.5rem' }} />
       </Button>
-      <Popper
-        placement="bottom-end"
-        open={open}
-        anchorEl={anchorRef.current}
-        role={undefined}
-        transition
-        disablePortal
-        modifiers={[
-          {
-            name: 'offset',
-            options: {
-              offset: [0, 10]
-            }
-          },
-          {
-            name: 'preventOverflow',
-            options: {
-              altAxis: true
-            }
-          }
-        ]}
-      >
+      <Popper open={open} anchorEl={anchorRef.current} transition disablePortal>
         {({ TransitionProps }) => (
           <Fade {...TransitionProps}>
             <Paper>
@@ -95,31 +55,19 @@ const ProfileSection = () => {
                     borderRadius: '10px'
                   }}
                 >
-                  <ListItemButton selected={selectedIndex === 0} onClick={(event) => handleListItemClick(event, 0)}>
+                  <ListItemButton>
                     <ListItemIcon>
                       <SettingsTwoToneIcon />
                     </ListItemIcon>
                     <ListItemText primary="Settings" />
                   </ListItemButton>
-                  <ListItemButton selected={selectedIndex === 1} onClick={(event) => handleListItemClick(event, 1)}>
+                  <ListItemButton>
                     <ListItemIcon>
                       <PersonTwoToneIcon />
                     </ListItemIcon>
                     <ListItemText primary="Profile" />
                   </ListItemButton>
-                  {/* <ListItemButton selected={selectedIndex === 2} onClick={(event) => handleListItemClick(event, 2)}>
-                    <ListItemIcon>
-                      <DraftsTwoToneIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="My Messages" />
-                  </ListItemButton>
-                  <ListItemButton selected={selectedIndex === 3} onClick={(event) => handleListItemClick(event, 3)}>
-                    <ListItemIcon>
-                      <LockOpenTwoTone />
-                    </ListItemIcon>
-                    <ListItemText primary="Lock Screen" />
-                  </ListItemButton> */}
-                  <ListItemButton selected={selectedIndex === 4}>
+                  <ListItemButton onClick={logout}>
                     <ListItemIcon>
                       <LogoutIcon />
                     </ListItemIcon>

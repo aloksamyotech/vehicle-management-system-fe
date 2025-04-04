@@ -31,7 +31,6 @@ const DriverManagementPage = () => {
       const formattedData = response.data.map((driver, index) => ({
         id: driver.id,
         name: driver.name,
-        email: driver.email,
         mobileNo: driver.mobileNo,
         age: driver.age,
         licenseNo: driver.licenseNo,
@@ -67,7 +66,6 @@ const DriverManagementPage = () => {
       renderCell: (params) => <img src={params.row.image} alt="driver" style={{ width: 50, height: 50, borderRadius: '50%' }} />
     },
     { field: 'name', headerName: t('text.NAME'), width: 150 },
-    { field: 'email', headerName: t('text.EMAIL'), width: 200 },
     { field: 'mobileNo', headerName: t('text.MOBILE'), width: 150 },
     { field: 'licenseNo', headerName: t('text.LICENSE_NO'), width: 150 },
     {

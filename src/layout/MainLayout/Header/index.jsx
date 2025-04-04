@@ -8,6 +8,7 @@ import { Box, Grid, IconButton } from '@mui/material';
 // project import
 import ProfileSection from './ProfileSection';
 import NotificationSection from './NotificationSection';
+import LogoSection from './LogoSection';
 import { drawerWidth } from 'config.js';
 import LanguageSwitcher from 'views/switchLanguage/languageswitcher';
 import { useTranslation } from "react-i18next";
@@ -29,11 +30,12 @@ const Header = ({ drawerToggle }) => {
         <Grid container justifyContent="space-between" alignItems="center">
           <Box sx={{ display: { xs: 'none', md: 'block' } }}>
             <Grid item>
-              <Box mt={0.5}>
-                <img src={logo} alt="Logo" />
+              <Box>
+              <LogoSection/>
               </Box>
             </Grid>
           </Box>
+        
           <Grid item>
             <IconButton
               edge="start"

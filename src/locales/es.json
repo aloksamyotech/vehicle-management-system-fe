@@ -262,5 +262,11 @@
   "Reminder": "Recordatorio",
   "Income & Expense": "Ingresos y gastos",
   "Reports": "Informes",
-  "User Management": "Gestión de usuarios"
+  "User Management": "Gestión de usuarios",
+
+  "text.LOGOUT_SUCCESS": "¡Cierre de sesión exitoso!",
+  "text.LOGIN_SUCCESS": "¡Inicio de sesión exitoso!",
+  "text.LOGIN": "Iniciar sesión",
+  "text.PASSWORD": "Contraseña",
+  "text.EMAIL_USERNAME": "Dirección de correo electrónico"
 }

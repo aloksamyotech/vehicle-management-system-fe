@@ -262,5 +262,11 @@
   "Reminder": "Erinnerung",
   "Income & Expense": "Einnahmen & Ausgaben",
   "Reports": "Berichte",
-  "User Management": "Benutzerverwaltung"
+  "User Management": "Benutzerverwaltung",
+
+  "text.LOGOUT_SUCCESS": "Erfolgreich abgemeldet!",
+  "text.LOGIN_SUCCESS": "Erfolgreich angemeldet!",
+  "text.LOGIN": "Anmelden",
+  "text.PASSWORD": "Passwort",
+  "text.EMAIL_USERNAME": "E-Mail-Adresse"
 }

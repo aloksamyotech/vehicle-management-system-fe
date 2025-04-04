@@ -81,12 +81,12 @@ export const text = {
   PAYMENT_DELETED: 'Payment deleted successfully',
   PAYMENT_INFO: 'Payment Information',
   INVOICE: 'INVOICE',
-  INV_NO:'Invoice No',
+  INV_NO: 'Invoice No',
   DOWNLOAD: 'Download',
 
   //Bookings
   BOOKINGS: 'Bookings',
-  BOOKING_STATUS_UPDATED:'Booking status updated successfully',
+  BOOKING_STATUS_UPDATED: 'Booking status updated successfully',
   BOOKING_DELETED: 'Booking deleted successfully',
   BOOKING_UPDATED: 'Booking updated successfully',
   BOOKING_ADDED: 'Booking added successfully',
@@ -94,7 +94,7 @@ export const text = {
   ADD_BOOKING: 'Add Booking',
   UPDATE_BOOKING: 'Update Booking',
   BOOKING_DETAILS: 'Booking Details',
-  BOOKING_ID:'Booking ID',
+  BOOKING_ID: 'Booking ID',
   BOOKING_EXP_ADDED: 'Booking expense added successfully',
   BOOKING_EXP_DELETED: 'Booking expense deleted successfully',
 
@@ -262,5 +262,10 @@ export const text = {
   NUMBERS_ONLY: 'Only numbers are allowed',
   ALPHA_NUM: 'Only alphabets and numbers are allowed',
   SELECT_ONE: 'Please select at least one valid part',
-  SEARCH: 'Search...'
+  SEARCH: 'Search...',
+  LOGOUT_SUCCESS: 'Logged out successfully!',
+  LOGIN_SUCCESS: 'Logged in successfully!',
+  LOGIN: 'Log In',
+  PASSWORD: 'Password',
+  EMAIL_USERNAME: 'Email Address'
 };

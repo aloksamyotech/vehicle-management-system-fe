@@ -261,5 +261,11 @@
     "Reminder":"Reminder",
     "Income & Expense":"Income & Expense",
     "Reports":"Reports",
-    "User Management":"User Management"
+    "User Management":"User Management",
+
+    "text.LOGOUT_SUCCESS": "Logged out successfully!",
+    "text.LOGIN_SUCCESS": "Logged in successfully!",
+    "text.LOGIN": "Log In",
+    "text.PASSWORD": "Password",
+    "text.EMAIL_USERNAME": "Email Address"
 }
