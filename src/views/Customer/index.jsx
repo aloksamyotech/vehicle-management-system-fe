@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Box, Grid, Typography, IconButton, Button, Divider, Modal } from '@mui/material';
-import { DataGrid} from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import { gridSpacing } from 'config.js';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -11,8 +11,10 @@ import toast from 'react-hot-toast';
 import CustomToolbar from 'common/customToolbar';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { text } from 'common/constant.jsx';
+import { useTranslation } from 'react-i18next';
 
 const CustomerManagementPage = () => {
+  const { t } = useTranslation();
   const [modalOpen, setModalOpen] = useState(false);
   const [editCustomer, setEditCustomer] = useState(null);
   const [rows, setRows] = useState([]);
@@ -32,21 +34,21 @@ const CustomerManagementPage = () => {
       }));
       setRows(modifiedRows);
     } catch (error) {
-      toast.error(text.ERROR_FETCHING);
+      toast.error(t('text.ERROR_FETCHING'));
     } finally {
       setLoading(false);
     }
   };
 
   const columns = [
-    { field: 'sno', headerName: text.S_NO, width: 80 },
-    { field: 'name', headerName: text.NAME, width: 150 },
-    { field: 'mobileNo', headerName: text.PHONE, width: 150 },
-    { field: 'email', headerName: text.EMAIL, width: 200 },
-    { field: 'address', headerName: text.ADDRESS, width: 200 },
+    { field: 'sno', headerName: t('text.S_NO'), width: 80 },
+    { field: 'name', headerName: t('text.NAME'), width: 150 },
+    { field: 'mobileNo', headerName: t('text.PHONE'), width: 150 },
+    { field: 'email', headerName: t('text.EMAIL'), width: 200 },
+    { field: 'address', headerName: t('text.ADDRESS'), width: 200 },
     {
       field: 'status',
-      headerName: text.STATUS,
+      headerName: t('text.STATUS'),
       width: 100,
       renderCell: (params) => (
         <Button
@@ -66,7 +68,7 @@ const CustomerManagementPage = () => {
     },
     {
       field: 'actions',
-      headerName: text.ACTION,
+      headerName: t('text.ACTION'),
       width: 100,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -97,14 +99,14 @@ const CustomerManagementPage = () => {
   };
 
   const handleDelete = async (id) => {
-      await deleteApi(urls.customer.delete.replace(':id', id));
-      toast.success(text.CUSTOMER_DELETED);
-      fetchData();
+    await deleteApi(urls.customer.delete.replace(':id', id));
+    toast.success(t('text.CUSTOMER_DELETED'));
+    fetchData();
   };
 
   return (
     <>
-       <CustomBreadcrumbs title={text.CUSTOMER_INFO} links={[{ name: text.CUSTOMER_MGNT, path: '/customer' }]} />
+      <CustomBreadcrumbs title={t('text.CUSTOMER_INFO')} links={[{ name: t('text.CUSTOMER_MGNT'), path: '/customer' }]} />
 
       <Grid container spacing={gridSpacing}>
         <Grid item xs={12}>
@@ -162,7 +164,7 @@ const CustomerManagementPage = () => {
           }}
         >
           <Typography variant="h4" sx={{ mb: 2 }}>
-            {editCustomer?.id ? text.edit : text.add} {text.CUSTOMER}
+            {editCustomer?.id ? t('text.EDIT') : t('text.ADD')} {t('text.CUSTOMER')}
           </Typography>
           <AddCustomerForm initialData={editCustomer} onSave={handleClose} onCancel={handleClose} refreshData={refreshData} />
         </Box>

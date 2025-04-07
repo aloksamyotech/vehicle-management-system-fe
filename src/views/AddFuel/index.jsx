@@ -23,8 +23,12 @@ import { postApi, getApi, updateApiPatch } from 'common/apiClient';
 import toast from 'react-hot-toast';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { text } from 'common/constant';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { useTranslation } from 'react-i18next';
 
 const FuelExpenseForm = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -84,10 +88,10 @@ const FuelExpenseForm = () => {
     let response;
     if (id) {
       response = await updateApiPatch(urls.fuel.update.replace(':id', id), filteredData);
-      toast.success(text.FUEL_UPDATED);
+      toast.success(t('text.FUEL_UPDATED'));
     } else {
       response = await postApi(urls.fuel.create, filteredData);
-      toast.success(text.FUEL_ADDED);
+      toast.success(t('text.FUEL_ADDED'));
     }
 
     reset();
@@ -97,10 +101,10 @@ const FuelExpenseForm = () => {
   return (
     <>
       <CustomBreadcrumbs
-        title={id ? text.EDIT_FUEL : text.ADD_FUEL}
+        title={id ? t('text.EDIT_FUEL') : t('text.ADD_FUEL')}
         links={[
-          { name: text.FUEL, path: '/fuel' },
-          { name: id ? text.EDIT_FUEL : text.ADD_FUEL, path: '' }
+          { name: t('text.FUEL'), path: '/fuel' },
+          { name: id ? t('text.EDIT_FUEL') : t('text.ADD_FUEL'), path: '' }
         ]}
       />
 
@@ -111,12 +115,12 @@ const FuelExpenseForm = () => {
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth>
                   <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                    {text.VEHICLE}
+                    {t('text.VEHICLE')}
                   </FormLabel>
                   <Controller
                     name="vehicleId"
                     control={control}
-                    rules={{ required: text.REQUIRED }}
+                    rules={{ required: t('text.REQUIRED') }}
                     render={({ field }) => (
                       <Autocomplete
                         options={vehicles}
@@ -128,7 +132,7 @@ const FuelExpenseForm = () => {
                           <TextField
                             {...params}
                             size="small"
-                            placeholder={text.SELECT_VEHICLE}
+                            placeholder={t('text.SELECT_VEHICLE')}
                             error={!!errors.vehicleId}
                             helperText={errors.vehicleId?.message}
                           />
@@ -142,13 +146,13 @@ const FuelExpenseForm = () => {
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth>
                   <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                    {text.DRIVER}
+                    {t('text.DRIVER')}
                   </FormLabel>
 
                   <Controller
                     name="driverId"
                     control={control}
-                    rules={{ required: text.REQUIRED }}
+                    rules={{ required: t('text.REQUIRED') }}
                     render={({ field }) => (
                       <Autocomplete
                         options={drivers}
@@ -160,7 +164,7 @@ const FuelExpenseForm = () => {
                           <TextField
                             {...params}
                             size="small"
-                            placeholder={text.SELECT_DRIVER}
+                            placeholder={t('text.SELECT_DRIVER')}
                             error={!!errors.driverId}
                             helperText={errors.driverId?.message}
                           />
@@ -173,38 +177,40 @@ const FuelExpenseForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  {text.FILL_DATE}
+                  {t('text.FILL_DATE')}
                 </FormLabel>
                 <Controller
                   name="fillDate"
                   control={control}
-                  rules={{ required: text.REQUIRED }}
+                  defaultValue={new Date()}
+                  rules={{ required: t('text.REQUIRED') }}
                   render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      size="small"
-                      type="date"
-                      value={field.value ? field.value.split('T')[0] : ''}
-                      onChange={(e) => field.onChange(new Date(e.target.value).toISOString())}
-                      error={!!errors.fillDate}
-                      helperText={errors.fillDate?.message}
-                    />
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <DatePicker
+                        {...field}
+                        disablePast
+                        value={field.value ? new Date(field.value) : null}
+                        onChange={(newValue) => field.onChange(newValue)}
+                        renderInput={(params) => (
+                          <TextField {...params} fullWidth size="small" error={!!errors.fillDate} helperText={errors.fillDate?.message} />
+                        )}
+                      />
+                    </LocalizationProvider>
                   )}
                 />
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  {text.QUANTITY}
+                  {t('text.QUANTITY')}
                 </FormLabel>
                 <Controller
                   name="quantity"
                   control={control}
                   rules={{
-                    required: text.REQUIRED,
-                    min: { value: 0.1, message: text.GREATER_THAN_0 },
-                    max: { value: 100000, message: text.CANNOT_EXCEED }
+                    required: t('text.REQUIRED'),
+                    min: { value: 0.1, message: t('text.GREATER_THAN_0') },
+                    max: { value: 100000, message: t('text.CANNOT_EXCEED') }
                   }}
                   render={({ field }) => (
                     <TextField
@@ -227,15 +233,15 @@ const FuelExpenseForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  {text.ODOMETER_READING}
+                  {t('text.ODOMETER_READING')}
                 </FormLabel>
                 <Controller
                   name="odometerReading"
                   control={control}
                   rules={{
-                    required: text.REQUIRED,
-                    min: { value: 0.1, message: text.GREATER_THAN_0 },
-                    max: { value: 100000, message: text.CANNOT_EXCEED }
+                    required: t('text.REQUIRED'),
+                    min: { value: 0.1, message: t('text.GREATER_THAN_0') },
+                    max: { value: 100000, message: t('text.CANNOT_EXCEED') }
                   }}
                   render={({ field }) => (
                     <TextField
@@ -258,15 +264,15 @@ const FuelExpenseForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  {text.AMOUNT}
+                  {t('text.AMOUNT')}
                 </FormLabel>
                 <Controller
                   name="amount"
                   control={control}
                   rules={{
-                    required: text.REQUIRED,
-                    min: { value: 0.1, message: text.GREATER_THAN_0 },
-                    max: { value: 100000, message: text.CANNOT_EXCEED }
+                    required: t('text.REQUIRED'),
+                    min: { value: 0.1, message: t('text.GREATER_THAN_0') },
+                    max: { value: 100000, message: t('text.CANNOT_EXCEED') }
                   }}
                   render={({ field }) => (
                     <TextField
@@ -288,11 +294,11 @@ const FuelExpenseForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.COMMENTS}</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{t('text.COMMENTS')}</FormLabel>
                 <Controller
                   name="comments"
                   control={control}
-                  rules={{ required: text.REQUIRED }}
+                  rules={{ required: t('text.REQUIRED') }}
                   render={({ field }) => (
                     <TextField {...field} fullWidth size="small" error={!!errors.comments} helperText={errors.comments?.message} />
                   )}
@@ -315,7 +321,7 @@ const FuelExpenseForm = () => {
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
               <Button variant="contained" color="primary" type="submit">
-                {id ? text.UPDATE_FUEL : text.ADD_FUEL}
+                {id ? t('text.UPDATE_FUEL') : t('text.ADD_FUEL')}
               </Button>
             </Box>
           </form>

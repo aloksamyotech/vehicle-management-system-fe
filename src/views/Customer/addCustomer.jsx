@@ -5,8 +5,10 @@ import { postApi, updateApiPatch } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
 import { text } from 'common/constant';
+import { useTranslation } from 'react-i18next';
 
 const AddCustomerForm = ({ initialData, onSave, refreshData, onCancel }) => {
+  const { t } = useTranslation();
   const {
     control,
     handleSubmit,
@@ -32,38 +34,38 @@ const AddCustomerForm = ({ initialData, onSave, refreshData, onCancel }) => {
       });
     }
   }, [initialData, reset]);
-  
+
   const onSubmit = async (data) => {
-      let response;
-      const financeData = { ...data };
+    let response;
+    const financeData = { ...data };
 
-      if (initialData?.id) {
-        response = await updateApiPatch(urls.customer.update.replace(':id', initialData.id), financeData);
-        toast.success(text.CUSTOMER_UPDATED);
-      } else {
-        response = await postApi(urls.customer.create, financeData);
-        toast.success(text.CUSTOMER_ADDED);
-      }
+    if (initialData?.id) {
+      response = await updateApiPatch(urls.customer.update.replace(':id', initialData.id), financeData);
+      toast.success(t('text.CUSTOMER_UPDATED'));
+    } else {
+      response = await postApi(urls.customer.create, financeData);
+      toast.success(t('text.CUSTOMER_ADDED'));
+    }
 
-      onSave(response.data);
-      refreshData();
-      reset();
+    onSave(response.data);
+    refreshData();
+    reset();
   };
 
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.NAME}</FormLabel>
+          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{t('text.NAME')}</FormLabel>
           <Controller
             name="name"
             control={control}
             rules={{
-              required: text.REQUIRED,
-              maxLength: { value: 30, message: text.MAX_30_CHAR},
+              required: t('text.REQUIRED'),
+              maxLength: { value: 30, message: t('text.MAX_30_CHAR') },
               pattern: {
                 value: /^[A-Za-z\s]+$/,
-                message: text.ALPHABETS_ONLY
+                message: t('text.ALPHABETS_ONLY')
               }
             }}
             render={({ field: { onChange, onBlur, value, ref } }) => (
@@ -90,13 +92,13 @@ const AddCustomerForm = ({ initialData, onSave, refreshData, onCancel }) => {
         </Grid>
 
         <Grid item xs={12}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.EMAIL}</FormLabel>
+          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{t('text.EMAIL')}</FormLabel>
           <Controller
             name="email"
             control={control}
             rules={{
-              required: text.REQUIRED,
-              pattern: { value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, message: text.INVALID_FORMAT}
+              required: t('text.REQUIRED'),
+              pattern: { value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, message: t('text.INVALID_FORMAT') }
             }}
             render={({ field }) => (
               <TextField fullWidth size="small" type="email" {...field} error={!!errors.email} helperText={errors.email?.message} />
@@ -105,19 +107,19 @@ const AddCustomerForm = ({ initialData, onSave, refreshData, onCancel }) => {
         </Grid>
 
         <Grid item xs={12}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.PHONE}</FormLabel>
+          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{t('text.PHONE')}</FormLabel>
           <Controller
             name="mobileNo"
             control={control}
             rules={{
-              required: text.REQUIRED,
+              required: t('text.REQUIRED'),
               pattern: {
                 value: /^[789]\d{9,11}$/,
                 message: 'Must start with 7, 8, or 9 (10-12 digits only)'
               },
               maxLength: {
                 value: 12,
-                message: text.MAX_12_DIGIT
+                message: t('text.MAX_12_DIGIT')
               }
             }}
             render={({ field: { onChange, onBlur, value, ref } }) => (
@@ -145,11 +147,11 @@ const AddCustomerForm = ({ initialData, onSave, refreshData, onCancel }) => {
         </Grid>
 
         <Grid item xs={12}>
-          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.ADDRESS}</FormLabel>
+          <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{t('text.ADDRESS')}</FormLabel>
           <Controller
             name="address"
             control={control}
-            rules={{ required:text.REQUIRED, maxLength: { value: 100, message: text.MAX_100_CHAR } }}
+            rules={{ required: t('text.REQUIRED'), maxLength: { value: 100, message: t('text.MAX_100_CHAR') } }}
             render={({ field }) => (
               <TextField
                 fullWidth
@@ -167,10 +169,10 @@ const AddCustomerForm = ({ initialData, onSave, refreshData, onCancel }) => {
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
         <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Processing...' : initialData?.id ? text.update : text.add} {text.CUSTOMER}
+          {isSubmitting ? 'Processing...' : initialData?.id ? t('text.UPDATE') : t('text.ADD')} {t('text.CUSTOMER')}
         </Button>
         <Button variant="outlined" onClick={onCancel} disabled={isSubmitting}>
-         {text.CANCEL}
+          {t('text.CANCEL')}
         </Button>
       </Box>
     </Box>

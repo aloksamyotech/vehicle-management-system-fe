@@ -30,7 +30,8 @@ export const urls = Object.freeze({
     get: `${baseUrl}/driver/fetch`,
     getById: `${baseUrl}/driver/getById/:id`,
     update: `${baseUrl}/driver/update/:id`,
-    delete: `${baseUrl}/driver/delete/:id`
+    delete: `${baseUrl}/driver/delete/:id`,
+    updateStatus: `${baseUrl}/driver/updateStatus/:id`,
   },
   partsInventory: {
     create: `${baseUrl}/parts/save`,
@@ -76,7 +77,7 @@ export const urls = Object.freeze({
     update: `${baseUrl}/booking/update/:id`,
     delete: `${baseUrl}/booking/delete/:id`,
     report: `${baseUrl}/booking/report`,
-    driverReport: `${baseUrl}/booking/driver-report`,
+    driverReport: `${baseUrl}/booking/driver-bookings`,
     updateStatus: `${baseUrl}/booking/updateStatus/:id`,
     updateExpense: `${baseUrl}/booking/updateExpense/:id`,
   },
@@ -84,6 +85,14 @@ export const urls = Object.freeze({
     create: `${baseUrl}/payment/save`,
     get: `${baseUrl}/payment/fetch`,
     getById: `${baseUrl}/payment/getBookingById/:id`,
-    update: `${baseUrl}/payment/update/:id`
+    update: `${baseUrl}/payment/update/:id`,
+  },
+  tripExpense: {
+    create: `${baseUrl}/tripExpense/save`,
+    getById: `${baseUrl}/tripExpense/getBookingById/:id`,
+    update: `${baseUrl}/tripExpense/update/:id`,
+  },
+  user: {
+    login: `${baseUrl}/login`,
   }
 });

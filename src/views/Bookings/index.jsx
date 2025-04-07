@@ -13,8 +13,10 @@ import dayjs from 'dayjs';
 import CustomToolbar from 'common/customToolbar';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { text } from 'common/constant';
+import { useTranslation } from 'react-i18next';
 
 const BookingPage = () => {
+   const { t } = useTranslation();
   const navigate = useNavigate();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -44,7 +46,7 @@ const BookingPage = () => {
       }));
       setRows(formattedData);
     } catch (error) {
-      toast.error('Failed to fetch booking data');
+      toast.error(t('text.ERROR_FETCHING'));
     } finally {
       setLoading(false);
     }
@@ -73,12 +75,12 @@ const BookingPage = () => {
   };
 
   const columns = [
-    { field: 'sNo', headerName: text.S_NO, width: 80 },
-    { field: 'customer', headerName: text.CUSTOMER, width: 150 },
-    { field: 'vehicle', headerName: text.VEHICLE, width: 150, editable: true },
+    { field: 'sNo', headerName:  t("text.S_NO"), width: 80 },
+    { field: 'customer', headerName: t('text.CUSTOMER'), width: 150 },
+    { field: 'vehicle', headerName: t('text.VEHICLE'), width: 150, editable: true },
     {
       field: 'tripDates',
-      headerName: text.DATE,
+      headerName: t('text.DATE'),
       width: 200,
       renderCell: (params) => (
         <Box>
@@ -88,10 +90,10 @@ const BookingPage = () => {
         </Box>
       )
     },
-    { field: 'tripType', headerName: text.TYPE, width: 120 },
+    { field: 'tripType', headerName: t('text.TYPE'), width: 120 },
     {
       field: 'driver',
-      headerName: 'Driver',
+      headerName: t('text.DRIVER'),
       width: 150,
       renderCell: (params) => {
         return params.value === 'Yet to Assign' ? renderDriverButton('Yet to Assign') : params.value;
@@ -99,7 +101,7 @@ const BookingPage = () => {
     },
     {
       field: 'tripStatus',
-      headerName: text.STATUS,
+      headerName: t('text.STATUS'),
       width: 100,
       renderCell: (params) => {
         const status = params.row.tripStatus;
@@ -129,7 +131,7 @@ const BookingPage = () => {
     },
     {
       field: 'actions',
-      headerName: text.ACTION,
+      headerName: t('text.ACTION'),
       width: 150,
       sortable: false,
       renderCell: (params) => {
@@ -158,13 +160,13 @@ const BookingPage = () => {
 
   const handleDelete = async (id) => {
     await deleteApi(urls.booking.delete.replace(':id', id));
-    toast.success(text.BOOKING_DELETED);
+    toast.success(t('text.BOOKING_DELETED'));
     fetchData();
   };
 
   return (
     <>
-      <CustomBreadcrumbs title={text.BOOKINGS} links={[{ name: text.BOOKINGS, path: '/booking' }]} />
+      <CustomBreadcrumbs title={t('text.BOOKINGS')} links={[{ name: t('text.BOOKINGS'), path: '/booking' }]} />
 
       <Grid container spacing={gridSpacing}>
         <Grid item xs={12}>

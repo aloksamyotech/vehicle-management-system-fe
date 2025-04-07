@@ -1,79 +1,92 @@
 import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-
-// material-ui
+import { Grid, Card, CardContent, Typography, Box, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { Card, CardContent, Typography, Grid } from '@mui/material';
-
-// project import
 import AuthLogin from './AuthLogin';
-
-// assets
-import Logo from 'assets/images/logo-dark.svg';
-
-// ==============================|| LOGIN ||============================== //
+import VehicleImage from 'assets/images/vehicle.jpg';
+import LogoSection from 'layout/MainLayout/Header/LogoSection';
 
 const Login = () => {
   const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
-    <Grid
-      container
-      justifyContent="center"
-      alignItems="center"
-      sx={{ backgroundColor: theme.palette.common.black, height: '100%', minHeight: '100vh' }}
-    >
-      <Grid item xs={11} sm={7} md={6} lg={4}>
-        <Card
+    <Grid container sx={{ height: '100vh' }}>
+      <Grid
+        item
+        xs={12}
+        md={6}
+        sx={{
+          backgroundColor: '#ffff',
+          color: 'white',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: isSmallScreen ? 2 : 4,
+          textAlign: 'center'
+        }}
+      >
+        <Typography
+          variant={isSmallScreen ? 'h5' : 'h4'}
           sx={{
-            overflow: 'visible',
-            display: 'flex',
-            position: 'relative',
-            '& .MuiCardContent-root': {
-              flexGrow: 1,
-              flexBasis: '50%',
-              width: '50%'
-            },
-            maxWidth: '475px',
-            margin: '24px auto'
+            fontWeight: 'bold',
+            marginBottom: 3,
+            color: 'black'
           }}
         >
-          <CardContent sx={{ p: theme.spacing(5, 4, 3, 4) }}>
-            <Grid container direction="column" spacing={4} justifyContent="center">
-              <Grid item xs={12}>
-                <Grid container justifyContent="space-between">
-                  <Grid item>
-                    <Typography color="textPrimary" gutterBottom variant="h2">
-                      Sign in
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      To keep connected with us.
-                    </Typography>
-                  </Grid>
-                  <Grid item>
-                    <RouterLink to="/">
-                      <img alt="Auth method" src={Logo} />
-                    </RouterLink>
-                  </Grid>
-                </Grid>
-              </Grid>
-              <Grid item xs={12}>
-                <AuthLogin />
-              </Grid>
-              <Grid container justifyContent="flex-start" sx={{ mt: theme.spacing(2), mb: theme.spacing(1) }}>
-                <Grid item>
-                  <Typography
-                    variant="subtitle2"
-                    color="secondary"
-                    component={RouterLink}
-                    to="/application/register"
-                    sx={{ textDecoration: 'none', pl: 2 }}
-                  >
-                    Create new account
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Grid>
+          Welcome aboard your Fleet Management Hub
+        </Typography>
+
+        <Box
+          component="img"
+          src={VehicleImage}
+          alt="Login Illustration"
+          sx={{
+            maxWidth: '90%',
+            maxHeight: '90%',
+            objectFit: 'contain',
+            borderRadius: '20px',
+            width: isSmallScreen ? '90%' : '80%',
+            marginBottom: '1rem'
+          }}
+        />
+      </Grid>
+
+      <Grid
+        item
+        xs={12}
+        md={6}
+        sx={{
+          backgroundColor: '#0769b4',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: isSmallScreen ? 2 : 0
+        }}
+      >
+        <Card
+          sx={{
+            backgroundColor: '#fff',
+            borderRadius: 3,
+            width: isSmallScreen ? '90%' : '80%',
+            maxWidth: 400,
+            padding: isSmallScreen ? 2 : 3,
+            boxShadow: 5
+          }}
+        >
+          <CardContent>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: '2px',
+              }}
+            >
+              <LogoSection />
+            </Box>
+
+            <AuthLogin />
           </CardContent>
         </Card>
       </Grid>

@@ -6,10 +6,13 @@ import { useTheme } from '@mui/material/styles';
 import { Box, Grid, IconButton } from '@mui/material';
 
 // project import
-import SearchSection from './SearchSection';
 import ProfileSection from './ProfileSection';
 import NotificationSection from './NotificationSection';
+import LogoSection from './LogoSection';
 import { drawerWidth } from 'config.js';
+import LanguageSwitcher from 'views/switchLanguage/languageswitcher';
+import { useTranslation } from "react-i18next";
+ 
 
 // assets
 import MenuTwoToneIcon from '@mui/icons-material/MenuTwoTone';
@@ -19,6 +22,7 @@ import logo from 'assets/images/logo.svg';
 
 const Header = ({ drawerToggle }) => {
   const theme = useTheme();
+  const {t}=useTranslation();
 
   return (
     <>
@@ -26,11 +30,12 @@ const Header = ({ drawerToggle }) => {
         <Grid container justifyContent="space-between" alignItems="center">
           <Box sx={{ display: { xs: 'none', md: 'block' } }}>
             <Grid item>
-              <Box mt={0.5}>
-                <img src={logo} alt="Logo" />
+              <Box>
+              <LogoSection/>
               </Box>
             </Grid>
           </Box>
+        
           <Grid item>
             <IconButton
               edge="start"
@@ -46,7 +51,7 @@ const Header = ({ drawerToggle }) => {
         </Grid>
       </Box>
       <Box sx={{ flexGrow: 1 }} />
-      {/* <SearchSection theme="light" /> */}
+      <LanguageSwitcher />
       <NotificationSection />
       <ProfileSection />
     </>

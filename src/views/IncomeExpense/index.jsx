@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Box, Grid, Typography, IconButton, Divider, Modal } from '@mui/material';
-import { DataGrid} from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IncomeExpenseForm from './addFinance.jsx';
@@ -10,8 +10,10 @@ import toast from 'react-hot-toast';
 import CustomToolbar from 'common/customToolbar';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { text } from 'common/constant.jsx';
+import { useTranslation } from 'react-i18next';
 
 const FinanceIndex = () => {
+  const { t } = useTranslation();
   const [modalOpen, setModalOpen] = useState(false);
   const [editData, setEditData] = useState(null);
   const [rows, setRows] = useState([]);
@@ -36,28 +38,29 @@ const FinanceIndex = () => {
       }));
       setRows(formattedData);
     } catch (error) {
-      toast.error(text.ERROR_FETCHING);
+      toast.error(t('text.ERROR_FETCHING'));
     } finally {
       setLoading(false);
     }
   };
 
   const columns = [
-    { field: 'sNo', headerName: text.S_NO, width: 80 },
-    { field: 'vehicle', headerName: text.VEHICLE, width: 150 },
+    { field: 'sNo', headerName: t('text.S_NO'), width: 80 },
+    { field: 'vehicle', headerName: t('text.VEHICLE'), width: 150 },
     {
       field: 'date',
-      headerName: text.DATE,
+      headerName: t('text.DATE'),
       width: 150,
       renderCell: (params) => {
-        return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
+        const date = params.value ? new Date(params.value) : null;
+        return date ? date.toLocaleDateString() : 'N/A';
       }
     },
-    { field: 'description', headerName: text.DESCRIPTION, width: 300 },
-    { field: 'amount', headerName: text.AMOUNT, width: 120 },
+    { field: 'description', headerName: t('text.DESCRIPTION'), width: 300 },
+    { field: 'amount', headerName: t('text.AMOUNT'), width: 120 },
     {
       field: 'type',
-      headerName: text.TYPE,
+      headerName: t('text.TYPE'),
       width: 120,
       renderCell: (params) => {
         const isActive = params.row.type === 'Expense';
@@ -80,7 +83,7 @@ const FinanceIndex = () => {
     },
     {
       field: 'actions',
-      headerName: text.ACTION,
+      headerName: t('text.ACTION'),
       width: 150,
       sortable: false,
       renderCell: (params) => (
@@ -119,14 +122,14 @@ const FinanceIndex = () => {
   };
 
   const handleDelete = async (id) => {
-      await deleteApi(urls.incomeExpense.delete.replace(':id', id));
-      toast.success(text.INC_EXP_DELETED);
-      fetchData();
+    await deleteApi(urls.incomeExpense.delete.replace(':id', id));
+    toast.success(t('text.INC_EXP_DELETED'));
+    fetchData();
   };
 
   return (
     <>
-      <CustomBreadcrumbs title={text.incomeExpense} links={[{ name: text.incomeExpense, path: '/finance' }]} />
+      <CustomBreadcrumbs title={t('text.INCOME_EXPENSE')} links={[{ name: t('text.INCOME_EXPENSE'), path: '/finance' }]} />
 
       <Grid container spacing={2}>
         <Grid item xs={12}>
@@ -179,7 +182,7 @@ const FinanceIndex = () => {
           }}
         >
           <Typography variant="h4" sx={{ mb: 2 }}>
-            {editData?.id ? text.edit : text.add} {text.incomeExpense}
+            {editData?.id ? t('text.EDIT') : t('text.ADD')} {t('text.INCOME_EXPENSE')}
           </Typography>
           <IncomeExpenseForm initialData={editData} onSave={handleClose} onCancel={handleClose} refreshData={refreshData} />
         </Box>

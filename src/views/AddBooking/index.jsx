@@ -23,8 +23,12 @@ import toast from 'react-hot-toast';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { text } from 'common/constant';
 import axios from 'axios';
+import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { useTranslation } from 'react-i18next';
 
 const DriverForm = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -33,7 +37,9 @@ const DriverForm = () => {
   const [vehicles, setVehicles] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [customers, setCustomers] = useState([]);
-  const [minEndDate, setMinEndDate] = useState('');
+  const [minEndDate, setMinEndDate] = useState(new Date());
+  const [totalKm, setTotalKm] = useState('');
+  const [isAutoCalculated, setIsAutoCalculated] = useState(true);
 
   useEffect(() => {
     const fetchVehicles = async () => {
@@ -59,6 +65,7 @@ const DriverForm = () => {
   const {
     control,
     handleSubmit,
+    watch,
     setValue,
     reset,
     getValues,
@@ -88,6 +95,17 @@ const DriverForm = () => {
     }
   }, [initialData, setValue]);
 
+  useEffect(() => {
+    if (initialData) {
+      const startDate = initialData.tripStartDate ? new Date(initialData.tripStartDate) : new Date();
+      const endDate = initialData.tripEndDate ? new Date(initialData.tripEndDate) : new Date(startDate.getTime() + 3600000);
+
+      setValue('tripStartDate', startDate);
+      setValue('tripEndDate', endDate);
+      setMinEndDate(startDate);
+    }
+  }, [initialData, setValue]);
+
   const fetchCityAndDetails = async (pincode) => {
     if (pincode && pincode.length === 6) {
       try {
@@ -104,7 +122,7 @@ const DriverForm = () => {
           setValue('tripStartPincode', '');
         }
       } catch (error) {
-        console.error(text.ERROR_FETCHING, error);
+        console.error(t('text.ERROR_FETCHING'));
       }
     }
   };
@@ -124,9 +142,64 @@ const DriverForm = () => {
           setValue('tripEndPincode', '');
         }
       } catch (error) {
-        console.error(text.ERROR_FETCHING, error);
+        console.error(t('text.ERROR_FETCHING'));
       }
     }
+  };
+
+  const fetchCoordinates = async (pincode) => {
+    try {
+      const response = await axios.get(`https://nominatim.openstreetmap.org/search?postalcode=${pincode}&country=India&format=json`);
+      const data = response.data[0];
+
+      if (data) {
+        return { lat: parseFloat(data.lat), lon: parseFloat(data.lon) };
+      }
+      return null;
+    } catch (error) {
+      console.error(t('text.ERROR_FETCHING'));
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    if (watch('tripStartPincode') && watch('tripEndPincode') && isAutoCalculated) {
+      calculateDistance();
+    }
+  }, [watch('tripStartPincode'), watch('tripEndPincode')]);
+
+  const calculateDistance = async () => {
+    const startPincode = watch('tripStartPincode');
+    const endPincode = watch('tripEndPincode');
+
+    if (startPincode && endPincode) {
+      const startCoords = await fetchCoordinates(startPincode);
+      const endCoords = await fetchCoordinates(endPincode);
+
+      if (startCoords && endCoords) {
+        let distance = getDistance(startCoords.lat, startCoords.lon, endCoords.lat, endCoords.lon);
+
+        distance = parseFloat(distance.toFixed(2));
+
+        if (isAutoCalculated) {
+          setTotalKm(distance);
+          setValue('totalKm', distance);
+        }
+      }
+    }
+  };
+
+  const getDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
   };
 
   const onSubmit = async (data) => {
@@ -134,10 +207,10 @@ const DriverForm = () => {
     let response;
     if (id) {
       response = await updateApiPatch(urls.booking.update.replace(':id', id), filteredData);
-      toast.success(text.BOOKING_UPDATED);
+      toast.success(t('text.BOOKING_UPDATED'));
     } else {
       response = await postApi(urls.booking.create, filteredData);
-      toast.success(text.BOOKING_ADDED);
+      toast.success(t('text.BOOKING_ADDED'));
     }
 
     reset();
@@ -147,12 +220,13 @@ const DriverForm = () => {
   return (
     <>
       <CustomBreadcrumbs
-        title={id ? text.EDIT_BOOKING : text.ADD_BOOKING}
+        title={id ? t('text.EDIT_BOOKING') : t('text.ADD_BOOKING')}
         links={[
-          { name: text.BOOKINGS, path: '/booking' },
-          { name: id ? text.EDIT_BOOKING : text.ADD_BOOKING, path: '' }
+          { name: t('text.BOOKINGS'), path: '/booking' },
+          { name: id ? t('text.EDIT_BOOKING') : t('text.ADD_BOOKING'), path: '' }
         ]}
       />
+
       <Card sx={{ maxWidth: 'auto', mt: 3, padding: 1 }}>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -160,13 +234,13 @@ const DriverForm = () => {
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth>
                   <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                    {text.CUSTOMER}
+                    {t('text.CUSTOMER')}
                   </FormLabel>
 
                   <Controller
                     name="customerId"
                     control={control}
-                    rules={{ required: text.REQUIRED }}
+                    rules={{ required: t('text.REQUIRED') }}
                     render={({ field }) => (
                       <Autocomplete
                         {...field}
@@ -179,7 +253,7 @@ const DriverForm = () => {
                           <TextField
                             {...params}
                             size="small"
-                            placeholder={text.SELECT_CUSTOMER}
+                            placeholder={t('text.SELECT_CUSTOMER')}
                             error={!!errors.customerId}
                             helperText={errors.customerId?.message}
                           />
@@ -193,13 +267,13 @@ const DriverForm = () => {
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth>
                   <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                    {text.VEHICLE}
+                    {t('text.VEHICLE')}
                   </FormLabel>
 
                   <Controller
                     name="vehicleId"
                     control={control}
-                    rules={{ required: text.REQUIRED }}
+                    rules={{ required: t('text.REQUIRED') }}
                     render={({ field }) => (
                       <Autocomplete
                         options={vehicles}
@@ -211,7 +285,7 @@ const DriverForm = () => {
                           <TextField
                             {...params}
                             size="small"
-                            placeholder={text.SELECT_VEHICLE}
+                            placeholder={t('text.SELECT_VEHICLE')}
                             error={!!errors.vehicleId}
                             helperText={errors.vehicleId?.message}
                           />
@@ -224,7 +298,7 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth>
-                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.DRIVER}</FormLabel>
+                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{t('text.DRIVER')}</FormLabel>
 
                   <Controller
                     name="driverId"
@@ -240,7 +314,7 @@ const DriverForm = () => {
                           <TextField
                             {...params}
                             size="small"
-                            placeholder={text.SELECT_DRIVER}
+                            placeholder={t('text.SELECT_DRIVER')}
                             error={!!errors.driverId}
                             helperText={errors.driverId?.message}
                           />
@@ -253,14 +327,14 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth required>
-                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.TRIP_TYPE}</FormLabel>
+                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{t('text.TRIP_TYPE')}</FormLabel>
                   <Controller
                     name="tripType"
                     control={control}
                     render={({ field }) => (
                       <Select {...field} size="small">
-                        <MenuItem value="Single Trip">{text.SINGLE_TRIP}</MenuItem>
-                        <MenuItem value="Round Trip">{text.ROUND_TRIP}</MenuItem>
+                        <MenuItem value="Single Trip">{t('text.SINGLE_TRIP')}</MenuItem>
+                        <MenuItem value="Round Trip">{t('text.ROUND_TRIP')}</MenuItem>
                       </Select>
                     )}
                   />
@@ -269,12 +343,12 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                 {text.TRIP_START_PIN}
+                  {t('text.TRIP_START_PIN')}
                 </FormLabel>
                 <Controller
                   name="tripStartPincode"
                   control={control}
-                  rules={{ required: text.REQUIRED }}
+                  rules={{ required: t('text.REQUIRED') }}
                   render={({ field }) => (
                     <TextField
                       {...field}
@@ -293,12 +367,12 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  {text.TRIP_START_LOC}
+                  {t('text.TRIP_START_LOC')}
                 </FormLabel>
                 <Controller
                   name="tripStartLoc"
                   control={control}
-                  rules={{ required: text.REQUIRED }}
+                  rules={{ required: t('text.REQUIRED') }}
                   render={({ field }) => (
                     <TextField
                       {...field}
@@ -317,12 +391,12 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                {text.TRIP_END_PIN}
+                  {t('text.TRIP_END_PIN')}
                 </FormLabel>
                 <Controller
                   name="tripEndPincode"
                   control={control}
-                  rules={{ required: text.REQUIRED }}
+                  rules={{ required: t('text.REQUIRED') }}
                   render={({ field }) => (
                     <TextField
                       {...field}
@@ -341,12 +415,12 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  {text.TRIP_END_LOC}
+                  {t('text.TRIP_END_LOC')}
                 </FormLabel>
                 <Controller
                   name="tripEndLoc"
                   control={control}
-                  rules={{ required: text.REQUIRED }}
+                  rules={{ required: t('text.REQUIRED') }}
                   render={({ field }) => (
                     <TextField
                       {...field}
@@ -365,15 +439,15 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  {text.TOTAL_KM}
+                  {t('text.TOTAL_KM')}
                 </FormLabel>
                 <Controller
                   name="totalKm"
                   control={control}
                   rules={{
-                    required: text.REQUIRED,
-                    min: { value: 0.1, message: text.GREATER_THAN_0 },
-                    max: { value: 100000, message: text.CANNOT_EXCEED }
+                    required: t('text.REQUIRED'),
+                    min: { value: 0.1, message: t('text.GREATER_THAN_0') },
+                    max: { value: 100000, message: t('text.CANNOT_EXCEED') }
                   }}
                   render={({ field }) => (
                     <TextField
@@ -383,7 +457,24 @@ const DriverForm = () => {
                       type="number"
                       size="small"
                       inputProps={{ step: '0.01', min: 0.1, max: 100000 }}
-                      onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                      value={totalKm}
+                      onChange={(e) => {
+                        setIsAutoCalculated(false);
+                        let value = parseFloat(e.target.value);
+
+                        if (!isNaN(value)) {
+                          setTotalKm(value);
+                          field.onChange(value);
+                        }
+                      }}
+                      onBlur={() => {
+                        if (!totalKm) {
+                          setIsAutoCalculated(true);
+                          calculateDistance();
+                        } else {
+                          setTotalKm(parseFloat(totalKm));
+                        }
+                      }}
                     />
                   )}
                 />
@@ -396,75 +487,75 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  {text.START_DATE}
+                  {t('text.START_DATE')}
                 </FormLabel>
                 <Controller
                   name="tripStartDate"
                   control={control}
-                  defaultValue={new Date().toISOString().slice(0, 16)}
-                  rules={{ required: text.REQUIRED }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      size="small"
-                      type="datetime-local"
-                      value={field.value ? field.value.split('.')[0] : new Date().toISOString().slice(0, 16)}
-                      onChange={(e) => {
-                        const newStartDate = new Date(e.target.value).toISOString();
-                        field.onChange(newStartDate);
-                        setMinEndDate(e.target.value);
-                      }}
-                      inputProps={{ min: new Date().toISOString().slice(0, 16) }}
-                      error={!!errors.tripStartDate}
-                      helperText={errors.tripStartDate?.message}
-                    />
+                  defaultValue={new Date()}
+                  rules={{ required: t('text.REQUIRED') }}
+                  render={({ field, fieldState: { error } }) => (
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <DateTimePicker
+                        {...field}
+                        renderInput={(props) => <TextField {...props} fullWidth size="small" error={!!error} helperText={error?.message} />}
+                        value={field.value}
+                        onChange={(newValue) => {
+                          field.onChange(newValue);
+                          setMinEndDate(newValue);
+                        }}
+                        minDateTime={new Date()}
+                        PopperProps={{ placement: 'top-start' }}
+                      />
+                    </LocalizationProvider>
                   )}
                 />
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  {text.END_DATE}
+                  {t('text.END_DATE')}
                 </FormLabel>
                 <Controller
                   name="tripEndDate"
                   control={control}
+                  defaultValue={new Date()}
                   rules={{
-                    required: text.REQUIRED,
+                    required: t('text.REQUIRED'),
                     validate: (value) => {
                       const startDate = new Date(getValues('tripStartDate'));
                       const endDate = new Date(value);
-                      return endDate >= startDate || text.END_DATE_AFTER_START;
+                      return endDate >= startDate || t('text.END_DATE_AFTER_START');
                     }
                   }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      size="small"
-                      type="datetime-local"
-                      inputProps={{ min: minEndDate }}
-                      value={field.value ? field.value.split('.')[0] : ''}
-                      onChange={(e) => field.onChange(new Date(e.target.value).toISOString())}
-                      error={!!errors.tripEndDate}
-                      helperText={errors.tripEndDate?.message}
-                    />
+                  render={({ field, fieldState: { error } }) => (
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <DateTimePicker
+                        {...field}
+                        renderInput={(props) => <TextField {...props} fullWidth size="small" error={!!error} helperText={error?.message} />}
+                        value={field.value}
+                        onChange={(newValue) => {
+                          field.onChange(newValue);
+                        }}
+                        minDateTime={minEndDate}
+                        PopperProps={{ placement: 'top-start' }}
+                      />
+                    </LocalizationProvider>
                   )}
                 />
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  {text.TOTAL_AMOUNT}
+                  {t('text.TOTAL_AMOUNT')}
                 </FormLabel>
                 <Controller
                   name="totalAmt"
                   control={control}
                   rules={{
-                    required: text.REQUIRED,
-                    min: { value: 0.1, message: text.GREATER_THAN_0 },
-                    max: { value: 100000, message: text.CANNOT_EXCEED }
+                    required: t('text.REQUIRED'),
+                    min: { value: 0.1, message: t('text.GREATER_THAN_0') },
+                    max: { value: 100000, message: t('text.CANNOT_EXCEED') }
                   }}
                   render={({ field }) => (
                     <TextField
@@ -474,7 +565,13 @@ const DriverForm = () => {
                       type="number"
                       size="small"
                       inputProps={{ step: '0.01', min: 0.1, max: 100000 }}
-                      onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                      onChange={(e) => {
+                        let value = parseFloat(e.target.value);
+                        if (!isNaN(value)) {
+                          value = parseFloat(value);
+                        }
+                        field.onChange(value);
+                      }}
                     />
                   )}
                 />
@@ -487,20 +584,17 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormControl fullWidth required>
-                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{text.STATUS}</FormLabel>
+                  <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{t('text.STATUS')}</FormLabel>
                   <Controller
                     name="tripStatus"
                     control={control}
                     defaultValue="YetToStart"
                     render={({ field }) => (
-                      <Select
-                        {...field}
-                        size="small"
-                      >
-                        <MenuItem value="YetToStart">{text.YET_TO_START}</MenuItem>
-                        <MenuItem value="Completed">{text.COMPLETED}</MenuItem>
-                        <MenuItem value="Ongoing">{text.ONGOING}</MenuItem>
-                        <MenuItem value="Cancelled">{text.CANCELLED}</MenuItem>
+                      <Select {...field} size="small">
+                        <MenuItem value="YetToStart">{t('text.YET_TO_START')}</MenuItem>
+                        <MenuItem value="Completed">{t('text.COMPLETED')}</MenuItem>
+                        <MenuItem value="Ongoing">{t('text.ONGOING')}</MenuItem>
+                        <MenuItem value="Cancelled">{t('text.CANCELLED')}</MenuItem>
                       </Select>
                     )}
                   />
@@ -517,7 +611,7 @@ const DriverForm = () => {
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
               <Button variant="contained" color="primary" type="submit">
-                {id ? text.UPDATE_BOOKING : text.ADD_BOOKING}
+                {id ? t('text.UPDATE_BOOKING') : t('text.ADD_BOOKING')}
               </Button>
             </Box>
           </form>

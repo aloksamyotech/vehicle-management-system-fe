@@ -1,8 +1,12 @@
 import React from 'react';
 import { GridToolbarContainer, GridToolbarExport, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import { Stack, Button, Tooltip } from '@mui/material';
+import { useTranslation } from 'react-i18next';
+import { text } from './constant';
 
-const CustomToolbar = ({ onAddClick, addLabel = 'Add', showExport = true }) => {
+const CustomToolbar = ({ onAddClick, addLabel, showExport = true }) => {
+  const { t } = useTranslation();
+
   return (
     <GridToolbarContainer
       style={{
@@ -13,7 +17,7 @@ const CustomToolbar = ({ onAddClick, addLabel = 'Add', showExport = true }) => {
       }}
     >
       <GridToolbarQuickFilter
-        placeholder="Search..."
+        placeholder={t('text.SEARCH')} 
         style={{
           width: '200px',
           backgroundColor: '#fff',
@@ -24,7 +28,7 @@ const CustomToolbar = ({ onAddClick, addLabel = 'Add', showExport = true }) => {
 
       <Stack direction="row" spacing={2} alignItems="center">
         {showExport && <GridToolbarExport style={{ fontSize: 14 }} />}
-        <Tooltip title={addLabel} arrow>
+        <Tooltip title={addLabel || t('text.ADD')} arrow>
           <Button
             variant="contained"
             color="primary"
@@ -35,7 +39,7 @@ const CustomToolbar = ({ onAddClick, addLabel = 'Add', showExport = true }) => {
               padding: '6px 16px'
             }}
           >
-            {addLabel}
+            {addLabel || t('text.ADD')}
           </Button>
         </Tooltip>
       </Stack>

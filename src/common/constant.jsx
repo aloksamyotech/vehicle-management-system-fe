@@ -58,12 +58,14 @@ export const text = {
   GENERATE_INVOICE: ' Generate Invoice',
   SHARE_TO_CUSTOMER: 'Share to Customer',
   EXCESS: 'Excess',
-  stock: 'Stock',
+  STOCK: 'Stock',
   CREATED_DATE: 'Created Date',
   MODIFIED_DATE: 'Modified Date',
   GEOFENCE: 'Geofence',
   NOTIFICATIONS: 'Notifications',
   BASIC_INFO: 'Basic Info',
+  EXPIRY_DATE_FUTURE: 'EXpiry date must be in future.',
+  SELECT_START_END_DATE: 'Please select both start and end dates',
 
   //Payment
   AMT_ERROR: 'Paid amount cannot exceed total amount',
@@ -79,12 +81,12 @@ export const text = {
   PAYMENT_DELETED: 'Payment deleted successfully',
   PAYMENT_INFO: 'Payment Information',
   INVOICE: 'INVOICE',
-  INV_NO:'Invoice No',
+  INV_NO: 'Invoice No',
   DOWNLOAD: 'Download',
 
   //Bookings
   BOOKINGS: 'Bookings',
-  BOOKING_STATUS_UPDATED:'Booking status updated successfully',
+  BOOKING_STATUS_UPDATED: 'Booking status updated successfully',
   BOOKING_DELETED: 'Booking deleted successfully',
   BOOKING_UPDATED: 'Booking updated successfully',
   BOOKING_ADDED: 'Booking added successfully',
@@ -92,8 +94,9 @@ export const text = {
   ADD_BOOKING: 'Add Booking',
   UPDATE_BOOKING: 'Update Booking',
   BOOKING_DETAILS: 'Booking Details',
-  BOOKING_ID:'Booking ID',
+  BOOKING_ID: 'Booking ID',
   BOOKING_EXP_ADDED: 'Booking expense added successfully',
+  BOOKING_EXP_DELETED: 'Booking expense deleted successfully',
 
   //Customer
   CUSTOMER: 'Customer',
@@ -122,6 +125,7 @@ export const text = {
   //Fuel
   FUEL_UPDATED: 'Fuel updated successfully',
   FUEL_ADDED: 'Fuel added successfully',
+  FUEL_DELETED: 'Fuel deleted successfully',
   FUEL: 'Fuel',
   UPDATE_FUEL: 'Update Fuel',
   EDIT_FUEL: 'Edit Fuel',
@@ -133,9 +137,9 @@ export const text = {
   MAINTENANCE_ADDED: 'Maintenance added successfully',
   MAINTENANCE_UPDATED: 'Maintenance updated successfully',
   MAINTENANCE_DELETED: 'Maintenance deleted successfully',
-  Add_MAINTENANCE: 'Add Maintenance',
+  ADD_MAINTENANCE: 'Add Maintenance',
   MAINTENANCE: 'Maintenance',
-  maintenanceRecords: 'Maintenance Records',
+  MAINTENANCE_RECORDS: 'Maintenance Records',
 
   //Vehicle
   VEHICLE: 'Vehicle',
@@ -161,26 +165,26 @@ export const text = {
 
   //Common
   CANCEL: ' Cancel',
-  update: 'Update',
-  edit: 'Edit',
-  add: 'Add',
+  UPDATE: 'Update',
+  EDIT: 'Edit',
+  ADD: 'Add',
 
   //Income & Expense
   INC_EXP_UPDATED: 'Income expense updated successfully',
   INC_EXP_ADDED: 'Income expense added successfully',
   INC_EXP_DELETED: 'Income expense deleted successfully',
-  incomeExpense: 'Income & Expense',
+  INCOME_EXPENSE: 'Income & Expense',
   TOTAL_INCOME: 'Total Income',
   TOTAL_EXPENSE: 'Total Expense',
   INCOME: 'Income',
   EXPENSE: 'Expense',
 
   //Parts
-  parts: 'Part',
+  PART: 'Part',
   PARTS_ADDED: 'Parts inventory added successfully!',
   PARTS_UPDATED: 'Parts inventory updated successfully!',
   PARTS_DELETED: 'Parts inventory deleted successfully!',
-  PartsInventory: 'Parts Inventory',
+  PARTS_INVENTORY: 'Parts Inventory',
 
   //Reminder
   REM_ADDED: 'Reminder added successfuly!',
@@ -196,7 +200,6 @@ export const text = {
   GROUP_UPDATED: 'Vehicle group updated succesfully!',
   GROUP_ADDED: 'Vehicle group added successfully!',
   GROUP_DELETED: 'Vehicle group deleted successfully!',
-  vehicleGroup: 'Vehicle Group',
   GROUP: 'Group',
 
   //Reports
@@ -258,5 +261,11 @@ export const text = {
   ALPHABETS_ONLY: 'Only alphabets are allowed (A-Z, a-z)',
   NUMBERS_ONLY: 'Only numbers are allowed',
   ALPHA_NUM: 'Only alphabets and numbers are allowed',
-  SELECT_ONE: 'Please select at least one valid part'
+  SELECT_ONE: 'Please select at least one valid part',
+  SEARCH: 'Search...',
+  LOGOUT_SUCCESS: 'Logged out successfully!',
+  LOGIN_SUCCESS: 'Logged in successfully!',
+  LOGIN: 'Log In',
+  PASSWORD: 'Password',
+  EMAIL_USERNAME: 'Email Address'
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Tabs, Tab, Card, CardContent, TextField, MenuItem, Autocomplete, Button, Grid } from '@mui/material';
+import { Box, Typography, Tabs, Tab, Card, CardContent, TextField, FormLabel, Autocomplete, Button, Grid } from '@mui/material';
 import { urls } from 'common/urls';
 import { getApi } from 'common/apiClient';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
@@ -7,11 +7,17 @@ import { DataGrid } from '@mui/x-data-grid';
 import toast from 'react-hot-toast';
 import { ThumbUp, ThumbDown, Assessment } from '@mui/icons-material';
 import { text } from 'common/constant';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { useTranslation } from 'react-i18next';
 
 const Reports = () => {
+   const { t } = useTranslation();
   const [tabIndex, setTabIndex] = useState(0);
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [startDateError, setStartDateError] = useState(false);
+  const [endDateError, setEndDateError] = useState(false);
   const [vehicles, setVehicles] = useState([]);
   const [selectedVehicle, setSelectedVehicle] = useState('');
   const [drivers, setDrivers] = useState([]);
@@ -21,97 +27,105 @@ const Reports = () => {
   const [fuel, setFuel] = useState([]);
   const [driverReport, setDriverReport] = useState([]);
   const [summary, setSummary] = useState('');
+  const [tripExpenses, setTripExpenses] = useState([]);
+  const [allBookings, setAllBookings] = useState([]);
+  const [allIncomeExpense, setAllIncomeExpense] = useState([]);
+  const [allFuel, setAllFuel] = useState([]);
+  const [allDriverReport, setAllDriverReport] = useState([]);
+  const [allTripExpenses, setAllTripExpenses] = useState([]);
 
   useEffect(() => {
-    const fetchVehicles = async () => {
-      const response = await getApi(urls.vehicle.get);
-      setVehicles(response.data);
+    const fetchData = async () => {
+      const [vehiclesRes, driversRes, bookingsRes, incomeExpenseRes, fuelRes, driverReportRes, tripExpensesRes] = await Promise.all([
+        getApi(urls.vehicle.get),
+        getApi(urls.driver.get),
+        getApi(urls.booking.report),
+        getApi(urls.incomeExpense.report),
+        getApi(urls.fuel.report),
+        getApi(urls.booking.driverReport),
+        getApi(urls.tripExpense.report)
+      ]);
+
+      setVehicles(vehiclesRes.data);
+      setDrivers(driversRes.data);
+      setBookings(bookingsRes.data || []);
+      setAllBookings(bookingsRes.data || []);
+
+      setIncomeExpense(incomeExpenseRes.data.incomeExpenseDetails || []);
+      setAllIncomeExpense(incomeExpenseRes.data.incomeExpenseDetails || []);
+
+      setFuel(fuelRes.data || []);
+      setAllFuel(fuelRes.data || []);
+
+      setDriverReport(driverReportRes.data || []);
+      setAllDriverReport(driverReportRes.data || []);
+
+      setTripExpenses(tripExpensesRes.data || []);
+      setAllTripExpenses(tripExpensesRes.data || []);
     };
 
-    const fetchDrivers = async () => {
-      const response = await getApi(urls.driver.get);
-      setDrivers(response.data);
-    };
-
-    fetchVehicles();
-    fetchDrivers();
+    fetchData();
   }, []);
 
-  const fetchVehicleBookings = async () => {
-    const queryParams = {
-      startDate,
-      endDate,
-      vehicleId: selectedVehicle
-    };
+  const filterData = () => {
+    let filteredBookings = allBookings;
+    let filteredIncomeExpense = allIncomeExpense;
+    let filteredFuel = allFuel;
+    let filteredDriverReport = allDriverReport;
+    let filteredTripExpenses = allTripExpenses;
 
-    const response = await getApi(urls.booking.report, queryParams);
-    setBookings(response.data || []);
-    if (response.data.length === 0) {
-      toast.error(text.NO_DATA_FOUND);
+    if (selectedVehicle) {
+      filteredBookings = filteredBookings.filter((item) => item.vehicleId === selectedVehicle);
+      filteredIncomeExpense = filteredIncomeExpense.filter((item) => item.vehicleId === selectedVehicle);
+      filteredFuel = filteredFuel.filter((item) => item.vehicleId === selectedVehicle);
+      filteredTripExpenses = filteredTripExpenses.filter((item) => item.vehicleId === selectedVehicle);
     }
-  };
 
-  const fetchVehicleIncomeExpense = async () => {
-    const queryParams = {
-      startDate,
-      endDate,
-      vehicleId: selectedVehicle
-    };
-
-    const response = await getApi(urls.incomeExpense.report, queryParams);
-    setIncomeExpense(response.data.incomeExpenseDetails || []);
-    setSummary(response.data.summary || null);
-  };
-
-  const fetchVehicleFuel = async () => {
-    const queryParams = {
-      startDate,
-      endDate,
-      vehicleId: selectedVehicle
-    };
-
-    const response = await getApi(urls.fuel.report, queryParams);
-    setFuel(response.data || []);
-    if (response.data.length === 0) {
-      toast.error(text.NO_DATA_FOUND);
+    if (selectedDriver) {
+      filteredDriverReport = filteredDriverReport.filter((item) => item.driverId === selectedDriver);
     }
-  };
 
-  const fetchDriverBookings = async () => {
-    const queryParams = {
-      startDate,
-      endDate,
-      driverId: selectedDriver
-    };
-
-    const response = await getApi(urls.booking.driverReport, queryParams);
-    setDriverReport(response.data || []);
-    if (response.data.length === 0) {
-      toast.error(text.NO_DATA_FOUND);
+    if (startDate && endDate) {
+      filteredBookings = filteredBookings.filter(
+        (item) => new Date(item.date) >= new Date(startDate) && new Date(item.date) <= new Date(endDate)
+      );
+      filteredIncomeExpense = filteredIncomeExpense.filter(
+        (item) => new Date(item.date) >= new Date(startDate) && new Date(item.date) <= new Date(endDate)
+      );
+      filteredFuel = filteredFuel.filter((item) => new Date(item.date) >= new Date(startDate) && new Date(item.date) <= new Date(endDate));
+      filteredDriverReport = filteredDriverReport.filter(
+        (item) => new Date(item.date) >= new Date(startDate) && new Date(item.date) <= new Date(endDate)
+      );
+      filteredTripExpenses = filteredTripExpenses.filter(
+        (item) => new Date(item.date) >= new Date(startDate) && new Date(item.date) <= new Date(endDate)
+      );
     }
+
+    setBookings(filteredBookings);
+    setIncomeExpense(filteredIncomeExpense);
+    setFuel(filteredFuel);
+    setDriverReport(filteredDriverReport);
+    setTripExpenses(filteredTripExpenses);
   };
 
-  const handleGenerateReport = async () => {
-    const tabFunctions = [fetchVehicleBookings, fetchVehicleIncomeExpense, fetchVehicleFuel, fetchDriverBookings];
-
-    await tabFunctions[tabIndex]();
-
-    setStartDate('');
-    setEndDate('');
-    setSelectedVehicle('');
-    setSelectedDriver('');
+  const handleGenerateReport = () => {
+    filterData();
   };
 
   useEffect(() => {
-    setStartDate('');
-    setEndDate('');
+    setStartDate(null);
+    setEndDate(null);
     setSelectedVehicle('');
     setSelectedDriver('');
+    setStartDateError(false);
+    setEndDateError(false);
+
+    filterData();
   }, [tabIndex]);
 
   return (
     <Box>
-      <CustomBreadcrumbs title={text.REPORTS} links={[{ name: text.REPORTS, path: '/reports' }]} />
+      <CustomBreadcrumbs title={t('text.REPORTS')} links={[{ name: t('text.REPORTS'), path: '/reports' }]} />
 
       <Tabs
         value={tabIndex}
@@ -126,7 +140,7 @@ const Reports = () => {
         }}
       >
         <Tab
-          label={text.BOOKINGS}
+          label={t('text.BOOKINGS')}
           sx={{
             backgroundColor: tabIndex === 0 ? '#1482d7' : 'transparent',
             color: tabIndex === 0 ? '#fff !important' : '#000',
@@ -136,7 +150,7 @@ const Reports = () => {
         />
 
         <Tab
-          label={text.incomeExpense}
+          label={t('text.INCOME_EXPENSE')}
           sx={{
             backgroundColor: tabIndex === 1 ? '#1482d7' : 'transparent',
             color: tabIndex === 1 ? '#fff !important' : '#000',
@@ -146,7 +160,7 @@ const Reports = () => {
         />
 
         <Tab
-          label={text.FUEL}
+          label={t('text.FUEL')}
           sx={{
             backgroundColor: tabIndex === 2 ? '#1482d7' : 'transparent',
             color: tabIndex === 2 ? '#fff !important' : '#000',
@@ -156,7 +170,7 @@ const Reports = () => {
         />
 
         <Tab
-          label={text.DRIVER}
+          label={t('text.DRIVER')}
           sx={{
             backgroundColor: tabIndex === 3 ? '#1482d7' : 'transparent',
             color: tabIndex === 3 ? '#fff !important' : '#000',
@@ -170,71 +184,88 @@ const Reports = () => {
         <Card>
           <CardContent>
             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-              <TextField
-                label="Report From"
-                size="small"
-                type="date"
-                InputLabelProps={{ shrink: true }}
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                sx={{ flex: 1, minWidth: 200 }}
-                inputProps={{
-                  max: endDate
-                }}
-              />
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={12} sm={3} md={2}>
+                    <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                      {t('text.FROM')}
+                    </FormLabel>
+                    <DatePicker
+                      value={startDate}
+                      onChange={(newValue) => {
+                        setStartDate(newValue);
+                        setStartDateError(false);
+                      }}
+                      maxDate={endDate || new Date()}
+                      renderInput={(params) => (
+                        <TextField {...params} size="small" error={startDateError} sx={{ flex: 1, minWidth: 200 }} />
+                      )}
+                    />
+                  </Grid>
 
-              <TextField
-                label="Report To"
-                size="small"
-                type="date"
-                InputLabelProps={{ shrink: true }}
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                sx={{ flex: 1, minWidth: 200 }}
-                inputProps={{
-                  min: startDate
-                }}
-              />
+                  <Grid item xs={12} sm={3} md={2}>
+                    <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
+                      {t('text.TO')}
+                    </FormLabel>
+                    <DatePicker
+                      value={endDate}
+                      onChange={(newValue) => {
+                        setEndDate(newValue);
+                        setEndDateError(false);
+                      }}
+                      minDate={startDate || new Date()}
+                      renderInput={(params) => <TextField {...params} size="small" error={endDateError} sx={{ flex: 1, minWidth: 200 }} />}
+                    />
+                  </Grid>
 
-              {(tabIndex === 0 || tabIndex === 1 || tabIndex === 2) && (
-                <Autocomplete
-                  size="small"
-                  options={vehicles}
-                  getOptionLabel={(option) => option.vehicleName || ''}
-                  isOptionEqualToValue={(option, value) => option.id === value}
-                  value={vehicles.find((v) => v.id === selectedVehicle) || null}
-                  onChange={(_, newValue) => setSelectedVehicle(newValue?.id || '')}
-                  renderInput={(params) => <TextField {...params} label={text.SELECT_VEHICLE} sx={{ flex: 1, minWidth: 180 }} />}
-                />
-              )}
+                  {(tabIndex === 0 || tabIndex === 1 || tabIndex === 2) && (
+                    <Grid item xs={12} sm={4} md={4} sx={{ mt: '20px' }}>
+                      <Autocomplete
+                        size="small"
+                        options={vehicles}
+                        getOptionLabel={(option) => option.vehicleName || ''}
+                        isOptionEqualToValue={(option, value) => option.id === value}
+                        value={vehicles.find((v) => v.id === selectedVehicle) || null}
+                        onChange={(_, newValue) => setSelectedVehicle(newValue?.id || '')}
+                        renderInput={(params) => <TextField {...params} label={t('text.SELECT_VEHICLE')} sx={{ flex: 1, minWidth: 180 }} />}
+                      />
+                    </Grid>
+                  )}
 
-              {tabIndex === 3 && (
-                <Autocomplete
-                  size="small"
-                  options={drivers}
-                  getOptionLabel={(option) => option.name || ''}
-                  isOptionEqualToValue={(option, value) => option.id === value}
-                  value={drivers.find((d) => d.id === selectedDriver) || null}
-                  onChange={(_, newValue) => setSelectedDriver(newValue?.id || '')}
-                  renderInput={(params) => <TextField {...params} label={text.SELECT_DRIVER} sx={{ flex: 1, minWidth: 180 }} />}
-                />
-              )}
-              <Button
-                variant="outlined"
-                onClick={handleGenerateReport}
-                sx={{
-                  borderColor: '#17a2b8',
-                  color: '#17a2b8',
-                  backgroundColor: 'white',
-                  '&:hover': {
-                    backgroundColor: '#17a2b8',
-                    borderColor: '#17a2b8',
-                    color: '#fff'
-                  }
-                }}
-              >
-                {text.GENERATE_REPORT}
-              </Button>
+                  {tabIndex === 3 && (
+                    <Grid item xs={12} sm={4} md={4} sx={{ mt: '20px' }}>
+                      <Autocomplete
+                        size="small"
+                        options={drivers}
+                        getOptionLabel={(option) => option.name || ''}
+                        isOptionEqualToValue={(option, value) => option.id === value}
+                        value={drivers.find((d) => d.id === selectedDriver) || null}
+                        onChange={(_, newValue) => setSelectedDriver(newValue?.id || '')}
+                        renderInput={(params) => <TextField {...params} label={t('text.SELECT_DRIVER')} sx={{ flex: 1, minWidth: 180 }} />}
+                      />
+                    </Grid>
+                  )}
+
+                  <Grid item xs={12} sm={3} md={2} sx={{ mt: '20px' }}>
+                    <Button
+                      variant="outlined"
+                      onClick={handleGenerateReport}
+                      sx={{
+                        borderColor: '#17a2b8',
+                        color: '#17a2b8',
+                        backgroundColor: 'white',
+                        '&:hover': {
+                          backgroundColor: '#17a2b8',
+                          borderColor: '#17a2b8',
+                          color: '#fff'
+                        }
+                      }}
+                    >
+                      {t('text.GENERATE_REPORT')}
+                    </Button>
+                  </Grid>
+                </Grid>
+              </LocalizationProvider>
             </Box>
 
             {tabIndex === 0 && bookings.length > 0 && (
@@ -254,14 +285,14 @@ const Reports = () => {
                     tripEndLoc: row.tripEndLoc
                   }))}
                   columns={[
-                    { field: 'sNo', headerName: text.S_NO, width: 70 },
-                    { field: 'customer', headerName: text.CUSTOMER, width: 150 },
-                    { field: 'vehicle', headerName: text.VEHICLE, width: 150 },
-                    { field: 'tripType', headerName: text.TYPE, width: 150 },
-                    { field: 'driver', headerName: text.DRIVER, width: 150 },
+                    { field: 'sNo', headerName: t('text.S_NO'), width: 70 },
+                    { field: 'customer', headerName: t('text.CUSTOMER'), width: 150 },
+                    { field: 'vehicle', headerName: t('text.VEHICLE'), width: 150 },
+                    { field: 'tripType', headerName: t('text.TYPE'), width: 150 },
+                    { field: 'driver', headerName: t('text.DRIVER'), width: 150 },
                     {
                       field: 'trip',
-                      headerName: text.FROM_TO,
+                      headerName: t('text.FROM_TO'),
                       width: 200,
                       renderCell: (params) => (
                         <Box>
@@ -271,11 +302,11 @@ const Reports = () => {
                         </Box>
                       )
                     },
-                    { field: 'totalKm', headerName: text.DISTANCE, width: 100 },
-                    { field: 'totalAmt', headerName: text.AMOUNT, width: 100 },
+                    { field: 'totalKm', headerName: t('text.DISTANCE'), width: 100 },
+                    { field: 'totalAmt', headerName: t('text.AMOUNT'), width: 100 },
                     {
                       field: 'tripStatus',
-                      headerName: text.STATUS,
+                      headerName: t('text.STATUS'),
                       width: 120,
                       renderCell: (params) => {
                         const status = params.row.tripStatus;
@@ -336,7 +367,7 @@ const Reports = () => {
                         <ThumbUp sx={{ color: 'white', fontSize: 30 }} />
                       </Box>
                       <Box>
-                        <Typography variant="h5">{text.TOTAL_INCOME}</Typography>
+                        <Typography variant="h5">{t('text.TOTAL_INCOME')}</Typography>
                         <Typography variant="h6" fontWeight="bold">
                           {summary?.income || 0}
                         </Typography>
@@ -361,7 +392,7 @@ const Reports = () => {
                         <ThumbDown sx={{ color: 'black', fontSize: 30 }} />
                       </Box>
                       <Box>
-                        <Typography variant="h5">{text.TOTAL_EXPENSE}</Typography>
+                        <Typography variant="h5">{t('text.TOTAL_EXPENSE')}</Typography>
                         <Typography variant="h6" fontWeight="bold">
                           {summary?.expense || 0}
                         </Typography>
@@ -407,21 +438,21 @@ const Reports = () => {
                       type: row.type
                     }))}
                     columns={[
-                      { field: 'sNo', headerName: text.S_NO, width: 70 },
-                      { field: 'vehicle', headerName: text.VEHICLE, width: 200 },
+                      { field: 'sNo', headerName: t('text.S_NO'), width: 70 },
+                      { field: 'vehicle', headerName: t('text.VEHICLE'), width: 200 },
                       {
                         field: 'date',
-                        headerName: text.DATE,
+                        headerName: t('text.DATE'),
                         width: 150,
                         renderCell: (params) => {
                           return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
                         }
                       },
-                      { field: 'description', headerName: text.DESCRIPTION, width: 200 },
-                      { field: 'amount', headerName: text.AMOUNT, width: 150 },
+                      { field: 'description', headerName: t('text.DESCRIPTION'), width: 200 },
+                      { field: 'amount', headerName: t('text.AMOUNT'), width: 150 },
                       {
                         field: 'type',
-                        headerName: text.TYPE,
+                        headerName: t('text.TYPE'),
                         width: 120,
                         renderCell: (params) => {
                           const isExpense = params.row.type === 'Expense';
@@ -471,21 +502,21 @@ const Reports = () => {
                     comments: row.comments
                   }))}
                   columns={[
-                    { field: 'sNo', headerName: text_S_No, width: 70 },
+                    { field: 'sNo', headerName: t('text_S_No'), width: 70 },
                     {
                       field: 'fillDate',
-                      headerName: text.FILL_DATE,
+                      headerName: t('text.FILL_DATE'),
                       width: 150,
                       renderCell: (params) => {
                         return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
                       }
                     },
-                    { field: 'vehicle', headerName: text.VEHICLE, width: 150 },
-                    { field: 'quantity', headerName: text.QUANTITY, width: 100 },
-                    { field: 'amount', headerName: text.TOTAL_AMOUNT, width: 150 },
-                    { field: 'driver', headerName: text.FUEL_FILL_BY, width: 150 },
-                    { field: 'odometerReading', headerName: text.ODOMETER_READING, width: 150 },
-                    { field: 'comments', headerName: text.COMMENTS, width: 150 }
+                    { field: 'vehicle', headerName: t('text.VEHICLE'), width: 150 },
+                    { field: 'quantity', headerName: t('text.QUANTITY'), width: 100 },
+                    { field: 'amount', headerName: t('text.TOTAL_AMOUNT'), width: 150 },
+                    { field: 'driver', headerName: t('text.FUEL_FILL_BY'), width: 150 },
+                    { field: 'odometerReading', headerName: t('text.ODOMETER_READING'), width: 150 },
+                    { field: 'comments', headerName: t('text.COMMENTS'), width: 150 }
                   ]}
                   disableRowSelectionOnClick
                   sx={{
@@ -515,28 +546,93 @@ const Reports = () => {
                     tripEndLoc: row.tripEndLoc
                   }))}
                   columns={[
-                    { field: 'sNo', headerName: text.S_NO, width: 70 },
+                    { field: 'sNo', headerName: t('text.S_NO'), width: 70 },
                     {
                       field: 'tripStartDate',
-                      headerName: text.BOOKING_DATE,
+                      headerName: t('text.BOOKING_DATE'),
                       width: 150,
                       renderCell: (params) => {
                         return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
                       }
                     },
-                    { field: 'tripStartLoc', headerName: text.FROM, width: 150 },
-                    { field: 'tripEndLoc', headerName: text.TO, width: 150 },
-                    { field: 'totalKm', headerName: text.DISTANCE, width: 150 },
-                    { field: 'vehicle', headerName: text.VEHICLE, width: 150 },
-                    { field: 'driver', headerName: text.DRIVER, width: 150 },
+                    {
+                      field: 'trip',
+                      headerName: t('text.FROM_TO'),
+                      width: 220,
+                      renderCell: (params) => (
+                        <Box>
+                          <Typography>{params.row.tripStartLoc ? params.row.tripStartLoc : 'N/A'}</Typography>
+                          <Typography>to</Typography>
+                          <Typography>{params.row.tripEndLoc ? params.row.tripEndLoc : 'N/A'}</Typography>
+                        </Box>
+                      )
+                    },
+                    { field: 'totalKm', headerName: t('text.DISTANCE'), width: 150 },
+                    { field: 'vehicle', headerName: t('text.VEHICLE'), width: 150 },
+                    { field: 'driver', headerName: t('text.DRIVER'), width: 150 },
                     {
                       field: 'createdAt',
-                      headerName: text.CREATED_AT,
+                      headerName: t('text.CREATED_AT'),
                       width: 150,
                       renderCell: (params) => {
                         return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
                       }
                     }
+                  ]}
+                  disableRowSelectionOnClick
+                  sx={{
+                    '.MuiDataGrid-columnHeaderTitle': { fontWeight: 'bold', fontSize: '16px' },
+                    '.MuiDataGrid-cell': { fontSize: '16px' }
+                  }}
+                  getRowHeight={() => 75}
+                  initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
+                  pageSizeOptions={[10]}
+                />
+              </Card>
+            )}
+
+            {tabIndex === 4 && tripExpenses.length > 0 && (
+              <Card sx={{ mt: '20px' }}>
+                <DataGrid
+                  rows={tripExpenses.map((row, index) => ({
+                    id: index + 1,
+                    sNo: index + 1,
+                    vehicle: row.vehicle?.vehicleName || 'N/A',
+                    driver: row.driver?.name || 'N/A',
+                    date: row.date,
+                    description: row.description,
+                    amount: row.amount,
+                    tripType: row.tripType,
+                    tripStartLoc: row.tripStartLoc,
+                    tripEndLoc: row.tripEndLoc
+                  }))}
+                  columns={[
+                    { field: 'sNo', headerName: t('text.S_NO'), width: 70 },
+                    { field: 'vehicle', headerName: t('text.VEHICLE'), width: 150 },
+                    { field: 'driver', headerName: t('text.DRIVER'), width: 150 },
+                    {
+                      field: 'date',
+                      headerName: t('text.DATE'),
+                      width: 150,
+                      renderCell: (params) => {
+                        return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
+                      }
+                    },
+                    { field: 'tripType', headerName: t('text.TYPE'), width: 120 },
+                    {
+                      field: 'trip',
+                      headerName: t('text.FROM_TO'),
+                      width: 200,
+                      renderCell: (params) => (
+                        <Box>
+                          <Typography>{params.row.tripStartLoc ? params.row.tripStartLoc : 'N/A'}</Typography>
+                          <Typography>to</Typography>
+                          <Typography>{params.row.tripEndLoc ? params.row.tripEndLoc : 'N/A'}</Typography>
+                        </Box>
+                      )
+                    },
+                    { field: 'description', headerName: t('text.DESCRIPTION'), width: 200 },
+                    { field: 'amount', headerName: t('text.AMOUNT'), width: 150 }
                   ]}
                   disableRowSelectionOnClick
                   sx={{
