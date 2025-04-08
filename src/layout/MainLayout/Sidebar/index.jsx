@@ -7,13 +7,11 @@ import { useMediaQuery, Divider, Drawer, Grid, Box } from '@mui/material';
 
 // third party
 import PerfectScrollbar from 'react-perfect-scrollbar';
+import LogoSection from '../Header/LogoSection';
 
 // project import
 import MenuList from './MenuList';
 import { drawerWidth } from 'config.js';
-
-// assets
-import logo from 'assets/images/logo.svg';
 
 // custom style
 const Nav = styled((props) => <nav {...props} />)(({ theme }) => ({
@@ -46,7 +44,7 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
           }}
         >
           <Grid item>
-            <img src={logo} alt="Logo" />
+            <LogoSection />
           </Grid>
         </Grid>
       </Box>

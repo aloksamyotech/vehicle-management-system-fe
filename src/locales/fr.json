@@ -268,5 +268,18 @@
   "text.LOGIN_SUCCESS": "Connexion réussie !",
   "text.LOGIN": "Se connecter",
   "text.PASSWORD": "Mot de passe",
-  "text.EMAIL_USERNAME": "Adresse e-mail"
+  "text.EMAIL_USERNAME": "Adresse e-mail",
+  "text.USER_ACCOUNT": "Compte Utilisateur",
+  "text.CURRENCY_UPDATE": "Devise mise à jour avec succès",
+  "text.CONTACT_INFO": "Informations de Contact",
+  "text.LOC": "Emplacement",
+  "text.ABOUT_US": "À Propos de Nous",
+  "text.CURRENCY_SETTINGS": "Paramètres de Devise",
+  "text.SELECT_CURRENCY": "Sélectionner une Devise",
+  "text.SAVE_CURRENCY": "Enregistrer la Devise",
+  "text.CURRENCY_CODE": "Code de Devise",
+  "text.CURRENCY_SYMBOL": "Symbole de Devise",
+  "text.PROFILE": "Profil",
+  "text.SETTINGS": "Paramètres",
+  "text.LOGOUT": "Déconnexion"
 }

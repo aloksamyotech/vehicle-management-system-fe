@@ -268,5 +268,18 @@
   "text.LOGIN_SUCCESS": "Erfolgreich angemeldet!",
   "text.LOGIN": "Anmelden",
   "text.PASSWORD": "Passwort",
-  "text.EMAIL_USERNAME": "E-Mail-Adresse"
+  "text.EMAIL_USERNAME": "E-Mail-Adresse",
+  "text.USER_ACCOUNT": "Benutzerkonto",
+  "text.CURRENCY_UPDATE": "Währung erfolgreich aktualisiert",
+  "text.CONTACT_INFO": "Kontaktinformationen",
+  "text.LOC": "Standort",
+  "text.ABOUT_US": "Über uns",
+  "text.CURRENCY_SETTINGS": "Währungseinstellungen",
+  "text.SELECT_CURRENCY": "Währung auswählen",
+  "text.SAVE_CURRENCY": "Währung speichern",
+  "text.CURRENCY_CODE": "Währungscode",
+  "text.CURRENCY_SYMBOL": "Währungssymbol",
+  "text.PROFILE": "Profil",
+  "text.SETTINGS": "Einstellungen",
+  "text.LOGOUT": "Abmelden"
 }

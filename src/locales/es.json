@@ -268,5 +268,18 @@
   "text.LOGIN_SUCCESS": "¡Inicio de sesión exitoso!",
   "text.LOGIN": "Iniciar sesión",
   "text.PASSWORD": "Contraseña",
-  "text.EMAIL_USERNAME": "Dirección de correo electrónico"
+  "text.EMAIL_USERNAME": "Dirección de correo electrónico",
+  "text.USER_ACCOUNT": "Cuenta de Usuario",
+  "text.CURRENCY_UPDATE": "Moneda actualizada con éxito",
+  "text.CONTACT_INFO": "Información de Contacto",
+  "text.LOC": "Ubicación",
+  "text.ABOUT_US": "Sobre Nosotros",
+  "text.CURRENCY_SETTINGS": "Configuración de Moneda",
+  "text.SELECT_CURRENCY": "Seleccionar Moneda",
+  "text.SAVE_CURRENCY": "Guardar Moneda",
+  "text.CURRENCY_CODE": "Código de Moneda",
+  "text.CURRENCY_SYMBOL": "Símbolo de Moneda",
+  "text.PROFILE": "Perfil",
+  "text.SETTINGS": "Configuraciones",
+  "text.LOGOUT": "Cerrar Sesión"
 }

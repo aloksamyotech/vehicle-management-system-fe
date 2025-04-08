@@ -10,9 +10,10 @@ import { text } from 'common/constant';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
 
 const Reports = () => {
-   const { t } = useTranslation();
+  const { t } = useTranslation();
   const [tabIndex, setTabIndex] = useState(0);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -28,11 +29,6 @@ const Reports = () => {
   const [driverReport, setDriverReport] = useState([]);
   const [summary, setSummary] = useState('');
   const [tripExpenses, setTripExpenses] = useState([]);
-  const [allBookings, setAllBookings] = useState([]);
-  const [allIncomeExpense, setAllIncomeExpense] = useState([]);
-  const [allFuel, setAllFuel] = useState([]);
-  const [allDriverReport, setAllDriverReport] = useState([]);
-  const [allTripExpenses, setAllTripExpenses] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,67 +45,70 @@ const Reports = () => {
       setVehicles(vehiclesRes.data);
       setDrivers(driversRes.data);
       setBookings(bookingsRes.data || []);
-      setAllBookings(bookingsRes.data || []);
-
       setIncomeExpense(incomeExpenseRes.data.incomeExpenseDetails || []);
-      setAllIncomeExpense(incomeExpenseRes.data.incomeExpenseDetails || []);
-
+      setSummary(incomeExpenseRes.data.summary || '');
       setFuel(fuelRes.data || []);
-      setAllFuel(fuelRes.data || []);
-
       setDriverReport(driverReportRes.data || []);
-      setAllDriverReport(driverReportRes.data || []);
-
       setTripExpenses(tripExpensesRes.data || []);
-      setAllTripExpenses(tripExpensesRes.data || []);
     };
 
     fetchData();
   }, []);
 
-  const filterData = () => {
-    let filteredBookings = allBookings;
-    let filteredIncomeExpense = allIncomeExpense;
-    let filteredFuel = allFuel;
-    let filteredDriverReport = allDriverReport;
-    let filteredTripExpenses = allTripExpenses;
+  const fetchFilteredReports = async () => {
+    try {
+      const params = new URLSearchParams();
 
-    if (selectedVehicle) {
-      filteredBookings = filteredBookings.filter((item) => item.vehicleId === selectedVehicle);
-      filteredIncomeExpense = filteredIncomeExpense.filter((item) => item.vehicleId === selectedVehicle);
-      filteredFuel = filteredFuel.filter((item) => item.vehicleId === selectedVehicle);
-      filteredTripExpenses = filteredTripExpenses.filter((item) => item.vehicleId === selectedVehicle);
+      if (startDate) {
+        const formattedStartDate = format(startDate, 'yyyy-MM-dd');
+        params.append('startDate', formattedStartDate);
+      }
+
+      if (endDate) {
+        const formattedEndDate = format(endDate, 'yyyy-MM-dd');
+        params.append('endDate', formattedEndDate);
+      }
+
+      if (selectedVehicle?.id) params.append('vehicleId', selectedVehicle.id);
+      if (selectedDriver?.id) params.append('driverId', selectedDriver.id);
+
+      const query = params.toString();
+
+      switch (tabIndex) {
+        case 0: {
+          const res = await getApi(`${urls.booking.report}?${query}`);
+          setBookings(res.data || []);
+          break;
+        }
+        case 1: {
+          const res = await getApi(`${urls.incomeExpense.report}?${query}`);
+          setIncomeExpense(res.data.incomeExpenseDetails || []);
+          break;
+        }
+        case 2: {
+          const res = await getApi(`${urls.fuel.report}?${query}`);
+          setFuel(res.data || []);
+          break;
+        }
+        case 3: {
+          const res = await getApi(`${urls.booking.driverReport}?${query}`);
+          setDriverReport(res.data || []);
+          break;
+        }
+        default:
+          break;
+      }
+    } catch (error) {
+      console.error(error);
     }
-
-    if (selectedDriver) {
-      filteredDriverReport = filteredDriverReport.filter((item) => item.driverId === selectedDriver);
-    }
-
-    if (startDate && endDate) {
-      filteredBookings = filteredBookings.filter(
-        (item) => new Date(item.date) >= new Date(startDate) && new Date(item.date) <= new Date(endDate)
-      );
-      filteredIncomeExpense = filteredIncomeExpense.filter(
-        (item) => new Date(item.date) >= new Date(startDate) && new Date(item.date) <= new Date(endDate)
-      );
-      filteredFuel = filteredFuel.filter((item) => new Date(item.date) >= new Date(startDate) && new Date(item.date) <= new Date(endDate));
-      filteredDriverReport = filteredDriverReport.filter(
-        (item) => new Date(item.date) >= new Date(startDate) && new Date(item.date) <= new Date(endDate)
-      );
-      filteredTripExpenses = filteredTripExpenses.filter(
-        (item) => new Date(item.date) >= new Date(startDate) && new Date(item.date) <= new Date(endDate)
-      );
-    }
-
-    setBookings(filteredBookings);
-    setIncomeExpense(filteredIncomeExpense);
-    setFuel(filteredFuel);
-    setDriverReport(filteredDriverReport);
-    setTripExpenses(filteredTripExpenses);
   };
 
   const handleGenerateReport = () => {
-    filterData();
+    if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+      toast.error(t('text.INVALID_DATE_RANGE'));
+      return;
+    }
+    fetchFilteredReports();
   };
 
   useEffect(() => {
@@ -120,7 +119,7 @@ const Reports = () => {
     setStartDateError(false);
     setEndDateError(false);
 
-    filterData();
+    fetchFilteredReports();
   }, [tabIndex]);
 
   return (
@@ -224,9 +223,9 @@ const Reports = () => {
                         size="small"
                         options={vehicles}
                         getOptionLabel={(option) => option.vehicleName || ''}
-                        isOptionEqualToValue={(option, value) => option.id === value}
-                        value={vehicles.find((v) => v.id === selectedVehicle) || null}
-                        onChange={(_, newValue) => setSelectedVehicle(newValue?.id || '')}
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                        value={selectedVehicle || null}
+                        onChange={(_, newValue) => setSelectedVehicle(newValue || null)}
                         renderInput={(params) => <TextField {...params} label={t('text.SELECT_VEHICLE')} sx={{ flex: 1, minWidth: 180 }} />}
                       />
                     </Grid>
@@ -238,9 +237,9 @@ const Reports = () => {
                         size="small"
                         options={drivers}
                         getOptionLabel={(option) => option.name || ''}
-                        isOptionEqualToValue={(option, value) => option.id === value}
-                        value={drivers.find((d) => d.id === selectedDriver) || null}
-                        onChange={(_, newValue) => setSelectedDriver(newValue?.id || '')}
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                        value={selectedDriver || null}
+                        onChange={(_, newValue) => setSelectedDriver(newValue || '')}
                         renderInput={(params) => <TextField {...params} label={t('text.SELECT_DRIVER')} sx={{ flex: 1, minWidth: 180 }} />}
                       />
                     </Grid>

@@ -56,8 +56,32 @@ const DriverForm = () => {
     }
   }, [initialData, setValue]);
 
+
   const onSubmit = async (data) => {
-    const { sNo, ...filteredData } = data;
+    const { sNo, image, doc, ...filteredData } = data;
+
+    const formData = new FormData();
+
+    Object.entries(filteredData).forEach(([key, value]) => {
+      if (value instanceof Date) {
+        formData.append(key, value.toISOString());
+      } else {
+        formData.append(key, value);
+      }
+    });
+
+    if (image instanceof File) {
+      formData.append('image', image);
+    } else if (initialData?.image) {
+      formData.append('image', initialData.image);
+    }
+
+    if (doc instanceof File) {
+      formData.append('doc', doc);
+    } else if (initialData?.doc) {
+      formData.append('doc', initialData.doc);
+    }
+
     let response;
     if (id) {
       response = await updateApiPatch(urls.driver.update.replace(':id', id), filteredData);
@@ -429,9 +453,8 @@ const DriverForm = () => {
                 <Controller
                   name="doc"
                   control={control}
-                  render={({ field }) => (
+                  render={() => (
                     <TextField
-                      {...field}
                       fullWidth
                       size="small"
                       type="file"

@@ -76,13 +76,36 @@ const VehicleForm = () => {
   }, [initialData, setValue]);
 
   const onSubmit = async (data) => {
-    const { sNo, group, gpsApiUrl, apiUsername, apiPassword, ...filteredData } = data;
+    const { sNo, group, gpsApiUrl, apiUsername, apiPassword, image, doc, ...filteredData } = data;
+
+    const formData = new FormData();
+
+    Object.entries(filteredData).forEach(([key, value]) => {
+      if (value instanceof Date) {
+        formData.append(key, value.toISOString());
+      } else {
+        formData.append(key, value);
+      }
+    });
+
+    if (image instanceof File) {
+      formData.append('image', image);
+    } else if (initialData?.image) {
+      formData.append('image', initialData.image);
+    }
+
+    if (doc instanceof File) {
+      formData.append('doc', doc);
+    } else if (initialData?.doc) {
+      formData.append('doc', initialData.doc);
+    }
+
     let response;
     if (id) {
-      response = await updateApiPatch(urls.vehicle.update.replace(':id', id), filteredData);
+      response = await updateApiPatch(urls.vehicle.update.replace(':id', id), formData, true);
       toast.success(t('text.VEHICLE_UPDATED'));
     } else {
-      response = await postApi(urls.vehicle.create, filteredData);
+      response = await postApi(urls.vehicle.create, formData, true);
       toast.success(t('text.VEHICLE_ADDED'));
     }
 
@@ -237,9 +260,9 @@ const VehicleForm = () => {
                   name="manufacturedBy"
                   control={control}
                   rules={{
-                    required: t("text.REQUIRED"),
-  minLength: { value: 3, message: t("text.MIN_3_CHAR") },
-  maxLength: { value: 50, message: t("text.MAX_50_CHAR") },
+                    required: t('text.REQUIRED'),
+                    minLength: { value: 3, message: t('text.MIN_3_CHAR') },
+                    maxLength: { value: 50, message: t('text.MAX_50_CHAR') },
                     pattern: {
                       value: /^[A-Za-z\s]+$/,
                       message: t('text.ALPHABETS_ONLY')
@@ -347,14 +370,21 @@ const VehicleForm = () => {
                 <Controller
                   name="image"
                   control={control}
-                  render={({ field }) => (
-                    <TextField
-                      fullWidth
-                      size="small"
-                      type="file"
-                      inputProps={{ accept: 'image/*' }}
-                      onChange={(e) => setValue('image', e.target.files[0])}
-                    />
+                  render={() => (
+                    <>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        type="file"
+                        inputProps={{ accept: 'image/*' }}
+                        onChange={(e) => setValue('image', e.target.files[0])}
+                      />
+                      {initialData?.image && (
+                        <Typography variant="caption" color="textSecondary">
+                          {initialData.image.split('/').pop()}
+                        </Typography>
+                      )}
+                    </>
                   )}
                 />
               </Grid>
@@ -364,15 +394,21 @@ const VehicleForm = () => {
                 <Controller
                   name="doc"
                   control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      size="small"
-                      type="file"
-                      inputProps={{ accept: 'application/pdf, image/*' }}
-                      onChange={(e) => setValue('doc', e.target.files[0])}
-                    />
+                  render={() => (
+                    <>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        type="file"
+                        inputProps={{ accept: 'application/pdf, image/*' }}
+                        onChange={(e) => setValue('doc', e.target.files[0])}
+                      />
+                      {initialData?.doc && (
+                        <Typography variant="caption" color="textSecondary">
+                          {initialData.doc.split('/').pop()}
+                        </Typography>
+                      )}
+                    </>
                   )}
                 />
               </Grid>

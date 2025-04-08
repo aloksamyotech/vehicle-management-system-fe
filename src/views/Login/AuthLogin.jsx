@@ -20,7 +20,6 @@ import * as Yup from 'yup';
 import { Formik } from 'formik';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import Google from 'assets/images/social-google.svg';
 import { text } from 'common/constant';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';

@@ -26,6 +26,7 @@ const AddMaintenance = Loadable(lazy(() => import('views/AddMaintenance')));
 const ViewVehiclePage = Loadable(lazy(() => import ('views/ViewVehicle')));
 const ViewBookingsPage = Loadable(lazy(() => import('views/ViewBookings')));
 const Invoice = Loadable(lazy(() => import('views/BookingInvoice')));
+const Profile = Loadable(lazy(() => import('views/Profile')));
 
 // ==============================|| MAIN ROUTES ||============================== //
 
@@ -140,6 +141,10 @@ const MainRoutes = {
     {
       path: '/users',
       element: <UserManagement />
+    },
+    {
+      path: '/profile',
+      element: <Profile />
     },
   ]
 };

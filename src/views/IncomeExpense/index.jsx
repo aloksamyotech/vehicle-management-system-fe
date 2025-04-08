@@ -68,7 +68,7 @@ const FinanceIndex = () => {
           <Button
             variant="contained"
             style={{
-              backgroundColor: isActive ? '#30aa4c' : '#dc3545',
+              backgroundColor: isActive ? '#dc3545' : '#30aa4c',
               color: 'white',
               fontWeight: 700,
               width: 'auto',
