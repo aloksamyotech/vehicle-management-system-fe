@@ -267,5 +267,20 @@ export const text = {
   LOGIN_SUCCESS: 'Logged in successfully!',
   LOGIN: 'Log In',
   PASSWORD: 'Password',
-  EMAIL_USERNAME: 'Email Address'
+  EMAIL_USERNAME: 'Email Address',
+
+
+  USER_ACCOUNT: 'User Account',
+  CURRENCY_UPDATE: 'Currency updated successfully',
+  CONTACT_INFO: 'Contact Information',
+  LOC: 'Location',
+  ABOUT_US:'About Us',
+  CURRENCY_SETTINGS:'Currency Settings',
+  SELECT_CURRENCY: 'Select Currency',
+  SAVE_CURRENCY:'Save Currency',
+  CURRENCY_CODE: 'Currency Code',
+  CURRENCY_SYMBOL:'Currency Symbol',
+  PROFILE: 'Profile',
+  SETTINGS: 'Settings',
+  LOGOUT: 'Logout'
 };

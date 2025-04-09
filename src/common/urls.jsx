@@ -94,5 +94,8 @@ export const urls = Object.freeze({
   },
   user: {
     login: `${baseUrl}/login`,
+  },
+  users : {
+    updateCurrency : `${baseUrl}/users/currency/:id`,
   }
 });

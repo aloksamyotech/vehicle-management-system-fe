@@ -16,7 +16,6 @@ import { useTranslation } from "react-i18next";
 
 // assets
 import MenuTwoToneIcon from '@mui/icons-material/MenuTwoTone';
-import logo from 'assets/images/logo.svg';
 
 // ==============================|| HEADER ||============================== //
 

@@ -29,11 +29,17 @@ const ProfileSection = () => {
   };
 
   const logout = () => {
+    setOpen(false); 
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     toast.success(t('text.LOGOUT_SUCCESS'));
     navigate('/login');
   };
+
+  const profile = () => {
+    setOpen(false); 
+    navigate('/profile');
+  }
 
   return (
     <>
@@ -55,23 +61,23 @@ const ProfileSection = () => {
                     borderRadius: '10px'
                   }}
                 >
-                  <ListItemButton>
+                  <ListItemButton onClick={profile}>
                     <ListItemIcon>
                       <SettingsTwoToneIcon />
                     </ListItemIcon>
-                    <ListItemText primary="Settings" />
+                    <ListItemText primary={t('text.SETTINGS')} />
                   </ListItemButton>
-                  <ListItemButton>
+                  <ListItemButton onClick={profile}>
                     <ListItemIcon>
                       <PersonTwoToneIcon />
                     </ListItemIcon>
-                    <ListItemText primary="Profile" />
+                    <ListItemText primary={t('text.PROFILE')} />
                   </ListItemButton>
                   <ListItemButton onClick={logout}>
                     <ListItemIcon>
                       <LogoutIcon />
                     </ListItemIcon>
-                    <ListItemText primary="Logout" />
+                    <ListItemText primary={t('text.LOGOUT')} />
                   </ListItemButton>
                 </List>
               </ClickAwayListener>
