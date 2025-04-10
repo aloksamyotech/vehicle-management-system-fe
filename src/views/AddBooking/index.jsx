@@ -142,7 +142,7 @@ const DriverForm = () => {
           setValue('tripEndPincode', '');
         }
       } catch (error) {
-        console.error(t('text.ERROR_FETCHING'));
+        toast.error(t('text.ERROR_FETCHING'));
       }
     }
   };
@@ -157,7 +157,7 @@ const DriverForm = () => {
       }
       return null;
     } catch (error) {
-      console.error(t('text.ERROR_FETCHING'));
+      toast.error(t('text.ERROR_FETCHING'));
       return null;
     }
   };
