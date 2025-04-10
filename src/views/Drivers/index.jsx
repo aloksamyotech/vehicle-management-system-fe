@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Box, Grid, Divider, IconButton, Stack, Typography } from '@mui/material';
+import { Card, Switch, Box, Grid, Divider, IconButton, Stack, Typography } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { gridSpacing } from 'config.js';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
@@ -13,7 +13,6 @@ import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { text } from 'common/constant';
 import ToggleSwitch from 'common/toggleSwitch';
 import { useTranslation } from 'react-i18next';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 
 const DriverManagementPage = () => {
   const { t } = useTranslation();
@@ -29,7 +28,6 @@ const DriverManagementPage = () => {
     setLoading(true);
     try {
       const response = await getApi(urls.driver.get);
-      console.log(response);
       const formattedData = response.data.map((driver, index) => ({
         id: driver.id,
         name: driver.name,
@@ -42,8 +40,8 @@ const DriverManagementPage = () => {
         notes: driver.notes,
         address: driver.address,
         status: driver.status,
-        image: driver.imageUrl ? driver.imageUrl.replace(/\\/g, '/') : null,
-        doc: driver.docUrl ? driver.docUrl.replace(/\\/g, '/') : null
+        image: driver.image || null,
+        doc: driver.doc || null
       }));
       setDrivers(formattedData);
     } catch (error) {
@@ -65,7 +63,7 @@ const DriverManagementPage = () => {
       field: 'image',
       headerName: t('text.PHOTO'),
       width: 120,
-      renderCell: (params) => <img src={params.row.image} alt="driver" style={{ width: 50, height: 50 }} />
+      renderCell: (params) => <img src={params.row.image} alt="driver" style={{ width: 50, height: 50, borderRadius: '50%' }} />
     },
     { field: 'name', headerName: t('text.NAME'), width: 150 },
     { field: 'mobileNo', headerName: t('text.MOBILE'), width: 150 },
@@ -88,45 +86,11 @@ const DriverManagementPage = () => {
         return date ? date.toLocaleDateString() : 'N/A';
       }
     },
-    {
-      field: 'doc',
-      headerName: t('text.DOCUMENT'),
-      width: 100,
-      renderCell: (params) => {
-        const docUrl = params.row.doc;
-        return (
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: '100%'
-            }}
-          >
-            {docUrl ? (
-              <a
-                href={docUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                <PictureAsPdfIcon color="error" style={{ fontSize: '20px' }} />
-              </a>
-            ) : (
-              <span>-</span>
-            )}
-          </div>
-        );
-      }
-    },
+    { field: 'doc', headerName: t('text.DOCUMENT'), width: 100 },
     {
       field: 'status',
       headerName: t('text.STATUS'),
-      width: 150,
+      width: 200,
       renderCell: (params) => {
         const isActive = params.row.status === 'Active';
 

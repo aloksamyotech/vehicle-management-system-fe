@@ -23,7 +23,6 @@ import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { useTranslation } from 'react-i18next';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 
 const ViewVehiclePage = () => {
   const { id } = useParams();
@@ -58,17 +57,7 @@ const ViewVehiclePage = () => {
     { label: t('text.API_PASS'), value: '278561' },
     { label: t('text.CREATED_DATE'), value: vehicles.createdAt },
     { label: t('text.MODIFIED_DATE'), value: vehicles.updatedAt },
-    {
-      label: t('text.DOCUMENT'),
-      value: vehicles.docUrl ? (
-        <a href={vehicles.docUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <PictureAsPdfIcon color="error" />
-          <span>{t('text.VIEW')}</span>
-        </a>
-      ) : (
-        t('text.NO_DOCUMENT')
-      ),
-    }
+    { label: t('text.DOCUMENT'), value: vehicles.doc }
   ];
 
   const bookingColumns = [

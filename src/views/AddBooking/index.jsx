@@ -600,6 +600,13 @@ const DriverForm = () => {
                   />
                 </FormControl>
               </Grid>
+
+              {/* <Grid item xs={12}>
+                <FormControlLabel
+                  control={<Checkbox {...register('sendEmailConfirmation')} />}
+                  label="Is need to send email confirmation after booking?"
+                />
+              </Grid> */}
             </Grid>
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>

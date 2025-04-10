@@ -281,8 +281,5 @@
   "text.CURRENCY_SYMBOL": "Currency Symbol",
   "text.PROFILE": "Profile",
   "text.SETTINGS":"Settings",
-  "text.LOGOUT":"Logout",
-  "text.VIEW":"View",
-  "text.DRIVER_PHOTO":"Driver Photo",
-  "text.DRIVER_DOC": "Driver Document"
+  "text.LOGOUT":"Logout"
 }

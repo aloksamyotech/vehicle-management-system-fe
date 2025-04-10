@@ -282,8 +282,5 @@ export const text = {
   CURRENCY_SYMBOL:'Currency Symbol',
   PROFILE: 'Profile',
   SETTINGS: 'Settings',
-  LOGOUT: 'Logout',
-  VIEW:'  View',
-  DRIVER_PHOTO:'Driver Photo',
-  DRIVER_DOC: 'Driver Document'
+  LOGOUT: 'Logout'
 };
