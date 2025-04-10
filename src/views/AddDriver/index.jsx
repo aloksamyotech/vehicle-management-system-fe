@@ -84,10 +84,10 @@ const DriverForm = () => {
 
     let response;
     if (id) {
-      response = await updateApiPatch(urls.driver.update.replace(':id', id), filteredData);
+      response = await updateApiPatch(urls.driver.update.replace(':id', id), formData, true);
       toast.success(t("text.DRIVER_UPDATED"));
     } else {
-      response = await postApi(urls.driver.create, filteredData);
+      response = await postApi(urls.driver.create, formData, true);
       toast.success(t("text.DRIVER_ADDED"));
     }
 
@@ -432,7 +432,7 @@ const DriverForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{t('text.PHOTO')}</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{t('text.DRIVER_PHOTO')}</FormLabel>
                 <Controller
                   name="image"
                   control={control}
@@ -449,7 +449,7 @@ const DriverForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{t('text.DOCUMENT')}</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{t('text.DRIVER_DOC')}</FormLabel>
                 <Controller
                   name="doc"
                   control={control}
