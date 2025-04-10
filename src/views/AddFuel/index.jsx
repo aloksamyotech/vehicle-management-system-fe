@@ -39,17 +39,16 @@ const FuelExpenseForm = () => {
 
   useEffect(() => {
     const fetchVehicles = async () => {
-      const response = await getApi(urls.vehicle.get);
-      setVehicles(response.data);
+      const response = await getApi(`${urls.vehicle.get}?all=true`);
+      setVehicles(response?.data?.vehicleDetails);
     };
 
     const fetchDriver = async () => {
-      const response = await getApi(urls.driver.get);
-      setDrivers(response.data);
+      const response = await getApi(`${urls.driver.get}?all=true`);
+      setDrivers(response?.data?.driverDetails);
     };
 
     fetchVehicles();
-
     fetchDriver();
   }, []);
 

@@ -20,17 +20,20 @@ const DriverManagementPage = () => {
   const navigate = useNavigate();
   const [drivers, setDrivers] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    fetchDrivers();
-  }, []);
+  const [totalRows, setTotalRows] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
 
   const fetchDrivers = async () => {
     setLoading(true);
     try {
-      const response = await getApi(urls.driver.get);
-      console.log(response);
-      const formattedData = response.data.map((driver, index) => ({
+      const response = await getApi(`${urls.driver.get}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
+      const driverList = response?.data?.driverDetails || [];
+      const pagination = response?.data?.pagination || { total: 0 };
+
+      const formattedData = driverList.map((driver, index) => ({
         id: driver.id,
         name: driver.name,
         mobileNo: driver.mobileNo,
@@ -46,12 +49,17 @@ const DriverManagementPage = () => {
         doc: driver.docUrl ? driver.docUrl.replace(/\\/g, '/') : null
       }));
       setDrivers(formattedData);
+      setTotalRows(pagination.total);
     } catch (error) {
       toast.error(t('text.ERROR_FETCHING'));
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchDrivers();
+  }, [paginationModel]);
 
   const handleDelete = async (id) => {
     await deleteApi(urls.driver.delete.replace(':id', id));
@@ -65,7 +73,9 @@ const DriverManagementPage = () => {
       field: 'image',
       headerName: t('text.PHOTO'),
       width: 120,
-      renderCell: (params) => <img src={params.row.image} alt="driver" style={{ width: 50, height: 50 }} />
+      renderCell: (params) => (
+        <img src={params.row.image} alt="driver" style={{ width: 50, height: 50, borderRadius: '10px', padding: '5px' }} />
+      )
     },
     { field: 'name', headerName: t('text.NAME'), width: 150 },
     { field: 'mobileNo', headerName: t('text.MOBILE'), width: 150 },
@@ -188,10 +198,17 @@ const DriverManagementPage = () => {
           <Card>
             <Box sx={{ height: 'auto', width: '100%' }}>
               <DataGrid
-                rows={loading ? [] : drivers.map((row, index) => ({ ...row, sNo: index + 1 }))}
+                rows={
+                  loading ? [] : drivers.map((row, index) => ({ ...row, sNo: paginationModel.page * paginationModel.pageSize + index + 1 }))
+                }
                 columns={columns}
+                rowCount={totalRows}
                 loading={loading}
-                disableRowSelectionOnClick
+                pagination
+                paginationMode="server"
+                paginationModel={paginationModel}
+                onPaginationModelChange={setPaginationModel}
+                pageSizeOptions={[10]}
                 sx={{
                   '.MuiDataGrid-columnHeaderTitle': {
                     fontWeight: 'bold',
@@ -201,17 +218,6 @@ const DriverManagementPage = () => {
                     fontSize: '16px'
                   }
                 }}
-                initialState={{
-                  pagination: {
-                    paginationModel: {
-                      pageSize: 10
-                    }
-                  }
-                }}
-                pageSizeOptions={[10]}
-                disableColumnFilter
-                disableColumnSelector
-                disableDensitySelector
                 slots={{ toolbar: CustomToolbar }}
                 slotProps={{
                   toolbar: {

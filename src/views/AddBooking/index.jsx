@@ -43,18 +43,18 @@ const DriverForm = () => {
 
   useEffect(() => {
     const fetchVehicles = async () => {
-      const response = await getApi(urls.vehicle.get);
-      setVehicles(response?.data);
+      const response = await getApi(`${urls.vehicle.get}?all=true`);
+      setVehicles(response?.data?.vehicleDetails || []);
     };
 
     const fetchDriver = async () => {
-      const response = await getApi(urls.driver.get);
-      setDrivers(response?.data);
+      const response = await getApi(`${urls.driver.get}?all=true`);
+      setDrivers(response?.data?.driverDetails || []);
     };
 
     const fetchCustomer = async () => {
-      const response = await getApi(urls.customer.get);
-      setCustomers(response?.data);
+      const response = await getApi(`${urls.customer.get}?all=true`);
+      setCustomers(response?.data?.customerDetails || []);
     };
 
     fetchVehicles();
@@ -122,7 +122,7 @@ const DriverForm = () => {
           setValue('tripStartPincode', '');
         }
       } catch (error) {
-        console.error(t('text.ERROR_FETCHING'));
+        toast.error(t('text.ERROR_FETCHING'));
       }
     }
   };

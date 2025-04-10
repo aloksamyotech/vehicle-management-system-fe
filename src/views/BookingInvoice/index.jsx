@@ -6,6 +6,7 @@ import { Box, Card, CardContent, Typography, Grid, Divider, Button } from '@mui/
 import { jsPDF } from 'jspdf';
 import { text } from 'common/constant';
 import { useTranslation } from 'react-i18next';
+import { fetchCurrencySymbol } from 'common/function';
 
 const InvoicePage = () => {
   const { t } = useTranslation();
@@ -13,7 +14,15 @@ const InvoicePage = () => {
   const location = useLocation();
   const { excess, paidAmount } = location.state || {};
   const [booking, setBooking] = useState(null);
-  const currentDate = new Date().toLocaleDateString();
+  const [currencySymbol, setCurrencySymbol] = useState('');
+
+  useEffect(() => {
+    const getCurrency = async () => {
+      const symbol = await fetchCurrencySymbol();
+      setCurrencySymbol(symbol);
+    };
+    getCurrency();
+  }, []);
 
   useEffect(() => {
     if (id) {
@@ -30,7 +39,7 @@ const InvoicePage = () => {
     const doc = new jsPDF();
     doc.setFontSize(18).text('INVOICE', 105, 20, null, null, 'center');
     doc.setFontSize(12).text(`Invoice No: ${invoiceNo}`, 150, 20);
-    doc.text(`Date: ${currentDate}`, 150, 30);
+    doc.text(`Date: ${booking?.createdAt}`, 150, 30);
 
     doc.setFontSize(14).text('Booking Details', 14, 50).line(14, 55, 190, 55);
     doc.setFontSize(12);
@@ -50,9 +59,9 @@ const InvoicePage = () => {
 
     doc.setFontSize(14).text('Payment Information', 14, 200).line(14, 205, 190, 205);
     doc.setFontSize(12);
-    doc.text(`Total Amount: ₹${booking?.totalAmt || ''}`, 14, 215);
-    doc.text(`Paid Amount: ₹${paidAmount || ''}`, 14, 225);
-    doc.text(`Pending Amount: ₹${excess || ''}`, 14, 235);
+    doc.text(`Total Amount: ${currencySymbol} ${booking?.totalAmt || ''}`, 14, 215);
+    doc.text(`Paid Amount:  ${currencySymbol} ${paidAmount || ''}`, 14, 225);
+    doc.text(`Pending Amount:${currencySymbol} ${excess || ''}`, 14, 235);
 
     doc.text('Thank you for your business!', 105, 260, null, null, 'center');
     doc.save(`${invoiceNo}.pdf`);
@@ -70,7 +79,7 @@ const InvoicePage = () => {
               {t('text.INV_NO')}: #{booking?.invoiceNo}
             </Typography>
             <Typography variant="h5">
-              {t('text.DATE')}: {currentDate}
+              {t('text.DATE')}: {new Date(booking?.createdAt).toLocaleDateString('en-GB')}
             </Typography>
           </Box>
 
@@ -92,11 +101,13 @@ const InvoicePage = () => {
             <Grid item xs={6}>
               <Typography variant="h6">{t('text.TRIP_START_LOC')}:</Typography>
               <Typography>
-                {booking?.tripStartDate || ''} | {booking?.tripStartLoc || ''}
+                {booking?.tripStartDate ? new Date(booking.tripStartDate).toLocaleDateString('en-GB') : ''} | {booking?.tripStartLoc || ''}
               </Typography>
+
               <Typography variant="h6">{t('text.TRIP_END_LOC')}:</Typography>
+
               <Typography>
-                {booking?.tripEndDate || ''} | {booking?.tripEndLoc || ''}
+                {booking?.tripEndDate ? new Date(booking.tripEndDate).toLocaleDateString('en-GB') : ''} | {booking?.tripEndLoc || ''}
               </Typography>
             </Grid>
           </Grid>
@@ -129,14 +140,18 @@ const InvoicePage = () => {
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <Typography variant="h6">{t('text.PAID_AMOUNT')}:</Typography>
-              <Typography>₹{paidAmount || ''}</Typography>
+              <Typography>
+                {currencySymbol} {paidAmount || ''}
+              </Typography>
               <Typography variant="h5">
-                {t('text.TOTAL_AMOUNT')}: ₹{booking?.totalAmt || ''}
+                {t('text.TOTAL_AMOUNT')}: {currencySymbol} {booking?.totalAmt || ''}
               </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography variant="h6">{t('text.PENDING_AMOUNT')}:</Typography>
-              <Typography>₹{excess || ''}</Typography>
+              <Typography>
+                {currencySymbol} {excess || ''}
+              </Typography>
             </Grid>
           </Grid>
 

@@ -281,5 +281,8 @@
   "text.CURRENCY_SYMBOL": "Symbole de Devise",
   "text.PROFILE": "Profil",
   "text.SETTINGS": "Paramètres",
-  "text.LOGOUT": "Déconnexion"
+  "text.LOGOUT": "Déconnexion",
+  "text.VIEW": "Voir",
+  "text.DRIVER_PHOTO": "Photo du conducteur",
+  "text.DRIVER_DOC": "Document du conducteur"
 }

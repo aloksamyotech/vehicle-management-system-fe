@@ -10,22 +10,36 @@ import CustomToolbar from 'common/customToolbar';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { text } from 'common/constant';
 import { useTranslation } from 'react-i18next';
+import { fetchCurrencySymbol } from 'common/function';
 
 const MaintenanceIndex = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [showData, setShowData] = useState([]);
+  const [currencySymbol, setCurrencySymbol] = useState('');
+  const [totalRows, setTotalRows] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
 
   useEffect(() => {
-    fetchData();
+    const getCurrency = async () => {
+      const symbol = await fetchCurrencySymbol();
+      setCurrencySymbol(symbol);
+    };
+    getCurrency();
   }, []);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await getApi(urls.maintenance.get);
-      const formattedData = response.data.map((maintenance, index) => ({
+      const response = await getApi(`${urls.maintenance.get}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
+      const mainList = response?.data?.mainDetails || [];
+      const pagination = response?.data?.pagination || { total: 0 };
+
+      const formattedData = mainList.map((maintenance, index) => ({
         id: maintenance.id,
         vendorName: maintenance.vendorName,
         totalCost: maintenance.totalCost,
@@ -38,12 +52,17 @@ const MaintenanceIndex = () => {
         group: maintenance.vehicle?.vehicleName || 'N/A'
       }));
       setShowData(formattedData);
+      setTotalRows(pagination.total);
     } catch (error) {
       toast.error(t('text.ERROR_FETCHING'));
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, [paginationModel]);
 
   const handleStatusChange = async (id, newStatus) => {
     try {
@@ -84,7 +103,14 @@ const MaintenanceIndex = () => {
     },
     { field: 'details', headerName: t('text.SERVICE_DETAILS'), width: 250 },
     { field: 'vendorName', headerName: t('text.VENDOR_NAME'), width: 150 },
-    { field: 'totalCost', headerName: t('text.TOTAL_COST'), width: 120 },
+    {
+      field: 'totalCost',
+      headerName: t('text.TOTAL_COST'),
+      width: 120,
+      renderCell: (params) => (
+        `${currencySymbol} ${params.value}`
+      )
+    },    
     {
       field: 'status',
       headerName: t('text.STATUS'),
@@ -121,24 +147,24 @@ const MaintenanceIndex = () => {
           <Card>
             <Box sx={{ height: 'auto', width: '100%' }}>
               <DataGrid
-                rows={loading ? [] : showData.map((row, index) => ({ ...row, sNo: index + 1 }))}
+                rows={
+                  loading
+                    ? []
+                    : showData.map((row, index) => ({ ...row, sNo: paginationModel.page * paginationModel.pageSize + index + 1 }))
+                }
                 columns={columns}
+                rowCount={totalRows}
+                loading={loading}
+                pagination
+                paginationMode="server"
+                paginationModel={paginationModel}
+                onPaginationModelChange={setPaginationModel}
+                pageSizeOptions={[10]}
                 disableRowSelectionOnClick
                 sx={{
                   '.MuiDataGrid-columnHeaderTitle': { fontWeight: 'bold', fontSize: '16px' },
                   '.MuiDataGrid-cell': { fontSize: '16px' }
                 }}
-                initialState={{
-                  pagination: {
-                    paginationModel: {
-                      pageSize: 10
-                    }
-                  }
-                }}
-                pageSizeOptions={[10]}
-                disableColumnFilter
-                disableColumnSelector
-                disableDensitySelector
                 slots={{ toolbar: CustomToolbar }}
                 slotProps={{
                   toolbar: {

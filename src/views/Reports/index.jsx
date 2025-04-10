@@ -28,32 +28,34 @@ const Reports = () => {
   const [fuel, setFuel] = useState([]);
   const [driverReport, setDriverReport] = useState([]);
   const [summary, setSummary] = useState('');
-  const [tripExpenses, setTripExpenses] = useState([]);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
+  const [totalRows, setTotalRows] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
-      const [vehiclesRes, driversRes, bookingsRes, incomeExpenseRes, fuelRes, driverReportRes, tripExpensesRes] = await Promise.all([
-        getApi(urls.vehicle.get),
-        getApi(urls.driver.get),
+      const [vehiclesRes, driversRes, bookingsRes, incomeExpenseRes, fuelRes, driverReportRes] = await Promise.all([
+        getApi(`${urls.vehicle.get}?all=true`),
+        getApi(`${urls.driver.get}?all=true`),
         getApi(urls.booking.report),
         getApi(urls.incomeExpense.report),
         getApi(urls.fuel.report),
-        getApi(urls.booking.driverReport),
-        getApi(urls.tripExpense.report)
+        getApi(urls.booking.driverReport)
       ]);
 
-      setVehicles(vehiclesRes.data);
-      setDrivers(driversRes.data);
-      setBookings(bookingsRes.data || []);
-      setIncomeExpense(incomeExpenseRes.data.incomeExpenseDetails || []);
-      setSummary(incomeExpenseRes.data.summary || '');
-      setFuel(fuelRes.data || []);
-      setDriverReport(driverReportRes.data || []);
-      setTripExpenses(tripExpensesRes.data || []);
+      setVehicles(vehiclesRes?.data?.vehicleDetails || []);
+      setDrivers(driversRes?.data?.driverDetails || []);
+      setBookings(bookingsRes?.data || []);
+      setIncomeExpense(incomeExpenseRes?.data?.incomeExpenseDetails || []);
+      setSummary(incomeExpenseRes?.data?.summary || '');
+      setFuel(fuelRes?.data?.fuelDetails || []);
+      setDriverReport(driverReportRes?.data || []);
     };
 
     fetchData();
-  }, []);
+  }, [paginationModel]);
 
   const fetchFilteredReports = async () => {
     try {
@@ -72,34 +74,41 @@ const Reports = () => {
       if (selectedVehicle?.id) params.append('vehicleId', selectedVehicle.id);
       if (selectedDriver?.id) params.append('driverId', selectedDriver.id);
 
+      params.append('page', paginationModel.page + 1);
+      params.append('limit', paginationModel.pageSize);
+
       const query = params.toString();
 
       switch (tabIndex) {
         case 0: {
           const res = await getApi(`${urls.booking.report}?${query}`);
-          setBookings(res.data || []);
+          setBookings(res?.data?.vehicleDetails || []);
+          setTotalRows(res?.data?.pagination?.total || 0);
           break;
         }
         case 1: {
           const res = await getApi(`${urls.incomeExpense.report}?${query}`);
-          setIncomeExpense(res.data.incomeExpenseDetails || []);
+          setIncomeExpense(res?.data?.incomeExpenseDetails || []);
+          setTotalRows(res?.data?.pagination?.total || 0);
           break;
         }
         case 2: {
           const res = await getApi(`${urls.fuel.report}?${query}`);
-          setFuel(res.data || []);
+          setFuel(res?.data?.fuelDetails || []);
+          setTotalRows(res?.data?.pagination?.total || 0);
           break;
         }
         case 3: {
           const res = await getApi(`${urls.booking.driverReport}?${query}`);
-          setDriverReport(res.data || []);
+          setDriverReport(res?.data?.driverDetails || []);
+          setTotalRows(res?.data?.pagination?.total || 0);
           break;
         }
         default:
           break;
       }
     } catch (error) {
-      console.error(error);
+      toast.error(error);
     }
   };
 
@@ -112,14 +121,17 @@ const Reports = () => {
   };
 
   useEffect(() => {
+    fetchFilteredReports();
+  }, [paginationModel, tabIndex]);
+
+  useEffect(() => {
     setStartDate(null);
     setEndDate(null);
     setSelectedVehicle('');
     setSelectedDriver('');
     setStartDateError(false);
     setEndDateError(false);
-
-    fetchFilteredReports();
+    setPaginationModel({ page: 0, pageSize: 10 });
   }, [tabIndex]);
 
   return (
@@ -334,14 +346,15 @@ const Reports = () => {
                       }
                     }
                   ]}
-                  disableRowSelectionOnClick
+                  rowCount={totalRows}
+                  paginationMode="server"
+                  paginationModel={paginationModel}
+                  onPaginationModelChange={setPaginationModel}
+                  getRowHeight={() => 75}
                   sx={{
                     '.MuiDataGrid-columnHeaderTitle': { fontWeight: 'bold', fontSize: '16px' },
                     '.MuiDataGrid-cell': { fontSize: '16px' }
                   }}
-                  getRowHeight={() => 75}
-                  initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
-                  pageSizeOptions={[10]}
                 />
               </Card>
             )}
@@ -473,14 +486,15 @@ const Reports = () => {
                         }
                       }
                     ]}
-                    disableRowSelectionOnClick
+                    rowCount={totalRows}
+                    paginationMode="server"
+                    paginationModel={paginationModel}
+                    onPaginationModelChange={setPaginationModel}
                     sx={{
                       '.MuiDataGrid-columnHeaderTitle': { fontWeight: 'bold', fontSize: '16px' },
                       '.MuiDataGrid-cell': { fontSize: '16px' }
                     }}
                     getRowHeight={() => 75}
-                    initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
-                    pageSizeOptions={[10]}
                   />
                 </Card>
               </>
@@ -501,7 +515,7 @@ const Reports = () => {
                     comments: row.comments
                   }))}
                   columns={[
-                    { field: 'sNo', headerName: t('text_S_No'), width: 70 },
+                    { field: 'sNo', headerName: t('text.S_NO'), width: 70 },
                     {
                       field: 'fillDate',
                       headerName: t('text.FILL_DATE'),
@@ -523,8 +537,10 @@ const Reports = () => {
                     '.MuiDataGrid-cell': { fontSize: '16px' }
                   }}
                   getRowHeight={() => 75}
-                  initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
-                  pageSizeOptions={[10]}
+                  rowCount={totalRows}
+                  paginationMode="server"
+                  paginationModel={paginationModel}
+                  onPaginationModelChange={setPaginationModel}
                 />
               </Card>
             )}
@@ -578,72 +594,19 @@ const Reports = () => {
                       }
                     }
                   ]}
-                  disableRowSelectionOnClick
+                  rowCount={totalRows}
+                  paginationMode="server"
+                  paginationModel={paginationModel}
+                  onPaginationModelChange={setPaginationModel}
                   sx={{
                     '.MuiDataGrid-columnHeaderTitle': { fontWeight: 'bold', fontSize: '16px' },
                     '.MuiDataGrid-cell': { fontSize: '16px' }
                   }}
                   getRowHeight={() => 75}
-                  initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
-                  pageSizeOptions={[10]}
                 />
               </Card>
             )}
 
-            {tabIndex === 4 && tripExpenses.length > 0 && (
-              <Card sx={{ mt: '20px' }}>
-                <DataGrid
-                  rows={tripExpenses.map((row, index) => ({
-                    id: index + 1,
-                    sNo: index + 1,
-                    vehicle: row.vehicle?.vehicleName || 'N/A',
-                    driver: row.driver?.name || 'N/A',
-                    date: row.date,
-                    description: row.description,
-                    amount: row.amount,
-                    tripType: row.tripType,
-                    tripStartLoc: row.tripStartLoc,
-                    tripEndLoc: row.tripEndLoc
-                  }))}
-                  columns={[
-                    { field: 'sNo', headerName: t('text.S_NO'), width: 70 },
-                    { field: 'vehicle', headerName: t('text.VEHICLE'), width: 150 },
-                    { field: 'driver', headerName: t('text.DRIVER'), width: 150 },
-                    {
-                      field: 'date',
-                      headerName: t('text.DATE'),
-                      width: 150,
-                      renderCell: (params) => {
-                        return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
-                      }
-                    },
-                    { field: 'tripType', headerName: t('text.TYPE'), width: 120 },
-                    {
-                      field: 'trip',
-                      headerName: t('text.FROM_TO'),
-                      width: 200,
-                      renderCell: (params) => (
-                        <Box>
-                          <Typography>{params.row.tripStartLoc ? params.row.tripStartLoc : 'N/A'}</Typography>
-                          <Typography>to</Typography>
-                          <Typography>{params.row.tripEndLoc ? params.row.tripEndLoc : 'N/A'}</Typography>
-                        </Box>
-                      )
-                    },
-                    { field: 'description', headerName: t('text.DESCRIPTION'), width: 200 },
-                    { field: 'amount', headerName: t('text.AMOUNT'), width: 150 }
-                  ]}
-                  disableRowSelectionOnClick
-                  sx={{
-                    '.MuiDataGrid-columnHeaderTitle': { fontWeight: 'bold', fontSize: '16px' },
-                    '.MuiDataGrid-cell': { fontSize: '16px' }
-                  }}
-                  getRowHeight={() => 75}
-                  initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
-                  pageSizeOptions={[10]}
-                />
-              </Card>
-            )}
           </CardContent>
         </Card>
       </Box>

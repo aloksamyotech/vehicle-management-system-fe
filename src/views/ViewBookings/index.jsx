@@ -30,6 +30,7 @@ import BookingStatusDialog from './bookingstatus';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import { fetchCurrencySymbol } from 'common/function';
 
 const ViewBookingPage = () => {
   const { t } = useTranslation();
@@ -47,10 +48,19 @@ const ViewBookingPage = () => {
   const [selectedBookingId, setSelectedBookingId] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [tripExpense, setTripExpense] = useState([]);
+  const [currencySymbol, setCurrencySymbol] = useState('');
   const [bookingExpense, setBookingExpense] = useState({
     amount: '',
     description: ''
   });
+
+  useEffect(() => {
+    const getCurrency = async () => {
+      const symbol = await fetchCurrencySymbol();
+      setCurrencySymbol(symbol);
+    };
+    getCurrency();
+  }, []);
 
   const handleOpenStatusDialog = (id, currentStatus) => {
     setSelectedBookingId(id);
@@ -63,7 +73,6 @@ const ViewBookingPage = () => {
   };
 
   const handleStatusUpdate = (newStatus) => {
-    console.log('Status Updated:', newStatus);
   };
 
   const fetchBookingData = async () => {
@@ -187,9 +196,9 @@ const ViewBookingPage = () => {
           <Grid item xs={12} md={7}>
             <Grid container spacing={2} padding={2} justifyContent="center">
               {[
-                 { title: t('text.TOTAL_AMOUNT'), value: bookings.totalAmt },
-                 { title: t('text.PAID_AMOUNT'), value: paidAmount },
-                 { title: t('text.PENDING_AMOUNT'), value: excess }
+                { title: t('text.TOTAL_AMOUNT'), value: bookings.totalAmt },
+                { title: t('text.PAID_AMOUNT'), value: paidAmount },
+                { title: t('text.PENDING_AMOUNT'), value: excess }
               ].map((item, index) => (
                 <Grid item xs={12} sm={4} key={index} display="flex" justifyContent="center">
                   <Card sx={{ textAlign: 'center', width: '100%', backgroundColor: '#f8f9fa' }}>
@@ -197,7 +206,10 @@ const ViewBookingPage = () => {
                       <Typography variant="h6" fontWeight="bold">
                         {item.title}
                       </Typography>
-                      <Typography variant="h5">{item.value}</Typography>
+                      <Typography variant="h5">
+                        {' '}
+                        {currencySymbol} {item.value}
+                      </Typography>
                     </CardContent>
                   </Card>
                 </Grid>
@@ -253,7 +265,7 @@ const ViewBookingPage = () => {
                       <TableRow key={row.id}>
                         {' '}
                         <TableCell sx={{ border: '1px solid #ddd' }}>{index + 1}</TableCell>
-                        <TableCell sx={{ border: '1px solid #ddd' }}>{row.amount}</TableCell>
+                        <TableCell sx={{ border: '1px solid #ddd' }}>{currencySymbol} {row.amount}</TableCell>
                         <TableCell sx={{ border: '1px solid #ddd' }}>{row.description}</TableCell>
                         <TableCell sx={{ border: '1px solid #ddd' }}>{dayjs(row.createdAt).format('DD-MM-YYYY')}</TableCell>
                         <TableCell sx={{ border: '1px solid #ddd' }}>
@@ -269,7 +281,7 @@ const ViewBookingPage = () => {
             </Box>
 
             <Box sx={{ mt: 2, p: 2 }}>
-              <Typography variant="h5">{t('text.PAYEMNT_ACTIVITY')}</Typography>
+              <Typography variant="h5">{t('text.PAYMENT_ACTIVITY')}</Typography>
               <TableContainer sx={{ border: '1px solid #ddd', borderRadius: '4px' }}>
                 <Table size="small" aria-label="a dense table" sx={{ border: '1px solid #ddd', borderRadius: '4px' }}>
                   <TableHead>
@@ -287,7 +299,7 @@ const ViewBookingPage = () => {
                       <TableRow key={row.id}>
                         {' '}
                         <TableCell sx={{ border: '1px solid #ddd' }}>{index + 1}</TableCell>
-                        <TableCell sx={{ border: '1px solid #ddd' }}>{row.paidAmount}</TableCell>
+                        <TableCell sx={{ border: '1px solid #ddd' }}>{currencySymbol} {row.paidAmount}</TableCell>
                         <TableCell sx={{ border: '1px solid #ddd' }}>{row.notes}</TableCell>
                         <TableCell sx={{ border: '1px solid #ddd' }}>{dayjs(row.createdAt).format('DD-MM-YYYY')}</TableCell>
                         <TableCell sx={{ border: '1px solid #ddd' }}>

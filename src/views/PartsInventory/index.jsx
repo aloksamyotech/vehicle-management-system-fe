@@ -18,6 +18,11 @@ const PartsInventory = () => {
   const [open, setOpen] = useState(false);
   const [editData, setEditData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [totalRows, setTotalRows] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
 
   useEffect(() => {
     fetchData();
@@ -26,18 +31,26 @@ const PartsInventory = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await getApi(urls.partsInventory.get);
-      const modifiedRows = response.data.map((item, index) => ({
+      const response = await getApi(`${urls.partsInventory.get}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
+      const partsList = response?.data?.partsDetails || [];
+      const pagination = response?.data?.pagination || { total: 0 };
+
+      const modifiedRows = partsList.map((item, index) => ({
         ...item,
-        sno: index + 1
+        sno: paginationModel.page * paginationModel.pageSize + index + 1
       }));
       setRows(modifiedRows);
+      setTotalRows(pagination.total);
     } catch (error) {
       toast.error(t('text.ERROR_FETCHING'));
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, [paginationModel]);
 
   const columns = [
     { field: 'sno', headerName: t('text.S_NO'), width: 80 },
@@ -116,22 +129,17 @@ const PartsInventory = () => {
               <DataGrid
                 rows={rows}
                 columns={columns}
+                rowCount={totalRows}
+                paginationModel={paginationModel}
+                onPaginationModelChange={setPaginationModel}
+                paginationMode="server"
+                loading={loading}
+                pageSizeOptions={[10]}
                 disableRowSelectionOnClick
                 sx={{
                   '.MuiDataGrid-columnHeaderTitle': { fontWeight: 'bold', fontSize: '16px' },
                   '.MuiDataGrid-cell': { fontSize: '16px' }
                 }}
-                initialState={{
-                  pagination: {
-                    paginationModel: {
-                      pageSize: 10
-                    }
-                  }
-                }}
-                pageSizeOptions={[10]}
-                disableColumnFilter
-                disableColumnSelector
-                disableDensitySelector
                 slots={{ toolbar: CustomToolbar }}
                 slotProps={{
                   toolbar: {

@@ -28,8 +28,8 @@ const AddFuelReminderForm = ({ onSave, onCancel, refreshData }) => {
 
   useEffect(() => {
     const fetchVehicles = async () => {
-      const response = await getApi(urls.vehicle.get);
-      setVehicles(response.data);
+      const response = await getApi(`${urls.vehicle.get}?all=true`);
+      setVehicles(response?.data?.vehicleDetails || []);
     };
 
     fetchVehicles();

@@ -281,5 +281,8 @@
   "text.CURRENCY_SYMBOL": "Währungssymbol",
   "text.PROFILE": "Profil",
   "text.SETTINGS": "Einstellungen",
-  "text.LOGOUT": "Abmelden"
+  "text.LOGOUT": "Abmelden",
+  "text.VIEW": "Ansehen",
+  "text.DRIVER_PHOTO": "Fahrerfoto",
+  "text.DRIVER_DOC": "Fahrerdokument"
 }

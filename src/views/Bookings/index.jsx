@@ -16,16 +16,24 @@ import { text } from 'common/constant';
 import { useTranslation } from 'react-i18next';
 
 const BookingPage = () => {
-   const { t } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [totalRows, setTotalRows] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await getApi(urls.booking.get);
-      const formattedData = response.data.map((booking, index) => ({
+      const response = await getApi(`${urls.booking.get}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
+      const bookingList = response?.data?.bookingDetails || [];
+      const pagination = response?.data?.pagination || { total: 0 };
+
+      const formattedData = bookingList.map((booking, index) => ({
         id: booking.id,
         tripStartDate: booking.tripStartDate,
         tripEndDate: booking.tripEndDate,
@@ -45,6 +53,7 @@ const BookingPage = () => {
         driver: booking.driver ? booking.driver.name : 'Yet to Assign'
       }));
       setRows(formattedData);
+      setTotalRows(pagination.total);
     } catch (error) {
       toast.error(t('text.ERROR_FETCHING'));
     } finally {
@@ -54,7 +63,7 @@ const BookingPage = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [paginationModel]);
 
   const renderDriverButton = (driver) => {
     return (
@@ -67,7 +76,7 @@ const BookingPage = () => {
           fontSize: '10px',
           padding: '0',
           width: 'auto'
-,        }}
+        }}
       >
         {driver}
       </Button>
@@ -75,7 +84,7 @@ const BookingPage = () => {
   };
 
   const columns = [
-    { field: 'sNo', headerName:  t("text.S_NO"), width: 80 },
+    { field: 'sNo', headerName: t('text.S_NO'), width: 80 },
     { field: 'customer', headerName: t('text.CUSTOMER'), width: 150 },
     { field: 'vehicle', headerName: t('text.VEHICLE'), width: 150, editable: true },
     {
@@ -173,9 +182,18 @@ const BookingPage = () => {
           <Card>
             <Box sx={{ height: 'auto', width: '100%' }}>
               <DataGrid
-                rows={loading ? [] : rows.map((row, index) => ({ ...row, sNo: index + 1 }))}
-                columns={columns}
+                rows={
+                  loading ? [] : rows.map((row, index) => ({ ...row, sNo: paginationModel.page * paginationModel.pageSize + index + 1 }))
+                }
                 getRowHeight={() => 75}
+                columns={columns}
+                rowCount={totalRows}
+                loading={loading}
+                pagination
+                paginationMode="server"
+                paginationModel={paginationModel}
+                onPaginationModelChange={setPaginationModel}
+                pageSizeOptions={[10]}
                 disableRowSelectionOnClick
                 sx={{
                   '.MuiDataGrid-columnHeaderTitle': {
@@ -186,17 +204,6 @@ const BookingPage = () => {
                     fontSize: '16px'
                   }
                 }}
-                initialState={{
-                  pagination: {
-                    paginationModel: {
-                      pageSize: 10
-                    }
-                  }
-                }}
-                pageSizeOptions={[10]}
-                disableColumnFilter
-                disableColumnSelector
-                disableDensitySelector
                 slots={{ toolbar: CustomToolbar }}
                 slotProps={{
                   toolbar: {

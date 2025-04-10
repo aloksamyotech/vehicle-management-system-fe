@@ -17,26 +17,36 @@ const NewComponent = () => {
   const [editItem, setEditItem] = useState(null);
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const [totalRows, setTotalRows] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await getApi(urls.vehicleGroup.get);
-      const modifiedRows = response.data.map((item, index) => ({
+      const response = await getApi(`${urls.vehicleGroup.get}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
+      const groupList = response?.data?.groupDetails || [];
+      const pagination = response?.data?.pagination || { total: 0 };
+
+      const modifiedRows = groupList.map((item, index) => ({
         ...item,
-        sno: index + 1
+        sno: paginationModel.page * paginationModel.pageSize + index + 1
       }));
+
       setRows(modifiedRows);
+      setTotalRows(pagination.total);
     } catch (error) {
       toast.error(t('text.ERROR_FETCHING'));
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, [paginationModel]);
 
   const handleOpenModal = (item = null) => {
     setEditItem(item);
@@ -66,9 +76,7 @@ const NewComponent = () => {
       field: 'createdAt',
       headerName: t('text.CREATED_AT'),
       width: 150,
-      renderCell: (params) => {
-        return params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A';
-      }
+      renderCell: (params) => (params.value ? new Date(params.value).toISOString().split('T')[0] : 'N/A')
     },
     {
       field: 'actions',
@@ -98,23 +106,17 @@ const NewComponent = () => {
           <DataGrid
             rows={rows}
             columns={columns}
-            disableRowSelectionOnClick
+            rowCount={totalRows}
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
+            paginationMode="server"
             loading={loading}
+            pageSizeOptions={[10]}
+            disableRowSelectionOnClick
             sx={{
               '.MuiDataGrid-columnHeaderTitle': { fontWeight: 'bold', fontSize: '16px' },
               '.MuiDataGrid-cell': { fontSize: '16px' }
             }}
-            initialState={{
-              pagination: {
-                paginationModel: {
-                  pageSize: 10
-                }
-              }
-            }}
-            pageSizeOptions={[10]}
-            disableColumnFilter
-            disableColumnSelector
-            disableDensitySelector
             slots={{ toolbar: CustomToolbar }}
             slotProps={{
               toolbar: {
