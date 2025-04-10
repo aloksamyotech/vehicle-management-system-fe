@@ -23,8 +23,8 @@ const VehicleForm = () => {
 
   useEffect(() => {
     const fetchVehicleGroups = async () => {
-      const response = await getApi(urls.vehicleGroup.get);
-      setVehicleGroups(response.data);
+      const response = await getApi(`${urls.vehicleGroup.get}?all=true`);
+      setVehicleGroups(response?.data?.groupDetails);
     };
 
     fetchVehicleGroups();
@@ -344,12 +344,11 @@ const VehicleForm = () => {
                     rules={{ required: t('text.REQUIRED') }}
                     render={({ field }) => (
                       <Autocomplete
-                        {...field}
-                        options={vehicleGroups}
-                        getOptionLabel={(option) => option.name || ''}
-                        isOptionEqualToValue={(option, value) => option.id === value}
-                        onChange={(_, newValue) => field.onChange(newValue?.id || '')}
-                        value={vehicleGroups.find((v) => v.id === field.value) || null}
+                        options={vehicleGroups || []}
+                        getOptionLabel={(option) => option?.name || ''}
+                        isOptionEqualToValue={(option, value) => option?.id === value?.id}
+                        onChange={(_, newValue) => field.onChange(newValue)}
+                        value={field.value || null}
                         renderInput={(params) => (
                           <TextField
                             {...params}

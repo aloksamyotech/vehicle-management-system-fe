@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Card, Divider, Box, Grid, IconButton, Button } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { gridSpacing } from 'config.js';
@@ -19,16 +19,20 @@ const VehiclePage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [vehicles, setVehicles] = useState([]);
-
-  useEffect(() => {
-    fetchVehicles();
-  }, []);
+  const [totalRows, setTotalRows] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
 
   const fetchVehicles = async () => {
     setLoading(true);
     try {
-      const response = await getApi(urls.vehicle.get);
-      const formattedData = response.data.map((vehicle, index) => ({
+      const response = await getApi(`${urls.vehicle.get}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
+      const vehicleList = response?.data?.vehicleDetails || [];
+      const pagination = response?.data?.pagination || { total: 0 };
+
+      const formattedData = vehicleList.map((vehicle) => ({
         id: vehicle.id,
         vehicleName: vehicle.vehicleName,
         registrationNo: vehicle.registrationNo,
@@ -44,7 +48,9 @@ const VehiclePage = () => {
         vehicleGroupId: vehicle.vehicleGroup.id,
         group: vehicle.vehicleGroup?.name || 'N/A'
       }));
+
       setVehicles(formattedData);
+      setTotalRows(pagination.total);
     } catch (error) {
       toast.error(t('text.ERROR_FETCHING'));
     } finally {
@@ -52,69 +58,67 @@ const VehiclePage = () => {
     }
   };
 
-  const columns = [
-    { field: 'sNo', headerName: t('text.S_NO'), width: 80 },
-    { field: 'vehicleName', headerName: t('text.VEHICLE_NAME'), width: 150, editable: true },
-    { field: 'registrationNo', headerName: t('text.RES_NO'), width: 180, editable: true },
-    { field: 'model', headerName: t('text.MODEL'), width: 100, editable: true },
-    { field: 'chasisNo', headerName: t('text.CHASIS_NO'), width: 150, editable: true },
-    { field: 'group', headerName: t('text.GROUP'), width: 150, editable: true },
-    {
-      field: 'isActive',
-      headerName: t('text.STATUS'),
-      width: 100,
-      renderCell: (params) => {
-        return (
-          <Button
-            variant="contained"
-            style={{
-              backgroundColor: params.value ? '#30aa4c' : '#dc3545',
-              color: 'white',
-              fontWeight: 700,
-              fontSize: '10px',
-              padding: '0'
-            }}
-          >
-            {params.value ? 'Active' : 'Inactive'}
-          </Button>
-        );
-      }
-    },
-    {
-      field: 'actions',
-      headerName: t('text.ACTION'),
-      width: 150,
-      sortable: false,
-      renderCell: (params) => {
-        const navigate = useNavigate();
-
-        return (
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <IconButton color="primary" sx={{ py: 2 }} onClick={() => navigate(`/view-vehicle/${params.row.id}`)}>
-              <VisibilityIcon />
-            </IconButton>
-            <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5, alignSelf: 'center' }} />
-            <IconButton
-              sx={{ color: '#17a2b8', py: 2 }}
-              onClick={() => navigate(`/add-vehicle/${params.row.id}`, { state: { ...params.row } })}
-            >
-              <BorderColorIcon />
-            </IconButton>
-            <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5, alignSelf: 'center' }} />
-            <IconButton color="error" sx={{ py: 2 }} onClick={() => handleDelete(params.row.id)}>
-              <DeleteIcon />
-            </IconButton>
-          </Box>
-        );
-      }
-    }
-  ];
+  useEffect(() => {
+    fetchVehicles();
+  }, [paginationModel]);
 
   const handleDelete = async (id) => {
     await deleteApi(urls.vehicle.delete.replace(':id', id));
     toast.success(t('text.VEHICLE_DELETED'));
     fetchVehicles();
   };
+
+  const columns = [
+    { field: 'sNo', headerName: t('text.S_NO'), width: 80 },
+    { field: 'vehicleName', headerName: t('text.VEHICLE_NAME'), width: 150 },
+    { field: 'registrationNo', headerName: t('text.RES_NO'), width: 180 },
+    { field: 'model', headerName: t('text.MODEL'), width: 100 },
+    { field: 'chasisNo', headerName: t('text.CHASIS_NO'), width: 150 },
+    { field: 'group', headerName: t('text.GROUP'), width: 150 },
+    {
+      field: 'isActive',
+      headerName: t('text.STATUS'),
+      width: 100,
+      renderCell: (params) => (
+        <Button
+          variant="contained"
+          style={{
+            backgroundColor: params.value ? '#30aa4c' : '#dc3545',
+            color: 'white',
+            fontWeight: 700,
+            fontSize: '10px',
+            padding: '0'
+          }}
+        >
+          {params.value ? 'Active' : 'Inactive'}
+        </Button>
+      )
+    },
+    {
+      field: 'actions',
+      headerName: t('text.ACTION'),
+      width: 150,
+      sortable: false,
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <IconButton color="primary" sx={{ py: 2 }} onClick={() => navigate(`/view-vehicle/${params.row.id}`)}>
+            <VisibilityIcon />
+          </IconButton>
+          <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5 }} />
+          <IconButton
+            sx={{ color: '#17a2b8', py: 2 }}
+            onClick={() => navigate(`/add-vehicle/${params.row.id}`, { state: { ...params.row } })}
+          >
+            <BorderColorIcon />
+          </IconButton>
+          <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5 }} />
+          <IconButton color="error" sx={{ py: 2 }} onClick={() => handleDelete(params.row.id)}>
+            <DeleteIcon />
+          </IconButton>
+        </Box>
+      )
+    }
+  ];
 
   return (
     <>
@@ -125,29 +129,27 @@ const VehiclePage = () => {
           <Card>
             <Box sx={{ height: 'auto', width: '100%' }}>
               <DataGrid
-                rows={loading ? [] : vehicles.map((row, index) => ({ ...row, sNo: index + 1 }))}
+                rows={
+                  loading
+                    ? []
+                    : vehicles.map((row, index) => ({
+                        ...row,
+                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                      }))
+                }
                 columns={columns}
+                rowCount={totalRows}
+                loading={loading}
+                pagination
+                paginationMode="server"
+                paginationModel={paginationModel}
+                onPaginationModelChange={setPaginationModel}
+                pageSizeOptions={[10]}
                 disableRowSelectionOnClick
                 sx={{
-                  '.MuiDataGrid-columnHeaderTitle': {
-                    fontWeight: 'bold',
-                    fontSize: '16px'
-                  },
-                  '.MuiDataGrid-cell': {
-                    fontSize: '16px'
-                  }
+                  '.MuiDataGrid-columnHeaderTitle': { fontWeight: 'bold', fontSize: '16px' },
+                  '.MuiDataGrid-cell': { fontSize: '16px' }
                 }}
-                initialState={{
-                  pagination: {
-                    paginationModel: {
-                      pageSize: 10
-                    }
-                  }
-                }}
-                pageSizeOptions={[10]}
-                disableColumnFilter
-                disableColumnSelector
-                disableDensitySelector
                 slots={{ toolbar: CustomToolbar }}
                 slotProps={{
                   toolbar: {

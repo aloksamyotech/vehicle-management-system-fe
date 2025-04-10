@@ -63,13 +63,13 @@ const AddMaintenanceForm = () => {
 
   useEffect(() => {
     const fetchVehicles = async () => {
-      const response = await getApi(urls.vehicle.get);
-      setVehicles(response.data);
+      const response = await getApi(`${urls.vehicle.get}?all=true`);
+      setVehicles(response?.data?.vehicleDetails || []);
     };
 
     const fetchParts = async () => {
-      const response = await getApi(urls.partsInventory.get);
-      setPartsList(response.data);
+      const response = await getApi(`${urls.partsInventory.get}?all=true`);
+      setPartsList(response?.data?.partsDetails || []);
     };
 
     fetchVehicles();

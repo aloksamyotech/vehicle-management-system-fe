@@ -16,16 +16,20 @@ const FuelReminderIndex = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const [totalRows, setTotalRows] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await getApi(urls.reminder.get);
-      const formattedData = response.data.map((rem, index) => ({
+      const response = await getApi(`${urls.reminder.get}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
+      const reminderList = response?.data?.reminderDetails || [];
+      const pagination = response?.data?.pagination || { total: 0 };
+
+      const formattedData = reminderList.map((rem, index) => ({
         id: rem.id,
         reminderDate: rem.reminderDate,
         message: rem.message,
@@ -33,12 +37,17 @@ const FuelReminderIndex = () => {
         group: rem.vehicle?.vehicleName || 'N/A'
       }));
       setRows(formattedData);
+      setTotalRows(pagination.total);
     } catch (error) {
       toast.error(t('text.ERROR_FETCHING'));
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, [paginationModel]);
 
   const columns = [
     { field: 'sNo', headerName: t('text.S_NO'), width: 80 },
@@ -93,9 +102,17 @@ const FuelReminderIndex = () => {
           <Card>
             <Box sx={{ height: 'auto', width: '100%' }}>
               <DataGrid
-                rows={loading ? [] : rows.map((row, index) => ({ ...row, sNo: index + 1 }))}
+                rows={
+                  loading ? [] : rows.map((row, index) => ({ ...row, sNo: paginationModel.page * paginationModel.pageSize + index + 1 }))
+                }
                 columns={columns}
-                pageSizeOptions={[5, 10]}
+                rowCount={totalRows}
+                loading={loading}
+                pagination
+                paginationMode="server"
+                paginationModel={paginationModel}
+                onPaginationModelChange={setPaginationModel}
+                pageSizeOptions={[10]}
                 disableRowSelectionOnClick
                 sx={{
                   '.MuiDataGrid-columnHeaderTitle': { fontWeight: 'bold', fontSize: '16px' },

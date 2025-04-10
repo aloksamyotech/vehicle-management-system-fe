@@ -24,13 +24,24 @@ import { urls } from 'common/urls';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { useTranslation } from 'react-i18next';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import { fetchCurrencySymbol } from 'common/function';
 
 const ViewVehiclePage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [vehicles, setVehicles] = useState({});
   const [tabIndex, setTabIndex] = useState(0);
- const { t } = useTranslation();
+  const { t } = useTranslation();
+  const [currencySymbol, setCurrencySymbol] = useState('');
+
+  useEffect(() => {
+    const getCurrency = async () => {
+      const symbol = await fetchCurrencySymbol();
+      setCurrencySymbol(symbol);
+    };
+    getCurrency();
+  }, []);
+
   const fetchVehicles = async () => {
     const response = await getApi(urls.vehicle.getById.replace(':id', id));
     setVehicles(response?.data);
@@ -67,7 +78,7 @@ const ViewVehiclePage = () => {
         </a>
       ) : (
         t('text.NO_DOCUMENT')
-      ),
+      )
     }
   ];
 
@@ -89,7 +100,12 @@ const ViewVehiclePage = () => {
         </Box>
       )
     },
-    { field: 'totalAmt', headerName: t('text.AMOUNT'), width: 150 },
+    {
+      field: 'totalAmt',
+      headerName: t('text.AMOUNT'),
+      width: 120,
+      renderCell: (params) => `${currencySymbol} ${params.value}`
+    },
     {
       field: 'tripStatus',
       headerName: t('text.STATUS'),
@@ -150,7 +166,7 @@ const ViewVehiclePage = () => {
   const geofenceColumns = [
     { field: 'id', headerName: '#', width: 50 },
     { field: 'name', headerName: t('text.NAME'), width: 150 },
-    { field: 'description', headerName:t('text.DESCRIPTION'), width: 250 },
+    { field: 'description', headerName: t('text.DESCRIPTION'), width: 250 },
     {
       field: 'action',
       headerName: t('text.ACTION'),
@@ -181,7 +197,12 @@ const ViewVehiclePage = () => {
       }
     },
     { field: 'description', headerName: t('text.DESCRIPTION'), width: 200 },
-    { field: 'amount', headerName: t('text.AMOUNT'), width: 100 },
+    {
+      field: 'amount',
+      headerName: t('text.AMOUNT'),
+      width: 100,
+      renderCell: (params) => `${currencySymbol} ${params.value}`
+    },
     {
       field: 'type',
       headerName: t('text.TYPE'),
@@ -231,7 +252,7 @@ const ViewVehiclePage = () => {
       <CustomBreadcrumbs
         title={t('text.VEHICLE_DETAILS')}
         links={[
-          { name:t('text.VEHICLE'), path: '/vehicles' },
+          { name: t('text.VEHICLE'), path: '/vehicles' },
           { name: t('text.VEHICLE_DETAILS'), path: '' }
         ]}
       />

@@ -31,8 +31,8 @@ const IncomeExpenseForm = ({ initialData, onSave, refreshData, onCancel }) => {
 
   useEffect(() => {
     const fetchVehicles = async () => {
-      const response = await getApi(urls.vehicle.get);
-      setVehicles(response.data);
+      const response = await getApi(`${urls.vehicle.get}?all=true`);
+      setVehicles(response?.data?.vehicleDetails || []);
     };
 
     fetchVehicles();
@@ -59,7 +59,6 @@ const IncomeExpenseForm = ({ initialData, onSave, refreshData, onCancel }) => {
       toast.success(t('text.INC_EXP_UPDATED'));
     } else {
       response = await postApi(urls.incomeExpense.create, financeData);
-      console.log(response);
       toast.success(t('text.INC_EXP_ADDED'));
     }
 

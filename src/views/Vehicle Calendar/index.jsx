@@ -20,14 +20,14 @@ const VehicleAvailability = () => {
     const fetchData = async () => {
       try {
         const [bookingResponse, maintenanceResponse, vehicleResponse] = await Promise.all([
-          getApi(urls.booking.get),
-          getApi(urls.maintenance.get),
-          getApi(urls.vehicle.get)
+          getApi(`${urls.booking.get}?all=true`),
+          getApi(`${urls.maintenance.get}?all=true`),
+          getApi(`${urls.vehicle.get}?all=true`),
         ]);
 
-        const bookingData = bookingResponse?.data;
-        const maintenanceData = maintenanceResponse?.data;
-        const vehicleData = vehicleResponse?.data;
+        const bookingData = bookingResponse?.data?.bookingDetails || [];
+        const maintenanceData = maintenanceResponse?.data?.mainDetails || [];
+        const vehicleData = vehicleResponse?.data?.vehicleDetails || [];
 
         setVehicles(vehicleData);
 

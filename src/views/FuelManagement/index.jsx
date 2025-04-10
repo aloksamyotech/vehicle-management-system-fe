@@ -11,22 +11,36 @@ import CustomToolbar from 'common/customToolbar';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { text } from 'common/constant';
 import { useTranslation } from 'react-i18next';
+import { fetchCurrencySymbol } from 'common/function';
 
 const FuelRecords = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [currencySymbol, setCurrencySymbol] = useState('');
+  const [totalRows, setTotalRows] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
 
   useEffect(() => {
-    fetchData();
+    const getCurrency = async () => {
+      const symbol = await fetchCurrencySymbol();
+      setCurrencySymbol(symbol);
+    };
+    getCurrency();
   }, []);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await getApi(urls.fuel.get);
-      const formattedData = response.data.map((fuel, index) => ({
+      const response = await getApi(`${urls.fuel.get}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
+      const fuelList = response?.data?.fuelDetails || [];
+      const pagination = response?.data?.pagination || { total: 0 };
+
+      const formattedData = fuelList.map((fuel, index) => ({
         id: fuel.id,
         fillDate: fuel.fillDate,
         quantity: fuel.quantity,
@@ -39,12 +53,17 @@ const FuelRecords = () => {
         driver: fuel.driver?.name || 'N/A'
       }));
       setRows(formattedData);
+      setTotalRows(pagination.total);
     } catch (error) {
       toast.error(t('text.ERROR_FETCHING'));
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, [paginationModel]);
 
   const columns = [
     { field: 'sNo', headerName: t('text.S_NO'), width: 80 },
@@ -59,7 +78,12 @@ const FuelRecords = () => {
     },
     { field: 'vehicle', headerName: t('text.VEHICLE'), width: 200 },
     { field: 'quantity', headerName: t('text.QUANTITY'), width: 120 },
-    { field: 'amount', headerName: t('text.TOTAL_AMOUNT'), width: 150 },
+    {
+      field: 'amount',
+      headerName: t('text.TOTAL_AMOUNT'),
+      width: 150,
+      renderCell: (params) => `${currencySymbol} ${params.value}`
+    },
     { field: 'driver', headerName: t('text.FUEL_FILL_BY'), width: 150 },
     { field: 'odometerReading', headerName: t('text.ODOMETER_READING'), width: 150 },
     { field: 'comments', headerName: t('text.COMMENTS'), width: 200 },
@@ -104,24 +128,22 @@ const FuelRecords = () => {
           <Card>
             <Box sx={{ height: 'auto', width: '100%' }}>
               <DataGrid
-                rows={loading ? [] : rows.map((row, index) => ({ ...row, sNo: index + 1 }))}
+                rows={
+                  loading ? [] : rows.map((row, index) => ({ ...row, sNo: paginationModel.page * paginationModel.pageSize + index + 1 }))
+                }
                 columns={columns}
+                rowCount={totalRows}
+                loading={loading}
+                pagination
+                paginationMode="server"
+                paginationModel={paginationModel}
+                onPaginationModelChange={setPaginationModel}
+                pageSizeOptions={[10]}
                 disableRowSelectionOnClick
                 sx={{
                   '.MuiDataGrid-columnHeaderTitle': { fontWeight: 'bold', fontSize: '16px' },
                   '.MuiDataGrid-cell': { fontSize: '16px' }
                 }}
-                initialState={{
-                  pagination: {
-                    paginationModel: {
-                      pageSize: 10
-                    }
-                  }
-                }}
-                pageSizeOptions={[10]}
-                disableColumnFilter
-                disableColumnSelector
-                disableDensitySelector
                 slots={{ toolbar: CustomToolbar }}
                 slotProps={{
                   toolbar: {
