@@ -4,9 +4,11 @@ import { useTheme } from '@mui/material/styles';
 import AuthLogin from './AuthLogin';
 import VehicleImage from 'assets/images/vehicle.jpg';
 import LogoSection from 'layout/MainLayout/Header/LogoSection';
+import { useTranslation } from 'react-i18next';
 
 const Login = () => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
@@ -34,7 +36,7 @@ const Login = () => {
             color: 'black'
           }}
         >
-          Welcome aboard your Fleet Management Hub
+          {t('text.WELCOME_FLEET')}
         </Typography>
 
         <Box
@@ -80,7 +82,7 @@ const Login = () => {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                marginTop: '2px',
+                marginTop: '2px'
               }}
             >
               <LogoSection />

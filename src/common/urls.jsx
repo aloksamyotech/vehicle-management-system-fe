@@ -61,7 +61,8 @@ export const urls = Object.freeze({
     getById: `${baseUrl}/income-expense/getById/:id`,
     update: `${baseUrl}/income-expense/update/:id`,
     delete: `${baseUrl}/income-expense/delete/:id`,
-    report: `${baseUrl}/income-expense/report`
+    report: `${baseUrl}/income-expense/report`,
+    summary: `${baseUrl}/income-expense/monthly-summary`,
   },
   maintenance: {
     create: `${baseUrl}/maintenance/save`,
