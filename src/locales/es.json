@@ -284,5 +284,20 @@
   "text.LOGOUT": "Cerrar Sesión",
   "text.VIEW": "Ver",
   "text.DRIVER_PHOTO": "Foto del conductor",
-  "text.DRIVER_DOC": "Documento del conductor"
+  "text.DRIVER_DOC": "Documento del conductor",
+  "text.AVAILABLE": "Disponible",
+  "text.TODAY": "Hoy",
+  "text.VEHICLE_AVAIL": "Disponibilidad de Vehículos",
+  "text.WELCOME_FLEET": "Bienvenido a tu Centro de Gestión de Flotas",
+  "text.MONTHLY_INC_EXP": "Ingresos/Gastos Mensuales",
+  "text.TOTAL_VEHICLES": "Total de Vehículos",
+  "text.TOTAL_DRIVERS": "Total de Conductores",
+  "text.TOTAL_CUSTOMERS": "Total de Clientes",
+  "text.TOTAL_TRIPS": "Viajes de Hoy",
+  "text.CUS_ADDED_MONTH": "clientes añadidos este mes",
+  "text.BOOKINGS_THIS_MONTH": "reservas este mes",
+  "text.DRIVER_JOINED_THIS_MONTH": "conductores que se unieron este mes",
+  "text.VEHICLES_ADDED_THIS_MONTH": "vehículos añadidos este mes",
+  "text.NO_REM": "No se encontraron recordatorios."
+
 }

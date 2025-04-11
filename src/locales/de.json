@@ -284,5 +284,20 @@
   "text.LOGOUT": "Abmelden",
   "text.VIEW": "Ansehen",
   "text.DRIVER_PHOTO": "Fahrerfoto",
-  "text.DRIVER_DOC": "Fahrerdokument"
+  "text.DRIVER_DOC": "Fahrerdokument",
+  "text.AVAILABLE": "Verfügbar",
+  "text.TODAY": "Heute",
+  "text.VEHICLE_AVAIL": "Fahrzeugverfügbarkeit",
+  "text.WELCOME_FLEET": "Willkommen in deinem Flottenmanagement-Zentrum",
+  "text.MONTHLY_INC_EXP": "Monatliche Einnahmen/Ausgaben",
+  "text.TOTAL_VEHICLES": "Gesamtfahrzeuge",
+  "text.TOTAL_DRIVERS": "Gesamtfahrer",
+  "text.TOTAL_CUSTOMERS": "Gesamtkunden",
+  "text.TOTAL_TRIPS": "Fahrten heute",
+  "text.CUS_ADDED_MONTH": "Kunden diesen Monat hinzugefügt",
+  "text.BOOKINGS_THIS_MONTH": "Buchungen in diesem Monat",
+  "text.DRIVER_JOINED_THIS_MONTH": "Fahrer, die diesen Monat beigetreten sind",
+  "text.VEHICLES_ADDED_THIS_MONTH": "Fahrzeuge, die diesen Monat hinzugefügt wurden",
+  "text.NO_REM": "Keine Erinnerungen gefunden."
+
 }

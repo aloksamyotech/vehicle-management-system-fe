@@ -40,13 +40,13 @@ const ReportCard = ({ primary, secondary, iconPrimary, color, footerData, iconFo
           sx={{
             textAlign: 'center',
             padding: theme.spacing(1.2),
-            pl: 2.5,
-            pr: 2.5,
+            pl: 2,
+            pr: 2,
             color: theme.palette.common.white
           }}
         >
           <Grid item>
-            <Typography variant="body2">{footerData}</Typography>
+            <Typography variant="body2" noWrap>{footerData}</Typography>
           </Grid>
           <Grid item>
             <Typography variant="body2">{footerIcon}</Typography>

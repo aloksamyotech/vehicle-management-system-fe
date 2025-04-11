@@ -142,7 +142,7 @@ export const text = {
   MAINTENANCE_RECORDS: 'Maintenance Records',
 
   //Vehicle
-  VEHICLE: 'Vehicle',
+  VEHICLE: 'Vehicles',
   SELECT_VEHICLE: 'Select Vehicle',
   VEHICLE_UPDATED: 'Vehicle updated successfully',
   VEHICLE_ADDED: 'Vehicle added successfully',
@@ -285,5 +285,21 @@ export const text = {
   LOGOUT: 'Logout',
   VIEW:'  View',
   DRIVER_PHOTO:'Driver Photo',
-  DRIVER_DOC: 'Driver Document'
+  DRIVER_DOC: 'Driver Document',
+
+  AVAILABLE: 'Available',
+  TODAY:'Today',
+  VEHICLE_AVAIL: 'Vehicle Availability',
+  WELCOME_FLEET: 'Welcome aboard your Fleet Management Hub',
+  MONTHLY_INC_EXP: 'Monthly Income/Expense',
+  TOTAL_VEHICLES:'Total Vehicles',
+  TOTAL_DRIVERS:'Total Drivers',
+  TOTAL_CUSTOMERS:'Total Customers',
+  TOTAL_TRIPS:'Today Trips',
+  CUS_ADDED_MONTH:'customers added this month',
+  BOOKINGS_THIS_MONTH:'bookings this month',
+  DRIVER_JOINED_THIS_MONTH:'drivers joined this month',
+  VEHICLES_ADDED_THIS_MONTH:'vehicles added this month',
+  NO_REM:'No reminders found.'
+
 };
