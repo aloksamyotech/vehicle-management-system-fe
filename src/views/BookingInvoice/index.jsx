@@ -38,7 +38,7 @@ const InvoicePage = () => {
   const generateInvoicePDF = () => {
     const doc = new jsPDF();
     doc.setFontSize(18).text('INVOICE', 105, 20, null, null, 'center');
-    doc.setFontSize(12).text(`Invoice No: ${invoiceNo}`, 150, 20);
+    doc.setFontSize(12).text(`Invoice No: ${booking?.invoiceNo}`, 150, 20);
     doc.text(`Date: ${booking?.createdAt}`, 150, 30);
 
     doc.setFontSize(14).text('Booking Details', 14, 50).line(14, 55, 190, 55);
@@ -64,7 +64,7 @@ const InvoicePage = () => {
     doc.text(`Pending Amount:${currencySymbol} ${excess || ''}`, 14, 235);
 
     doc.text('Thank you for your business!', 105, 260, null, null, 'center');
-    doc.save(`${invoiceNo}.pdf`);
+    doc.save(`${booking?.invoiceNo}.pdf`);
   };
 
   return (

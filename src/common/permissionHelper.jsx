@@ -1,0 +1,51 @@
+export const FEATURE = {
+  DASHBOARD: 1,
+  AVAILABILITY: 2,
+  VEHICLES: 3,
+  VEHICLE_GROUP: 4,
+  DRIVERS: 5,
+  BOOKINGS: 6,
+  CUSTOMER: 7,
+  MAINTENANCE: 8,
+  PARTS_INVENTORY: 9,
+  FUEL: 10,
+  REMINDER: 11,
+  INCOME_EXPENSE: 12,
+  REPORTS: 13
+};
+
+export const PERMISSION = {
+  READ: 1,
+  WRITE: 2
+};
+
+export const FEATURE_PERMISSIONS = {
+  [FEATURE.DASHBOARD]: [PERMISSION.READ],
+  [FEATURE.AVAILABILITY]: [PERMISSION.READ],
+  [FEATURE.VEHICLES]: [PERMISSION.READ, PERMISSION.WRITE],
+  [FEATURE.VEHICLE_GROUP]: [PERMISSION.READ, PERMISSION.WRITE],
+  [FEATURE.DRIVERS]: [PERMISSION.READ, PERMISSION.WRITE],
+  [FEATURE.BOOKINGS]: [PERMISSION.READ,  PERMISSION.WRITE],
+  [FEATURE.CUSTOMER]: [PERMISSION.READ, PERMISSION.WRITE],
+  [FEATURE.MAINTENANCE]: [PERMISSION.READ, PERMISSION.WRITE],
+  [FEATURE.PARTS_INVENTORY]: [PERMISSION.READ, PERMISSION.WRITE],
+  [FEATURE.FUEL]: [PERMISSION.READ, PERMISSION.WRITE],
+  [FEATURE.INCOME_EXPENSE]: [PERMISSION.READ, PERMISSION.WRITE],
+  [FEATURE.REMINDER]: [PERMISSION.READ, PERMISSION.WRITE],
+  [FEATURE.REPORTS]: [PERMISSION.READ]
+};
+
+const getUserPermissions = () => {
+  return JSON.parse(localStorage.getItem('userPermissions') || '[]');
+};
+
+export const hasPermission = (featureId, permissionId) => {
+  const permissions = getUserPermissions();
+
+  const READowedPermissions = FEATURE_PERMISSIONS[featureId] || [];
+  if (!READowedPermissions.includes(permissionId)) {
+    return false;
+  }
+
+  return permissions.some((p) => p.featureId === featureId && p.permissionId === permissionId);
+};

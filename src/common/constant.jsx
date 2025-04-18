@@ -163,6 +163,17 @@ export const text = {
   TRUCK: 'TRUCK',
   BICYCLE: 'BICYCLE',
 
+  //User
+  USER: 'User',
+  ADD_USER: 'Add User',
+  EDIT_USER:'Edit User',
+  VIEW_USER: 'View User',
+  USER_LIST:'Users List',
+  USER_ADDED: 'User added successfully',
+  USER_UPDATED: 'User updated successfully',
+  SAVE_PERMISSIONS: 'Save Permissions',
+  USER_PERMISSION: 'User Permission',
+
   //Common
   CANCEL: ' Cancel',
   UPDATE: 'Update',

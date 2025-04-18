@@ -1,30 +1,38 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, Typography, Button, Grid, List, ListItem, ListItemText, Divider, Box } from '@mui/material';
+import { Card, CardContent, Typography, Button, Grid, List, ListItem, ListItemText, Divider, Box, Pagination } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
-import toast from 'react-hot-toast';
 import { text } from 'common/constant';
 import { useTranslation } from 'react-i18next';
 
 const ReminderCard = () => {
   const [reminders, setReminders] = useState([]);
+  const [todayPage, setTodayPage] = useState(1);
+  const [todayLimit] = useState(5);
+  const [totalTodayPages, setTotalTodayPages] = useState(1);
+
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchReminders = async () => {
-        const response = await getApi(urls.reminder.get);
-        const { todaysReminders } = response?.data || {};
-        setReminders(todaysReminders || []);
-    };
+  const fetchReminders = async (page = 1) => {
+    const response = await getApi(`${urls.reminder.get}?todayPage=${page}&todayLimit=${todayLimit}`);
+    const { todaysReminders, todayPagination } = response?.data || {};
+    setReminders(todaysReminders || []);
+    setTotalTodayPages(todayPagination?.totalPages || 1);
+  };
 
-    fetchReminders();
-  }, []);
+  useEffect(() => {
+    fetchReminders(todayPage);
+  }, [todayPage]);
+
+  const handlePageChange = (_event, value) => {
+    setTodayPage(value);
+  };
 
   return (
-    <Grid item xs={12} sx={{ display: { md: 'block', sm: 'none' } }}>
+    <Grid item xs={12}>
       <Card>
         <Box sx={{ position: 'relative' }}>
           <CardContent sx={{ p: 2 }}>
@@ -36,11 +44,12 @@ const ReminderCard = () => {
               {reminders.length > 0 ? (
                 reminders.map((item, index) => {
                   const vehicle = item.vehicle;
-                  const message = `${vehicle?.vehicleName || 'Vehicle'} (${vehicle?.registrationNo || ''}) - ${item.message}`;
                   return (
                     <ListItem key={index} alignItems="flex-start" sx={{ py: 1 }}>
                       <Box sx={{ mr: 1 }}>
-                        <Typography variant="subtitle2" sx={{mt:'6px'}}>{index + 1}.</Typography>
+                        <Typography variant="subtitle2" sx={{ mt: '6px' }}>
+                          {(todayPage - 1) * todayLimit + index + 1}.
+                        </Typography>
                       </Box>
                       <ListItemText
                         primary={
@@ -63,6 +72,12 @@ const ReminderCard = () => {
                 </Typography>
               )}
             </List>
+
+            {totalTodayPages > 1 && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1}}>
+                <Pagination count={totalTodayPages} page={todayPage} onChange={handlePageChange} color="primary" size="small" />
+              </Box>
+            )}
           </CardContent>
 
           <Button

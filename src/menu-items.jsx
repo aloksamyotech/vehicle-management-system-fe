@@ -1,4 +1,3 @@
-// assets
 import NavigationOutlinedIcon from '@mui/icons-material/NavigationOutlined';
 import HomeIcon from '@mui/icons-material/Home';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
@@ -159,28 +158,6 @@ export default {
           url: '/users',
           icon: icons['VerifiedUserIcon']
         },
-        // {
-        //   id: 'auth',
-        //   title: 'Authentication',
-        //   type: 'collapse',
-        //   icon: icons['SecurityOutlinedIcon'],
-        //   children: [
-        //     {
-        //       id: 'login-1',
-        //       title: 'Login',
-        //       type: 'item',
-        //       url: '/login',
-        //       target: true
-        //     },
-        //     {
-        //       id: 'register',
-        //       title: 'Register',
-        //       type: 'item',
-        //       url: '/register',
-        //       target: true
-        //     }
-        //   ]
-        // }
       ]
     }
   ]

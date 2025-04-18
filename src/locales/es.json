@@ -298,6 +298,14 @@
   "text.BOOKINGS_THIS_MONTH": "reservas este mes",
   "text.DRIVER_JOINED_THIS_MONTH": "conductores que se unieron este mes",
   "text.VEHICLES_ADDED_THIS_MONTH": "vehículos añadidos este mes",
-  "text.NO_REM": "No se encontraron recordatorios."
-
+  "text.NO_REM": "No se encontraron recordatorios.",
+  "text.USER": "Usuario",
+  "text.ADD_USER": "Agregar Usuario",
+  "text.EDIT_USER": "Editar Usuario",
+  "text.USER_LIST": "Lista de Usuarios",
+  "text.VIEW_USER": "Ver Usuario",
+  "text.USER_ADDED": "Usuario agregado con éxito",
+  "text.USER_UPDATED": "Usuario actualizado con éxito",
+  "text.SAVE_PERMISSIONS": "Guardar Permisos",
+  "text.USER_PERMISSION": "Permiso de Usuario"
 }
