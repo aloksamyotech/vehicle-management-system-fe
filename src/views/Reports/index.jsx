@@ -49,69 +49,91 @@ const Reports = () => {
       setDrivers(driversRes?.data?.driverDetails || []);
       setBookings(bookingsRes?.data || []);
       setIncomeExpense(incomeExpenseRes?.data?.incomeExpenseDetails || []);
-      setSummary(incomeExpenseRes?.data?.summary || '');
+      setSummary(incomeExpenseRes?.data?.summary || {});
       setFuel(fuelRes?.data?.fuelDetails || []);
       setDriverReport(driverReportRes?.data || []);
     };
 
     fetchData();
-  }, [paginationModel]);
+  }, []);
 
   const fetchFilteredReports = async () => {
     try {
       const params = new URLSearchParams();
-
+  
       if (startDate) {
         const formattedStartDate = format(startDate, 'yyyy-MM-dd');
         params.append('startDate', formattedStartDate);
       }
-
+  
       if (endDate) {
         const formattedEndDate = format(endDate, 'yyyy-MM-dd');
         params.append('endDate', formattedEndDate);
       }
-
+  
       if (selectedVehicle?.id) params.append('vehicleId', selectedVehicle.id);
       if (selectedDriver?.id) params.append('driverId', selectedDriver.id);
-
+  
       params.append('page', paginationModel.page + 1);
       params.append('limit', paginationModel.pageSize);
-
+  
       const query = params.toString();
-
+  
       switch (tabIndex) {
         case 0: {
           const res = await getApi(`${urls.booking.report}?${query}`);
-          setBookings(res?.data?.vehicleDetails || []);
-          setTotalRows(res?.data?.pagination?.total || 0);
+          if (res?.data?.vehicleDetails) {
+            setBookings(res?.data?.vehicleDetails || []);
+            setTotalRows(res?.data?.pagination?.total || 0);
+          } else {
+            setBookings([]);
+            setTotalRows(0);
+          }
           break;
         }
         case 1: {
           const res = await getApi(`${urls.incomeExpense.report}?${query}`);
-          setIncomeExpense(res?.data?.incomeExpenseDetails || []);
-          setTotalRows(res?.data?.pagination?.total || 0);
+          if (res?.data?.incomeExpenseDetails) {
+            setIncomeExpense(res?.data?.incomeExpenseDetails || []);
+            setSummary(res?.data?.summary || {});
+            setTotalRows(res?.data?.pagination?.total || 0);
+          } else {
+            setIncomeExpense([]);
+            setSummary({});
+            setTotalRows(0);
+          }
           break;
         }
         case 2: {
           const res = await getApi(`${urls.fuel.report}?${query}`);
-          setFuel(res?.data?.fuelDetails || []);
-          setTotalRows(res?.data?.pagination?.total || 0);
+          if (res?.data?.fuelDetails) {
+            setFuel(res?.data?.fuelDetails || []);
+            setTotalRows(res?.data?.pagination?.total || 0);
+          } else {
+            setFuel([]);
+            setTotalRows(0);
+          }
           break;
         }
         case 3: {
           const res = await getApi(`${urls.booking.driverReport}?${query}`);
-          setDriverReport(res?.data?.driverDetails || []);
-          setTotalRows(res?.data?.pagination?.total || 0);
+          if (res?.data?.driverDetails) {
+            setDriverReport(res?.data?.driverDetails || []);
+            setTotalRows(res?.data?.pagination?.total || 0);
+          } else {
+            setDriverReport([]);
+            setTotalRows(0);
+          }
           break;
         }
         default:
           break;
       }
     } catch (error) {
-      toast.error(error);
+      console.error('Error fetching reports:', error);
     }
   };
-
+  
   const handleGenerateReport = () => {
     if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
       toast.error(t('text.INVALID_DATE_RANGE'));
@@ -121,9 +143,9 @@ const Reports = () => {
   };
 
   useEffect(() => {
-    fetchFilteredReports();
-  }, [paginationModel, tabIndex]);
-
+    fetchFilteredReports(); 
+  }, [paginationModel, tabIndex ]);
+  
   useEffect(() => {
     setStartDate(null);
     setEndDate(null);

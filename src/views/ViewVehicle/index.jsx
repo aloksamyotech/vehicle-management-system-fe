@@ -296,7 +296,7 @@ const ViewVehiclePage = () => {
                   <Typography sx={{ fontWeight: 'bold', textAlign: 'left' }}>{t('text.BOOKINGS')}:</Typography>
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography sx={{ textAlign: 'right' }}>0</Typography>
+                  <Typography sx={{ textAlign: 'right' }}>{vehicles?.bookingsCount || 0}</Typography>
                 </Grid>
 
                 <Grid item xs={12}>

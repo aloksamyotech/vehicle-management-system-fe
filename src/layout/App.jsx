@@ -1,13 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
-// material-ui
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
-// third-party
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
-// project import
 import theme from 'themes';
 import Routes from 'routes/index';
 import NavigationScroll from './NavigationScroll';
@@ -16,6 +14,14 @@ import NavigationScroll from './NavigationScroll';
 
 const App = () => {
   const customization = useSelector((state) => state.customization);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+    }
+  }, []);
 
   return (
     <>

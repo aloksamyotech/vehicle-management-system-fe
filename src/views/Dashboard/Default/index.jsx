@@ -104,6 +104,7 @@ const Default = () => {
           </Grid>
         </Grid>
       </Grid>
+
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
           <Grid item xs={12}>
@@ -113,108 +114,111 @@ const Default = () => {
                   <Grid item xs={12}>
                     <SalesLineCard />
                   </Grid>
-                  <Grid item xs={12} sx={{ display: { md: 'block', sm: 'none' } }}>
-                   <ReminderCard/>
+                  <Grid item xs={12}>
+                    <ReminderCard />
                   </Grid>
                 </Grid>
               </Grid>
 
               <Grid item xs={12} sm={6}>
-                <RevenuChartCard />
-              </Grid>
-            </Grid>
-          </Grid>
-
-          <Grid item lg={4} xs={12}>
-            <Card>
-              <CardHeader
-                title={
-                  <Typography component="div" className="card-header">
-                    Traffic Sources
-                  </Typography>
-                }
-              />
-              <Divider />
-              <CardContent>
                 <Grid container spacing={gridSpacing}>
                   <Grid item xs={12}>
-                    <Grid container alignItems="center" spacing={1}>
-                      <Grid item sm zeroMinWidth>
-                        <Typography variant="body2">Direct</Typography>
-                      </Grid>
-                      <Grid item>
-                        <Typography variant="body2" align="right">
-                          80%
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <LinearProgress variant="determinate" aria-label="direct" value={80} color="primary" />
-                      </Grid>
-                    </Grid>
+                    <RevenuChartCard />
                   </Grid>
                   <Grid item xs={12}>
-                    <Grid container alignItems="center" spacing={1}>
-                      <Grid item sm zeroMinWidth>
-                        <Typography variant="body2">Social</Typography>
-                      </Grid>
-                      <Grid item>
-                        <Typography variant="body2" align="right">
-                          50%
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <LinearProgress variant="determinate" aria-label="Social" value={50} color="secondary" />
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Grid container alignItems="center" spacing={1}>
-                      <Grid item sm zeroMinWidth>
-                        <Typography variant="body2">Referral</Typography>
-                      </Grid>
-                      <Grid item>
-                        <Typography variant="body2" align="right">
-                          20%
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <LinearProgress variant="determinate" aria-label="Referral" value={20} color="primary" />
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Grid container alignItems="center" spacing={1}>
-                      <Grid item sm zeroMinWidth>
-                        <Typography variant="body2">Bounce</Typography>
-                      </Grid>
-                      <Grid item>
-                        <Typography variant="body2" align="right">
-                          60%
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <LinearProgress variant="determinate" aria-label="Bounce" value={60} color="secondary" />
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Grid container alignItems="center" spacing={1}>
-                      <Grid item sm zeroMinWidth>
-                        <Typography variant="body2">Internet</Typography>
-                      </Grid>
-                      <Grid item>
-                        <Typography variant="body2" align="right">
-                          40%
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <LinearProgress variant="determinate" aria-label="Internet" value={40} color="primary" />
-                      </Grid>
-                    </Grid>
+                    <Card>
+                      <CardHeader
+                        title={
+                          <Typography component="div" className="card-header">
+                            Traffic Sources
+                          </Typography>
+                        }
+                      />
+                      <Divider />
+                      <CardContent>
+                        <Grid container spacing={gridSpacing}>
+                          <Grid item xs={12}>
+                            <Grid container alignItems="center" spacing={1}>
+                              <Grid item sm zeroMinWidth>
+                                <Typography variant="body2">Direct</Typography>
+                              </Grid>
+                              <Grid item>
+                                <Typography variant="body2" align="right">
+                                  80%
+                                </Typography>
+                              </Grid>
+                              <Grid item xs={12}>
+                                <LinearProgress variant="determinate" aria-label="direct" value={80} color="primary" />
+                              </Grid>
+                            </Grid>
+                          </Grid>
+                          <Grid item xs={12}>
+                            <Grid container alignItems="center" spacing={1}>
+                              <Grid item sm zeroMinWidth>
+                                <Typography variant="body2">Social</Typography>
+                              </Grid>
+                              <Grid item>
+                                <Typography variant="body2" align="right">
+                                  50%
+                                </Typography>
+                              </Grid>
+                              <Grid item xs={12}>
+                                <LinearProgress variant="determinate" aria-label="Social" value={50} color="secondary" />
+                              </Grid>
+                            </Grid>
+                          </Grid>
+                          <Grid item xs={12}>
+                            <Grid container alignItems="center" spacing={1}>
+                              <Grid item sm zeroMinWidth>
+                                <Typography variant="body2">Referral</Typography>
+                              </Grid>
+                              <Grid item>
+                                <Typography variant="body2" align="right">
+                                  20%
+                                </Typography>
+                              </Grid>
+                              <Grid item xs={12}>
+                                <LinearProgress variant="determinate" aria-label="Referral" value={20} color="primary" />
+                              </Grid>
+                            </Grid>
+                          </Grid>
+                          <Grid item xs={12}>
+                            <Grid container alignItems="center" spacing={1}>
+                              <Grid item sm zeroMinWidth>
+                                <Typography variant="body2">Bounce</Typography>
+                              </Grid>
+                              <Grid item>
+                                <Typography variant="body2" align="right">
+                                  60%
+                                </Typography>
+                              </Grid>
+                              <Grid item xs={12}>
+                                <LinearProgress variant="determinate" aria-label="Bounce" value={60} color="secondary" />
+                              </Grid>
+                            </Grid>
+                          </Grid>
+                          <Grid item xs={12}>
+                            <Grid container alignItems="center" spacing={1}>
+                              <Grid item sm zeroMinWidth>
+                                <Typography variant="body2">Internet</Typography>
+                              </Grid>
+                              <Grid item>
+                                <Typography variant="body2" align="right">
+                                  40%
+                                </Typography>
+                              </Grid>
+                              <Grid item xs={12}>
+                                <LinearProgress variant="determinate" aria-label="Internet" value={40} color="primary" />
+                              </Grid>
+                            </Grid>
+                          </Grid>
+                        </Grid>
+                      </CardContent>
+                    </Card>
                   </Grid>
                 </Grid>
-              </CardContent>
-            </Card>
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
       </Grid>

@@ -298,5 +298,15 @@
   "text.BOOKINGS_THIS_MONTH":"bookings this month",
   "text.DRIVER_JOINED_THIS_MONTH":"drivers joined this month",
   "text.VEHICLES_ADDED_THIS_MONTH":"vehicles added this month",
-  "text.NO_REM":"No reminders found."
+  "text.NO_REM":"No reminders found.",
+
+  "text.USER": "User",
+  "text.ADD_USER": "Add User",
+  "text.EDIT_USER":"Edit User",
+  "text.USER_LIST":"Users List",
+  "text.VIEW_USER": "View User",
+  "text.USER_ADDED": "User added successfully",
+  "text.USER_UPDATED": "User updated successfully",
+  "text.SAVE_PERMISSIONS": "Save Permissions",
+  "text.USER_PERMISSION": "User Permission"
 }

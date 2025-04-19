@@ -98,5 +98,10 @@ export const urls = Object.freeze({
   },
   users : {
     updateCurrency : `${baseUrl}/users/currency/:id`,
+    create: `${baseUrl}/users/save`,
+    get: `${baseUrl}/users/fetch`,
+    getById: `${baseUrl}/users/getById/:id`,
+    update: `${baseUrl}/users/update/:id`,
+    updateStatus: `${baseUrl}/users/updateStatus/:id`,
   }
 });
