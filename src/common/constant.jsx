@@ -173,6 +173,7 @@ export const text = {
   USER_UPDATED: 'User updated successfully',
   SAVE_PERMISSIONS: 'Save Permissions',
   USER_PERMISSION: 'User Permission',
+  PERMISSION_ADDED:'Permissions added successfully',
 
   //Common
   CANCEL: ' Cancel',

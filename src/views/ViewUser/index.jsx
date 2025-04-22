@@ -17,34 +17,82 @@ import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { text } from 'common/constant';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { FEATURE, PERMISSION, FEATURE_PERMISSIONS } from 'common/permissionHelper.jsx';
-import { getApi } from 'common/apiClient';
+import { FEATURE, PERMISSION, FEATURE_PERMISSIONS } from 'common/authHelper.jsx';
+import { getApi, postApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import toast from 'react-hot-toast';
 
 const featureList = Object.entries(FEATURE);
 const permissionLabels = Object.entries(PERMISSION);
 
+const defaultValues = {
+  permissions: Object.fromEntries(
+    Object.entries(FEATURE_PERMISSIONS).map(([featureId, permIds]) => [featureId, Object.fromEntries(permIds.map((pid) => [pid, false]))])
+  )
+};
+
 const AddUserFullPage = () => {
   const { t } = useTranslation();
   const { id } = useParams();
-  const [userData, setUserData] = useState({});
   const {
     register,
     handleSubmit,
     control,
+    setValue,
     formState: { errors }
-  } = useForm();
+  } = useForm({ defaultValues });
+  const location = useLocation();
 
-  const fetchUsers = async () => {
-    const response = await getApi(urls.users.getById.replace(':id', id));
-    setUserData(response?.data);
+  const userData = location.state || {};
+  const paramId = useParams()?.id;
+
+  const userId = Number(userData?.id) || Number(paramId);
+  const [userPermissions, setUserPermissions] = useState([]);
+
+  const fetchData = async () => {
+      const response = await getApi(urls.userManagement.get.replace(':userId', userId));
+      if (response?.data) {
+        setUserPermissions(response.data.data || []);
+      }
   };
 
   useEffect(() => {
-    if (id) {
-      fetchUsers();
+    if (userId) fetchData();
+  }, [userId, t]);
+
+  useEffect(() => {
+    if (userPermissions && userPermissions.length > 0) {
+      userPermissions.forEach(({ featureId, permissionId }) => {
+        setValue(`permissions.${featureId}.${permissionId}`, true);
+      });
     }
-  }, [id]);
+  }, [userPermissions, setValue]);
+
+  const onSubmit = async (data) => {
+    const { permissions } = data;
+    const permissionPayload = [];
+
+    Object.entries(permissions).forEach(([featureId, permObj]) => {
+      Object.entries(permObj).forEach(([permissionId, isChecked]) => {
+        if (isChecked) {
+          permissionPayload.push({
+            userId: parseInt(userId),
+            featureId: parseInt(featureId),
+            permissionId: parseInt(permissionId)
+          });
+        }
+      });
+    });
+
+    const payload = {
+      userId: parseInt(userId),
+      permissions: permissionPayload
+    };
+
+      const response = await postApi(urls.userManagement.create, payload);
+      toast.success(t('text.PERMISSION_ADDED'));
+      fetchData();
+  };
 
   return (
     <>
@@ -80,18 +128,18 @@ const AddUserFullPage = () => {
           </Grid>
 
           <Typography variant="h5" gutterBottom>
-          {t('text.USER_PERMISSION')}
+            {t('text.USER_PERMISSION')}
           </Typography>
 
           <Grid container spacing={2}>
-            {featureList.map(([featureName, featureId]) => {
+            {featureList.map(([featureCode, featureId]) => {
               const allowedPermIds = FEATURE_PERMISSIONS[featureId] || [];
 
               return (
                 <Grid
                   item
                   xs={12}
-                  key={featureName}
+                  key={featureCode}
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
@@ -99,7 +147,7 @@ const AddUserFullPage = () => {
                     pb: 1
                   }}
                 >
-                  <Box sx={{ width: 180, fontWeight: 'bold' }}>{featureName}</Box>
+                  <Box sx={{ width: 180, fontWeight: 'bold' }}>{featureCode}</Box>
 
                   {permissionLabels
                     .filter(([, permId]) => allowedPermIds.includes(permId))
@@ -110,8 +158,7 @@ const AddUserFullPage = () => {
                           <Controller
                             name={`permissions.${featureId}.${permId}`}
                             control={control}
-                            defaultValue={false}
-                            render={({ field }) => <Checkbox {...field} />}
+                            render={({ field }) => <Checkbox checked={field.value} onChange={field.onChange} />}
                           />
                         }
                         label={permName}
@@ -124,10 +171,10 @@ const AddUserFullPage = () => {
           </Grid>
 
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4, gap: 2 }}>
-            <Button type="submit" variant="contained">
-             {t('text.SAVE_PERMISSIONS')}
+            <Button type="submit" variant="contained" onClick={handleSubmit(onSubmit)}>
+              {t('text.SAVE_PERMISSIONS')}
             </Button>
-            <Button variant="outlined"> {t('text.CANCEL')}</Button>
+            <Button variant="outlined">{t('text.CANCEL')}</Button>
           </Box>
         </CardContent>
       </Card>

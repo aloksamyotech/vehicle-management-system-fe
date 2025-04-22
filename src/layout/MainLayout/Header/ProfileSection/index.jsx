@@ -30,8 +30,7 @@ const ProfileSection = () => {
 
   const logout = () => {
     setOpen(false); 
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.clear();
     toast.success(t('text.LOGOUT_SUCCESS'));
     navigate('/login');
   };

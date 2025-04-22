@@ -1,8 +1,7 @@
 import React, { lazy } from 'react';
 import MainLayout from 'layout/MainLayout';
 import Loadable from 'component/Loadable';
-import ProtectedRoute from 'common/protectedRoute.jsx';
-import { FEATURE, PERMISSION } from 'common/permissionHelper.jsx';
+import ProtectedRoute from 'common/authHelper.jsx';
 
 const DashboardDefault = Loadable(lazy(() => import('views/Dashboard/Default')));
 const VehicleAvailability = Loadable(lazy(() => import('views/Vehicle Calendar')));
@@ -35,31 +34,55 @@ const MainRoutes = {
   children: [
     {
       path: '/',
-      element: <ProtectedRoute element={<DashboardDefault />} featureId={FEATURE.DASHBOARD} permissionId={PERMISSION.READ} />
+      element: (
+        <ProtectedRoute requiredPermission="DASHBOARD_READ">
+          <DashboardDefault />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/dashboard/default',
-      element: <ProtectedRoute element={<DashboardDefault />} featureId={FEATURE.DASHBOARD} permissionId={PERMISSION.READ} />
+      element: (
+        <ProtectedRoute requiredPermission="DASHBOARD_READ">
+          <DashboardDefault />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/vehicleavailability',
-      element: <ProtectedRoute element={<VehicleAvailability />} featureId={FEATURE.AVAILABILITY} permissionId={PERMISSION.READ} />
+      element: (
+        <ProtectedRoute requiredPermission="AVAILABILITY_READ">
+          <VehicleAvailability />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/vehicles',
-      element: <ProtectedRoute element={<Vehicles />} featureId={FEATURE.VEHICLES} permissionId={PERMISSION.READ} />
+      element: (
+        <ProtectedRoute requiredPermission="VEHICLES_READ">
+          <Vehicles />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/vehiclegroup',
-      element: <ProtectedRoute element={<VehicleGroup />} featureId={FEATURE.VEHICLE_GROUP} permissionId={PERMISSION.READ} />
+      element: (
+        <ProtectedRoute requiredPermission="VEHICLES_READ">
+          <VehicleGroup />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/add-vehicle',
-      element: <ProtectedRoute element={<AddVehicle />} featureId={FEATURE.VEHICLES} permissionId={PERMISSION.WRITE} />
+      element: (
+        <ProtectedRoute requiredPermission="VEHICLES_WRITE">
+          <AddVehicle />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/add-vehicle/:id',
-      element: <AddVehicle /> 
+      element: <AddVehicle />
     },
     {
       path: '/view-vehicle/:id',
@@ -67,11 +90,19 @@ const MainRoutes = {
     },
     {
       path: '/drivers',
-      element: <ProtectedRoute element={<Drivers />} featureId={FEATURE.DRIVERS} permissionId={PERMISSION.READ} />
+      element: (
+        <ProtectedRoute requiredPermission="DRIVERS_READ">
+          <Drivers />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/add-driver',
-      element: <ProtectedRoute element={<AddDriver />} featureId={FEATURE.DRIVERS} permissionId={PERMISSION.WRITE} />
+      element: (
+        <ProtectedRoute requiredPermission="DRIVERS_WRITE">
+          <AddDriver />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/add-driver/:id',
@@ -79,11 +110,19 @@ const MainRoutes = {
     },
     {
       path: '/booking',
-      element: <ProtectedRoute element={<Bookings />} featureId={FEATURE.BOOKING} permissionId={PERMISSION.READ} />
+      element: (
+        <ProtectedRoute requiredPermission="BOOKING_READ">
+          <Bookings />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/add-booking',
-      element: <ProtectedRoute element={<AddBooking />} featureId={FEATURE.BOOKING} permissionId={PERMISSION.WRITE} />
+      element: (
+        <ProtectedRoute requiredPermission="BOOKING_WRITE">
+          <AddBooking />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/add-booking/:id',
@@ -99,27 +138,51 @@ const MainRoutes = {
     },
     {
       path: '/customer',
-      element: <ProtectedRoute element={<Customer />} featureId={FEATURE.CUSTOMER} permissionId={PERMISSION.READ} />
+      element: (
+        <ProtectedRoute requiredPermission="CUSTOMER_READ">
+          <Customer />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/partsinventory',
-      element: <ProtectedRoute element={<PartsInventory />} featureId={FEATURE.PARTS} permissionId={PERMISSION.READ} />
+      element: (
+        <ProtectedRoute requiredPermission="PARTS_READ">
+          <PartsInventory />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/maintenance',
-      element: <ProtectedRoute element={<Maintenance />} featureId={FEATURE.MAINTENANCE} permissionId={PERMISSION.READ} />
+      element: (
+        <ProtectedRoute requiredPermission="MAINTENANCE_READ">
+          <Maintenance />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/add-maintenance',
-      element: <ProtectedRoute element={<AddMaintenance />} featureId={FEATURE.MAINTENANCE} permissionId={PERMISSION.WRITE} />
+      element: (
+        <ProtectedRoute requiredPermission="MAINTENANCE_WRITE">
+          <AddMaintenance />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/fuel',
-      element: <ProtectedRoute element={<Fuel />} featureId={FEATURE.FUEL} permissionId={PERMISSION.READ} />
+      element: (
+        <ProtectedRoute requiredPermission="FUEL_READ">
+          <Fuel />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/add-fuel',
-      element: <ProtectedRoute element={<AddFuel />} featureId={FEATURE.FUEL} permissionId={PERMISSION.WRITE} />
+      element: (
+        <ProtectedRoute requiredPermission="FUEL_WRITE">
+          <AddFuel />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/add-fuel/:id',
@@ -127,15 +190,27 @@ const MainRoutes = {
     },
     {
       path: '/reminder',
-      element: <ProtectedRoute element={<Reminder />} featureId={FEATURE.REMINDER} permissionId={PERMISSION.READ} />
+      element: (
+        <ProtectedRoute requiredPermission="REMINDER_READ">
+          <Reminder />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/finance',
-      element: <ProtectedRoute element={<Finance />} featureId={FEATURE.FINANCE} permissionId={PERMISSION.READ} />
+      element: (
+        <ProtectedRoute requiredPermission="FINANCE_READ">
+          <Finance />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/reports',
-      element: <ProtectedRoute element={<Reports />} featureId={FEATURE.REPORTS} permissionId={PERMISSION.READ} />
+      element: (
+        <ProtectedRoute requiredPermission="REPORTS_READ">
+          <Reports />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/users',
