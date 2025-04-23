@@ -131,7 +131,6 @@ const UserIndex = () => {
 
   const handleOpen = (user = null) => {
     setSelectedUser(user);
-    console.log(user);
     setOpen(true);
   };
 

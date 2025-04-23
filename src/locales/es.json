@@ -102,6 +102,7 @@
   "text.CUSTOMER_ADDED": "Cliente añadido con éxito",
   "text.EDIT_CUSTOMER": "Editar cliente",
   "text.ADD_CUSTOMER": "Agregar cliente",
+  "text.VIEW_CUSTOMER": "Ver cliente",
   "text.SELECT_CUSTOMER": "Seleccionar cliente",
   "text.CUSTOMER_INFO": "Información del cliente",
   "text.CUSTOMER_MGNT": "Gestión de clientes",
@@ -113,6 +114,7 @@
   "text.DRIVER_ADDED": "Conductor añadido con éxito",
   "text.EDIT_DRIVER": "Editar conductor",
   "text.ADD_DRIVER": "Agregar conductor",
+  "text.VIEW_DRIVER": "Ver conductor",
   "text.SELECT_DRIVER": "Seleccionar conductor",
   "text.DRIVER_INFO": "Información del conductor",
   "text.DRIVER_MGNT": "Gestión de conductores",
@@ -309,5 +311,4 @@
   "text.SAVE_PERMISSIONS": "Guardar Permisos",
   "text.USER_PERMISSION": "Permiso de Usuario",
   "text.PERMISSION_ADDED": "Permisos añadidos con éxito"
-
 }

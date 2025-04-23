@@ -83,7 +83,11 @@ const NewComponent = () => {
       headerName: t('text.ACTION'),
       width: 100,
       sortable: false,
-      renderCell: (params) => (
+      renderCell: (params) => {
+        const userRole = JSON.parse(localStorage.getItem('user'))?.role;
+    
+        if (userRole !== 'ADMIN') return null;
+        return(
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <IconButton sx={{ color: '#17a2b8' }} onClick={() => handleOpenModal(params.row)}>
             <BorderColorIcon />
@@ -93,7 +97,8 @@ const NewComponent = () => {
             <DeleteIcon />
           </IconButton>
         </Box>
-      )
+      );
+    }
     }
   ];
 

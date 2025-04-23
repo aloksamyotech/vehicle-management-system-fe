@@ -50,10 +50,10 @@ const AddUserFullPage = () => {
   const [userPermissions, setUserPermissions] = useState([]);
 
   const fetchData = async () => {
-      const response = await getApi(urls.userManagement.get.replace(':userId', userId));
-      if (response?.data) {
-        setUserPermissions(response.data.data || []);
-      }
+    const response = await getApi(urls.userManagement.get.replace(':userId', userId));
+    if (response?.data) {
+      setUserPermissions(response.data.data || []);
+    }
   };
 
   useEffect(() => {
@@ -89,9 +89,9 @@ const AddUserFullPage = () => {
       permissions: permissionPayload
     };
 
-      const response = await postApi(urls.userManagement.create, payload);
-      toast.success(t('text.PERMISSION_ADDED'));
-      fetchData();
+    const response = await postApi(urls.userManagement.create, payload);
+    toast.success(t('text.PERMISSION_ADDED'));
+    fetchData();
   };
 
   return (
@@ -158,7 +158,19 @@ const AddUserFullPage = () => {
                           <Controller
                             name={`permissions.${featureId}.${permId}`}
                             control={control}
-                            render={({ field }) => <Checkbox checked={field.value} onChange={field.onChange} />}
+                            render={({ field }) => (
+                              <Checkbox
+                                checked={field.value}
+                                onChange={(e) => {
+                                  const isChecked = e.target.checked;
+                                  field.onChange(isChecked);
+
+                                  if (permId === PERMISSION.WRITE && isChecked) {
+                                    setValue(`permissions.${featureId}.${PERMISSION.READ}`, true);
+                                  }
+                                }}
+                              />
+                            )}
                           />
                         }
                         label={permName}

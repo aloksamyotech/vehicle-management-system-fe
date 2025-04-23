@@ -67,11 +67,17 @@ const FuelReminderIndex = () => {
       headerName: t('text.ACTION'),
       width: 100,
       sortable: false,
-      renderCell: (params) => (
-        <IconButton color="error" onClick={() => handleDelete(params.row.id)}>
-          <DeleteIcon />
-        </IconButton>
-      )
+      renderCell: (params) => {
+        const userRole = JSON.parse(localStorage.getItem('user'))?.role;
+
+        if (userRole !== 'ADMIN') return null;
+
+        return (
+          <IconButton color="error" onClick={() => handleDelete(params.row.id)}>
+            <DeleteIcon />
+          </IconButton>
+        );
+      }
     }
   ];
 

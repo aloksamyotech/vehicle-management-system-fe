@@ -94,6 +94,9 @@ const FuelRecords = () => {
       sortable: false,
       renderCell: (params) => {
         const navigate = useNavigate();
+        const userRole = JSON.parse(localStorage.getItem('user'))?.role;
+
+        if (userRole !== 'ADMIN') return null;
 
         return (
           <Box sx={{ display: 'flex', alignItems: 'center' }}>

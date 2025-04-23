@@ -4,6 +4,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import { gridSpacing } from 'config.js';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import DeleteIcon from '@mui/icons-material/Delete';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getApi, deleteApi, updateApi } from 'common/apiClient';
@@ -156,23 +157,35 @@ const DriverManagementPage = () => {
     {
       field: 'actions',
       headerName: t('text.ACTION'),
-      width: 100,
+      width: 150,
       sortable: false,
-      renderCell: (params) => (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <IconButton
-            sx={{ color: '#17a2b8', py: 2 }}
-            onClick={() => navigate(`/add-driver/${params.row.id}`, { state: { ...params.row } })}
-          >
-            <BorderColorIcon />
-          </IconButton>
+      renderCell: (params) => {
+        const userRole = JSON.parse(localStorage.getItem('user'))?.role;
 
-          <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5, alignSelf: 'center' }} />
-          <IconButton color="error" sx={{ py: 2 }} onClick={() => handleDelete(params.row.id)}>
-            <DeleteIcon />
-          </IconButton>
-        </Box>
-      )
+        if (userRole !== 'ADMIN') return null;
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <IconButton
+              color="primary"
+              sx={{ py: 2 }}
+              onClick={() => navigate(`/view-driver/${params.row.id}`, { state: { ...params.row } })}
+            >
+              <VisibilityIcon />
+            </IconButton>
+            <IconButton
+              sx={{ color: '#17a2b8', py: 2 }}
+              onClick={() => navigate(`/add-driver/${params.row.id}`, { state: { ...params.row } })}
+            >
+              <BorderColorIcon />
+            </IconButton>
+
+            <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5, alignSelf: 'center' }} />
+            <IconButton color="error" sx={{ py: 2 }} onClick={() => handleDelete(params.row.id)}>
+              <DeleteIcon />
+            </IconButton>
+          </Box>
+        );
+      }
     }
   ];
 

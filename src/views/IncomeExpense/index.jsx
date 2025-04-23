@@ -110,17 +110,22 @@ const FinanceIndex = () => {
       headerName: t('text.ACTION'),
       width: 150,
       sortable: false,
-      renderCell: (params) => (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <IconButton sx={{ color: '#17a2b8' }} onClick={() => handleOpen(params.row)}>
-            <BorderColorIcon />
-          </IconButton>
-          <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5, alignSelf: 'center' }} />
-          <IconButton color="error" onClick={() => handleDelete(params.row.id)}>
-            <DeleteIcon />
-          </IconButton>
-        </Box>
-      )
+      renderCell: (params) => {
+        const userRole = JSON.parse(localStorage.getItem('user'))?.role;
+
+        if (userRole !== 'ADMIN') return null;
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <IconButton sx={{ color: '#17a2b8' }} onClick={() => handleOpen(params.row)}>
+              <BorderColorIcon />
+            </IconButton>
+            <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5, alignSelf: 'center' }} />
+            <IconButton color="error" onClick={() => handleDelete(params.row.id)}>
+              <DeleteIcon />
+            </IconButton>
+          </Box>
+        );
+      }
     }
   ];
 
