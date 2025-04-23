@@ -38,7 +38,6 @@ const ViewDriver = () => {
     setLoading(true);
     try {
       const res = await getApi(`${urls.booking.driverReport}?driverId=${id}`);
-      console.log(res);
       const bookings = res?.data?.driverDetails || [];
       const pagination = res?.data?.pagination || { total: 0 };
 
