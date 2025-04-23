@@ -107,10 +107,8 @@ const MaintenanceIndex = () => {
       field: 'totalCost',
       headerName: t('text.TOTAL_COST'),
       width: 120,
-      renderCell: (params) => (
-        `${currencySymbol} ${params.value}`
-      )
-    },    
+      renderCell: (params) => `${currencySymbol} ${params.value}`
+    },
     {
       field: 'status',
       headerName: t('text.STATUS'),
@@ -128,13 +126,18 @@ const MaintenanceIndex = () => {
       headerName: t('text.ACTION'),
       width: 150,
       sortable: false,
-      renderCell: (params) => (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <IconButton color="error" sx={{ py: 2 }} onClick={() => handleDelete(params.row.id)}>
-            <DeleteIcon />
-          </IconButton>
-        </Box>
-      )
+      renderCell: (params) => {
+        const userRole = JSON.parse(localStorage.getItem('user'))?.role;
+
+        if (userRole !== 'ADMIN') return null;
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <IconButton color="error" sx={{ py: 2 }} onClick={() => handleDelete(params.row.id)}>
+              <DeleteIcon />
+            </IconButton>
+          </Box>
+        );
+      }
     }
   ];
 

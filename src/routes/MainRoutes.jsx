@@ -27,6 +27,9 @@ const ViewBookingsPage = Loadable(lazy(() => import('views/ViewBookings')));
 const Invoice = Loadable(lazy(() => import('views/BookingInvoice')));
 const Profile = Loadable(lazy(() => import('views/Profile')));
 const AddUser = Loadable(lazy(() => import('views/ViewUser')));
+const Unauthorized = Loadable(lazy(() => import('views/Unauthorized')));
+const ViewCustomer = Loadable(lazy(() => import('views/ViewCustomer')));
+const ViewDriver = Loadable(lazy(() => import('views/ViewDriver')));
 
 const MainRoutes = {
   path: '/',
@@ -82,11 +85,19 @@ const MainRoutes = {
     },
     {
       path: '/add-vehicle/:id',
-      element: <AddVehicle />
+      element: (
+        <ProtectedRoute requiredRole="ADMIN">
+          <AddVehicle />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/view-vehicle/:id',
-      element: <ViewVehiclePage />
+      element: (
+        <ProtectedRoute requiredRole="ADMIN">
+          <ViewVehiclePage />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/drivers',
@@ -106,12 +117,24 @@ const MainRoutes = {
     },
     {
       path: '/add-driver/:id',
-      element: <AddDriver />
+      element: (
+        <ProtectedRoute requiredRole="ADMIN">
+          <AddDriver />
+        </ProtectedRoute>
+      )
+    },
+    {
+      path: '/view-driver/:id',
+      element: (
+        <ProtectedRoute requiredRole="ADMIN">
+          <ViewDriver />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/booking',
       element: (
-        <ProtectedRoute requiredPermission="BOOKING_READ">
+        <ProtectedRoute requiredPermission="BOOKINGS_READ">
           <Bookings />
         </ProtectedRoute>
       )
@@ -119,28 +142,48 @@ const MainRoutes = {
     {
       path: '/add-booking',
       element: (
-        <ProtectedRoute requiredPermission="BOOKING_WRITE">
+        <ProtectedRoute requiredPermission="BOOKINGS_WRITE">
           <AddBooking />
         </ProtectedRoute>
       )
     },
     {
       path: '/add-booking/:id',
-      element: <AddBooking />
+      element: (
+        <ProtectedRoute requiredRole="ADMIN">
+          <AddBooking />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/view-booking/:id',
-      element: <ViewBookingsPage />
+      element: (
+        <ProtectedRoute requiredRole="ADMIN">
+          <ViewBookingsPage />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/invoice/:id',
-      element: <Invoice />
+      element: (
+        <ProtectedRoute requiredRole="ADMIN">
+          <Invoice />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/customer',
       element: (
         <ProtectedRoute requiredPermission="CUSTOMER_READ">
           <Customer />
+        </ProtectedRoute>
+      )
+    },
+    {
+      path: '/view-customer/:id',
+      element: (
+        <ProtectedRoute requiredRole="ADMIN">
+          <ViewCustomer />
         </ProtectedRoute>
       )
     },
@@ -186,7 +229,11 @@ const MainRoutes = {
     },
     {
       path: '/add-fuel/:id',
-      element: <AddFuel />
+      element: (
+        <ProtectedRoute requiredRole="ADMIN">
+          <AddFuel />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/reminder',
@@ -214,15 +261,27 @@ const MainRoutes = {
     },
     {
       path: '/users',
-      element: <UserManagement />
+      element: (
+        <ProtectedRoute requiredRole="ADMIN">
+          <UserManagement />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/view-user/:id',
-      element: <AddUser />
+      element: (
+        <ProtectedRoute requiredRole="ADMIN">
+          <AddUser />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/profile',
       element: <Profile />
+    },
+    {
+      path: '/unauthorized',
+      element: <Unauthorized />
     }
   ]
 };

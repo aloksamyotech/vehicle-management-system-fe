@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Card, Box, Grid, Typography, IconButton, Button, Divider, Modal } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { gridSpacing } from 'config.js';
+import { useNavigate } from 'react-router-dom';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import DeleteIcon from '@mui/icons-material/Delete';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import AddCustomerForm from './addCustomer.jsx';
 import { getApi, deleteApi } from 'common/apiClient';
 import { urls } from 'common/urls';
@@ -79,18 +81,29 @@ const CustomerManagementPage = () => {
     {
       field: 'actions',
       headerName: t('text.ACTION'),
-      width: 100,
-      renderCell: (params) => (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <IconButton sx={{ color: '#17a2b8', py: 2 }} onClick={() => handleOpen(params.row)}>
-            <BorderColorIcon />
-          </IconButton>
-          <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5, alignSelf: 'center' }} />
-          <IconButton color="error" sx={{ py: 2 }} onClick={() => handleDelete(params.row.id)}>
-            <DeleteIcon />
-          </IconButton>
-        </Box>
-      )
+      width: 150,
+      sortable: false,
+      renderCell: (params) => {
+        const navigate = useNavigate();
+        const userRole = JSON.parse(localStorage.getItem('user'))?.role;
+
+        if (userRole !== 'ADMIN') return null;
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <IconButton color="primary" sx={{ py: 2 }} onClick={() => navigate(`/view-customer/${params.row.id}`, { state: { ...params.row } })}>
+              <VisibilityIcon />
+            </IconButton>
+            <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5, alignSelf: 'center' }} />
+            <IconButton sx={{ color: '#17a2b8', py: 2 }} onClick={() => handleOpen(params.row)}>
+              <BorderColorIcon />
+            </IconButton>
+            <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5, alignSelf: 'center' }} />
+            <IconButton color="error" sx={{ py: 2 }} onClick={() => handleDelete(params.row.id)}>
+              <DeleteIcon />
+            </IconButton>
+          </Box>
+        );
+      }
     }
   ];
 

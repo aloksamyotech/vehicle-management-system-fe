@@ -347,8 +347,10 @@ const VehicleForm = () => {
                         options={vehicleGroups || []}
                         getOptionLabel={(option) => option?.name || ''}
                         isOptionEqualToValue={(option, value) => option?.id === value?.id}
-                        onChange={(_, newValue) => field.onChange(newValue)}
-                        value={field.value || null}
+                        onChange={(_, newValue) => {
+                          field.onChange(newValue ? newValue.id : null);
+                        }}
+                        value={vehicleGroups.find((group) => group.id === field.value) || null}
                         renderInput={(params) => (
                           <TextField
                             {...params}

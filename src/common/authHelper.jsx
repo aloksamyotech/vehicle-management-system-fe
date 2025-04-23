@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Navigate } from 'react-router-dom';
 
 export const FEATURE = {
@@ -36,10 +36,14 @@ export const FEATURE_PERMISSIONS = {
   [FEATURE.REPORTS]: [PERMISSION.READ]
 };
 
-const ProtectedRoute = ({ requiredPermission, children }) => {
+const ProtectedRoute = ({ requiredPermission, requiredRole, children }) => {
   const userData = JSON.parse(localStorage.getItem('user'));
-
   const userPermissions = JSON.parse(localStorage.getItem('permissions')) || [];
+
+  if (requiredRole && userData.role !== requiredRole) {
+    return <ClearStorageAndRedirect />;
+  }
+
   if (userData.role === 'ADMIN') {
     return children;
   }
@@ -51,17 +55,12 @@ const ProtectedRoute = ({ requiredPermission, children }) => {
       return <ClearStorageAndRedirect />;
     }
   }
+
   return <ClearStorageAndRedirect />;
 };
 
 const ClearStorageAndRedirect = () => {
-  useEffect(() => {
-    localStorage.clear();
-  }, []);
-
-  return <Navigate to="/login" replace />;
+  return <Navigate to="/unauthorized" replace />;
 };
 
-
 export default ProtectedRoute;
-

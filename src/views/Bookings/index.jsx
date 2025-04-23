@@ -145,6 +145,9 @@ const BookingPage = () => {
       sortable: false,
       renderCell: (params) => {
         const navigate = useNavigate();
+        const userRole = JSON.parse(localStorage.getItem('user'))?.role;
+    
+        if (userRole !== 'ADMIN') return null;
         return (
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <IconButton color="primary" sx={{ py: 3 }} onClick={() => navigate(`/view-booking/${params.row.id}`)}>
