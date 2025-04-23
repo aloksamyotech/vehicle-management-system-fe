@@ -308,5 +308,6 @@
   "text.USER_ADDED": "User added successfully",
   "text.USER_UPDATED": "User updated successfully",
   "text.SAVE_PERMISSIONS": "Save Permissions",
-  "text.USER_PERMISSION": "User Permission"
+  "text.USER_PERMISSION": "User Permission",
+  "text.PERMISSION_ADDED":"Permissions added successfully"
 }

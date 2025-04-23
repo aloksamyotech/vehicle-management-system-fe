@@ -45,7 +45,10 @@ const icons = {
   SummarizeIcon: SummarizeIcon
 };
 
-export default {
+const data = JSON.parse(localStorage.getItem('user'));
+const permissions = JSON.parse(localStorage.getItem('permissions'));
+
+export const dashboard = {
   title: i18n.t('Dashboard-Menu'),
 
   items: [
@@ -55,33 +58,33 @@ export default {
       icon: icons['NavigationOutlinedIcon'],
       children: [
         {
-          id: 'dashboard',
+          id: 'DASHBOARD_READ',
           title: i18n.t('DASHBOARD'),
           type: 'item',
           icon: icons['HomeIcon'],
           url: '/dashboard/default'
         },
         {
-          id: 'availability',
+          id: 'AVAILABILITY_READ',
           title: i18n.t('Availability'),
           type: 'item',
           icon: icons['CalendarMonthIcon'],
           url: '/vehicleavailability'
         },
         {
-          id: 'vehicle',
+          id: 'VEHICLES_READ',
           title: i18n.t('Vehicles'),
           type: 'collapse',
           icon: icons['LocalShippingIcon'],
           children: [
             {
-              id: 'vehicles',
+              id: 'VEHICLES_READ',
               title: i18n.t('Vehicle List'),
               type: 'item',
               url: '/vehicles'
             },
             {
-              id: 'vehiclegroup',
+              id: 'VEHICLES_READ',
               title: i18n.t('Vehicle Group'),
               type: 'item',
               url: '/vehiclegroup'
@@ -89,76 +92,118 @@ export default {
           ]
         },
         {
-          id: 'drivers',
+          id: 'DRIVERS_READ',
           title: i18n.t('Drivers'),
           type: 'item',
           url: '/drivers',
           icon: icons['ContactEmergencyIcon']
         },
         {
-          id: 'booking',
+          id: 'BOOKINGS_READ',
           title: i18n.t('Bookings'),
           type: 'item',
           url: '/booking',
           icon: icons['BookOnlineIcon']
         },
         {
-          id: 'customer',
+          id: 'CUSTOMER_READ',
           title: i18n.t('Customer'),
           type: 'item',
           url: '/customer',
           icon: icons['Person2Icon']
         },
         {
-          id: 'maintenance',
+          id: 'MAINTENANCE_READ',
           title: i18n.t('Maintenance'),
           type: 'item',
           url: '/maintenance',
           icon: icons['BuildIcon']
         },
         {
-          id: 'partsinventory',
+          id: 'PARTS_INVENTORY_READ',
           title: i18n.t('Parts Inventory'),
           type: 'item',
           url: '/partsinventory',
           icon: icons['InventoryIcon']
         },
         {
-          id: 'fuel',
+          id: 'FUEL_READ',
           title: i18n.t('Fuel'),
           type: 'item',
           url: '/fuel',
           icon: icons['LocalGasStationIcon']
         },
         {
-          id: 'reminder',
+          id: 'REMINDER_READ',
           title: i18n.t('Reminder'),
           type: 'item',
           url: '/reminder',
           icon: icons['CampaignIcon']
         },
         {
-          id: 'finance',
+          id: 'INCOME_EXPENSE_READ',
           title: i18n.t('Income & Expense'),
           type: 'item',
           url: '/finance',
           icon: icons['AttachMoneyIcon']
         },
         {
-          id: 'reports',
+          id: 'REPORTS_READ',
           title: i18n.t('Reports'),
           type: 'item',
           url: '/reports',
           icon: icons['SummarizeIcon']
         },
         {
-          id: 'users',
+          id: 'USERS',
           title: i18n.t('User Management'),
           type: 'item',
           url: '/users',
           icon: icons['VerifiedUserIcon']
-        },
+        }
       ]
     }
   ]
 };
+
+
+export const filterMenuItems = (menuItems, permissions) => {
+  if (!Array.isArray(menuItems)) return [];
+
+  return menuItems
+    .map((item) => {
+      if (item.type === 'item') {
+        const hasPermission = permissions.some((perm) => perm.startsWith(item.id));
+        return hasPermission ? item : null;
+      }
+
+      if (item.children) {
+        const filteredChildren = filterMenuItems(item.children, permissions);
+        if (filteredChildren.length > 0) {
+          return {
+            ...item,
+            children: filteredChildren
+          };
+        }
+      }
+
+      return null;
+    })
+    .filter(Boolean);
+};
+
+let finalMenu = [];
+
+if (data?.role === 'ADMIN') {
+  finalMenu = dashboard;
+} else if (data?.role === 'USER') {
+  finalMenu = {
+    ...dashboard,
+    items: dashboard.items.map((group) => ({
+      ...group,
+      children: filterMenuItems(group.children, permissions)
+    }))
+  };
+}
+
+export default finalMenu;

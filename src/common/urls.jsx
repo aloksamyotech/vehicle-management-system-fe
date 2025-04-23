@@ -103,5 +103,9 @@ export const urls = Object.freeze({
     getById: `${baseUrl}/users/getById/:id`,
     update: `${baseUrl}/users/update/:id`,
     updateStatus: `${baseUrl}/users/updateStatus/:id`,
+  },
+  userManagement : {
+    create: `${baseUrl}/usermanagement/add`,
+    get: `${baseUrl}/usermanagement/fetch/:userId`
   }
 });

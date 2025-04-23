@@ -25,6 +25,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { postApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import { filterMenuItems, dashboard } from 'menu-items';
 
 const AuthLogin = ({ ...rest }) => {
   const { t } = useTranslation();
@@ -52,8 +53,26 @@ const AuthLogin = ({ ...rest }) => {
 
               localStorage.setItem('token', access_token);
               localStorage.setItem('user', JSON.stringify(user));
+
+              const formattedPermissions = user.permissions.map((p) => {
+                const featureCode = p.feature?.code;
+                const permissionCode = p.permission?.code;
+                return `${featureCode}_${permissionCode}`;
+              });
+
+              localStorage.setItem('permissions', JSON.stringify(formattedPermissions));
+
               toast.success(t('text.LOGIN_SUCCESS'));
-              navigate('/dashboard/default');
+              if (user.role === 'ADMIN') {
+                window.location.replace('/dashboard/default');
+              } else {
+                const permissions = JSON.parse(localStorage.getItem('permissions'));
+                const filteredMenu = filterMenuItems(dashboard.items[0].children, permissions);
+                const firstAvailableRoute =
+                  filteredMenu.length > 0 ? filteredMenu[0].url || filteredMenu[0].children?.[0]?.url : '/dashboard/default';
+
+                window.location.replace(firstAvailableRoute);
+              }
             } else {
               setErrors({ submit: response?.message });
             }

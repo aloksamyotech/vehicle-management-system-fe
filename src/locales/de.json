@@ -307,5 +307,6 @@
   "text.USER_ADDED": "Benutzer erfolgreich hinzugefügt",
   "text.USER_UPDATED": "Benutzer erfolgreich aktualisiert",
   "text.SAVE_PERMISSIONS": "Berechtigungen speichern",
-  "text.USER_PERMISSION": "Benutzerberechtigung"
+  "text.USER_PERMISSION": "Benutzerberechtigung",
+  "text.PERMISSION_ADDED": "Berechtigungen erfolgreich hinzugefügt"
 }

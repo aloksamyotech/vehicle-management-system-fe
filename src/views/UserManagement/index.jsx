@@ -86,7 +86,19 @@ const UserIndex = () => {
       width: 150,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <IconButton color="primary" sx={{ py: 2 }} onClick={() => navigate(`/view-user/${params.row.id}`)}>
+          <IconButton color="primary" sx={{ py: 2 }} 
+           onClick={() =>
+            navigate(`/view-user/${params.row.id}`, {
+              state: {
+                id: params.row.id,
+                name: params.row.name,
+                email: params.row.email,
+                address: params.row.address,
+                phone: params.row.phone
+              }
+            })
+          }
+          >
             <VisibilityIcon />
           </IconButton>
           <Divider orientation="vertical" flexItem sx={{ height: 20, mx: 0.5, alignSelf: 'center' }} />
