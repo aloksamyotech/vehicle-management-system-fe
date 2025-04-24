@@ -1,15 +1,17 @@
-import React, { useEffect } from 'react';
+import React, {useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Button, TextField, FormLabel, Grid, Box } from '@mui/material';
+import { Button, TextField, FormLabel, Grid, Box, IconButton, InputAdornment } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { postApi, updateApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import { text } from 'common/constant';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import toast from 'react-hot-toast';
 
 const AddUserForm = ({ onSave, onCancel, refreshData, userData }) => {
   const { t } = useTranslation();
-
+  const [showPassword, setShowPassword] = useState(false);
   const {
     register,
     handleSubmit,
@@ -115,13 +117,22 @@ const AddUserForm = ({ onSave, onCancel, refreshData, userData }) => {
             <TextField
               fullWidth
               size="small"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               {...register('password', {
                 required: t('text.REQUIRED'),
                 minLength: { value: 6, message: t('text.MIN_6_CHAR') }
               })}
               error={!!errors.password}
               helperText={errors.password?.message}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                      {showPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
             />
           </Grid>
         )}
@@ -152,7 +163,7 @@ const AddUserForm = ({ onSave, onCancel, refreshData, userData }) => {
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
         <Button type="submit" variant="contained" color="primary" disabled={isSubmitting}>
-          {t('text.ADD')} {t('text.USER')}
+          {userData?.id ? t('text.UPDATE') : t('text.ADD')} {t('text.USER')}
         </Button>
 
         <Button variant="outlined" onClick={onCancel} disabled={isSubmitting}>

@@ -264,6 +264,8 @@
   "Income & Expense": "Income & Expense",
   "Reports": "Reports",
   "User Management": "User Management",
+  "Driver Alert": "Driver Alert",
+  "Vehicle Breakdown":"Vehicle Breakdown",
 
   "text.LOGOUT_SUCCESS": "Logged out successfully!",
   "text.LOGIN_SUCCESS": "Logged in successfully!",
@@ -311,5 +313,17 @@
   "text.USER_UPDATED": "User updated successfully",
   "text.SAVE_PERMISSIONS": "Save Permissions",
   "text.USER_PERMISSION": "User Permission",
-  "text.PERMISSION_ADDED":"Permissions added successfully"
+  "text.PERMISSION_ADDED":"Permissions added successfully",
+  "text.EDIT_PROFILE":"Edit Profile",
+  "text.SAVE_PROFILE":"Save Profile",
+  "text.CHANGE_PASSWORD":"Change Password",
+  "text.UPDATE_CURRENCY": "Update Currency",
+  "text.PASSWORDS_DO_NOT_MATCH": "Passwords do not match",
+  "text.PASSWORD_UPDATED_SUCCESSFULLY": "Password updated successfully",
+  "text.OLD_PASSWORD": "Old Password",
+  "text.NEW_PASSWORD": "New Password",
+  "text.CONFIRM_PASSWORD": "Confirm Password",
+  "text.UPDATE_PASSWORD": "Update Password",
+  "text.DRIVER_ALERT": "Driver Alert",
+  "text.VEHICLE_BREAKDOWN": "Vehicle Breakdown"
 }

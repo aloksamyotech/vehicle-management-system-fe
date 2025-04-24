@@ -66,12 +66,6 @@ const ProfileSection = () => {
                     </ListItemIcon>
                     <ListItemText primary={t('text.SETTINGS')} />
                   </ListItemButton>
-                  <ListItemButton onClick={profile}>
-                    <ListItemIcon>
-                      <PersonTwoToneIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={t('text.PROFILE')} />
-                  </ListItemButton>
                   <ListItemButton onClick={logout}>
                     <ListItemIcon>
                       <LogoutIcon />

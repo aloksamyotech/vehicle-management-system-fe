@@ -44,11 +44,11 @@ const ProtectedRoute = ({ requiredPermission, requiredRole, children }) => {
     return <ClearStorageAndRedirect />;
   }
 
-  if (userData.role === 'ADMIN') {
+  if (userData?.role === 'ADMIN') {
     return children;
   }
 
-  if (userData.role === 'USER') {
+  if (userData?.role === 'USER') {
     if (!requiredPermission || userPermissions.includes(requiredPermission)) {
       return children;
     } else {

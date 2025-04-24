@@ -134,6 +134,13 @@ export const dashboard = {
           icon: icons['LocalGasStationIcon']
         },
         {
+          id: 'VEHICLE_BREAKDOWN',
+          title: i18n.t('Vehicle Breakdown'),
+          type: 'item',
+          url: '/breakdown',
+          icon: icons['CampaignIcon']
+        },
+        {
           id: 'REMINDER_READ',
           title: i18n.t('Reminder'),
           type: 'item',
@@ -146,6 +153,13 @@ export const dashboard = {
           type: 'item',
           url: '/finance',
           icon: icons['AttachMoneyIcon']
+        },
+        {
+          id: 'DRIVER_ALERT',
+          title: i18n.t('Driver Alert'),
+          type: 'item',
+          url: '/driver-alert',
+          icon: icons['CampaignIcon']
         },
         {
           id: 'REPORTS_READ',
