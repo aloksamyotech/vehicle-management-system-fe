@@ -19,6 +19,8 @@ const DriverForm = () => {
   const [loading, setLoading] = useState(false);
   const location = useLocation();
   const initialData = location.state || null;
+  const [previewImage, setPreviewImage] = useState(null);
+  const [previewDoc, setPreviewDoc] = useState(null);
 
   const {
     control,
@@ -49,6 +51,12 @@ const DriverForm = () => {
       Object.keys(initialData).forEach((key) => {
         if (key === 'licenseExpiry' || key === 'dateOfJoining') {
           setValue(key, initialData[key] ? new Date(initialData[key]) : null);
+        } else if (key === 'image' && initialData[key]) {
+          setValue(key, initialData[key]);
+          setPreviewImage(initialData[key]);
+        } else if (key === 'doc' && initialData[key]) {
+          setValue(key, initialData[key]);
+          setPreviewDoc(initialData[key]);
         } else {
           setValue(key, initialData[key]);
         }
@@ -56,9 +64,24 @@ const DriverForm = () => {
     }
   }, [initialData, setValue]);
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setValue('image', file);
+      setPreviewImage(URL.createObjectURL(file));
+    }
+  };
+
+  const handleDocChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setValue('doc', file);
+      setPreviewDoc(URL.createObjectURL(file));
+    }
+  };
 
   const onSubmit = async (data) => {
-    const { sNo, image, doc, ...filteredData } = data;
+    const { sNo, image, doc,id, ...filteredData } = data;
 
     const formData = new FormData();
 
@@ -72,13 +95,13 @@ const DriverForm = () => {
 
     if (image instanceof File) {
       formData.append('image', image);
-    } else if (initialData?.image) {
+    } else if (initialData?.image && !image) {
       formData.append('image', initialData.image);
     }
 
     if (doc instanceof File) {
       formData.append('doc', doc);
-    } else if (initialData?.doc) {
+    } else if (initialData?.doc && !doc) {
       formData.append('doc', initialData.doc);
     }
 
@@ -91,7 +114,7 @@ const DriverForm = () => {
       toast.success(t("text.DRIVER_ADDED"));
     }
 
-    reset(filteredData);
+    reset();
     navigate('/drivers');
   };
 
@@ -436,14 +459,30 @@ const DriverForm = () => {
                 <Controller
                   name="image"
                   control={control}
-                  render={({ field }) => (
-                    <TextField
-                      fullWidth
-                      size="small"
-                      type="file"
-                      inputProps={{ accept: 'image/*' }}
-                      onChange={(e) => setValue('image', e.target.files[0])}
-                    />
+                  render={() => (
+                    <>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        type="file"
+                        inputProps={{ accept: 'image/*' }}
+                        onChange={handleImageChange}
+                      />
+                      {previewImage && (
+                        <Box mt={1}>
+                          <img 
+                            src={previewImage} 
+                            alt="Driver preview" 
+                            style={{ 
+                              width: '100px', 
+                              height: '100px', 
+                              objectFit: 'cover',
+                              borderRadius: '8px'
+                            }} 
+                          />
+                        </Box>
+                      )}
+                    </>
                   )}
                 />
               </Grid>
@@ -454,13 +493,22 @@ const DriverForm = () => {
                   name="doc"
                   control={control}
                   render={() => (
-                    <TextField
-                      fullWidth
-                      size="small"
-                      type="file"
-                      inputProps={{ accept: 'application/pdf, image/*' }}
-                      onChange={(e) => setValue('doc', e.target.files[0])}
-                    />
+                    <>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        type="file"
+                        inputProps={{ accept: 'application/pdf, image/*' }}
+                        onChange={handleDocChange}
+                      />
+                      {previewDoc && (
+                        <Box mt={1}>
+                          <Typography variant="caption" color="textSecondary">
+                            {previewDoc.split('/').pop()}
+                          </Typography>
+                        </Box>
+                      )}
+                    </>
                   )}
                 />
               </Grid>

@@ -20,6 +20,8 @@ const VehicleForm = () => {
   const location = useLocation();
   const initialData = location.state || null;
   const [vehicleGroups, setVehicleGroups] = useState([]);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [previewDoc, setPreviewDoc] = useState(null);
 
   useEffect(() => {
     const fetchVehicleGroups = async () => {
@@ -62,7 +64,18 @@ const VehicleForm = () => {
   useEffect(() => {
     if (initialData) {
       Object.keys(initialData).forEach((key) => {
-        setValue(key, initialData[key]);
+        if (key === 'image' && initialData[key]) {
+          setValue(key, initialData[key]);
+          const imageUrl = initialData[key].startsWith('http') 
+            ? initialData[key] 
+            : `${urls.vehicle.image}/${initialData[key]}`;
+          setPreviewImage(imageUrl);
+        } else if (key === 'doc' && initialData[key]) {
+          setValue(key, initialData[key]);
+          setPreviewDoc(initialData[key]);
+        } else {
+          setValue(key, initialData[key]);
+        }
       });
     }
   }, [initialData, setValue]);
@@ -76,41 +89,63 @@ const VehicleForm = () => {
   }, [initialData, setValue]);
 
   const onSubmit = async (data) => {
-    const { sNo, group, gpsApiUrl, apiUsername, apiPassword, image, doc, ...filteredData } = data;
+    try {
+      const { sNo, id, group, gpsApiUrl, apiUsername, apiPassword, ...filteredData } = data;
 
-    const formData = new FormData();
+      const formData = new FormData();
 
-    Object.entries(filteredData).forEach(([key, value]) => {
-      if (value instanceof Date) {
-        formData.append(key, value.toISOString());
-      } else {
-        formData.append(key, value);
+      Object.entries(filteredData).forEach(([key, value]) => {
+        if (value instanceof Date) {
+          formData.append(key, value.toISOString());
+        } else if (key === 'isActive') {
+          formData.append(key, value ? 'true' : 'false');
+        } else if (key !== 'image' && key !== 'doc' && value !== null && value !== undefined) {
+          formData.append(key, value);
+        }
+      });
+
+      if (data.image instanceof File) {
+        formData.append('image', data.image);
+      } else if (initialData?.image && !data.image) {
+        formData.append('image', initialData.image);
       }
-    });
 
-    if (image instanceof File) {
-      formData.append('image', image);
-    } else if (initialData?.image) {
-      formData.append('image', initialData.image);
+      if (data.doc instanceof File) {
+        formData.append('doc', data.doc);
+      } else if (initialData?.doc && !data.doc) {
+        formData.append('doc', initialData.doc);
+      }
+
+      let response;
+      if (id) {
+        response = await updateApiPatch(urls.vehicle.update.replace(':id', id), formData, true);
+        toast.success(t('text.VEHICLE_UPDATED'));
+      } else {
+        response = await postApi(urls.vehicle.create, formData, true);
+        toast.success(t('text.VEHICLE_ADDED'));
+      }
+
+      reset();
+      navigate('/vehicles');
+    } catch (error) {
+      toast.error(error.message || t('text.ERROR_UPDATING'));
     }
+  };
 
-    if (doc instanceof File) {
-      formData.append('doc', doc);
-    } else if (initialData?.doc) {
-      formData.append('doc', initialData.doc);
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setValue('image', file);
+      setPreviewImage(URL.createObjectURL(file));
     }
+  };
 
-    let response;
-    if (id) {
-      response = await updateApiPatch(urls.vehicle.update.replace(':id', id), formData, true);
-      toast.success(t('text.VEHICLE_UPDATED'));
-    } else {
-      response = await postApi(urls.vehicle.create, formData, true);
-      toast.success(t('text.VEHICLE_ADDED'));
+  const handleDocChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setValue('doc', file);
+      setPreviewDoc(URL.createObjectURL(file));
     }
-
-    reset();
-    navigate('/vehicles');
   };
 
   return (
@@ -378,12 +413,21 @@ const VehicleForm = () => {
                         size="small"
                         type="file"
                         inputProps={{ accept: 'image/*' }}
-                        onChange={(e) => setValue('image', e.target.files[0])}
+                        onChange={handleImageChange}
                       />
-                      {initialData?.image && (
-                        <Typography variant="caption" color="textSecondary">
-                          {initialData.image.split('/').pop()}
-                        </Typography>
+                      {previewImage && (
+                        <Box mt={1}>
+                          <img 
+                            src={previewImage} 
+                            alt="Vehicle preview" 
+                            style={{ 
+                              width: '100px', 
+                              height: '100px', 
+                              objectFit: 'cover',
+                              borderRadius: '8px'
+                            }} 
+                          />
+                        </Box>
                       )}
                     </>
                   )}
@@ -402,12 +446,14 @@ const VehicleForm = () => {
                         size="small"
                         type="file"
                         inputProps={{ accept: 'application/pdf, image/*' }}
-                        onChange={(e) => setValue('doc', e.target.files[0])}
+                        onChange={handleDocChange}
                       />
-                      {initialData?.doc && (
-                        <Typography variant="caption" color="textSecondary">
-                          {initialData.doc.split('/').pop()}
-                        </Typography>
+                      {previewDoc && (
+                        <Box mt={1}>
+                          <Typography variant="caption" color="textSecondary">
+                          {previewDoc.split('/').pop()}
+                          </Typography>
+                        </Box>
                       )}
                     </>
                   )}
