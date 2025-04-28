@@ -30,6 +30,8 @@ const AddUser = Loadable(lazy(() => import('views/ViewUser')));
 const Unauthorized = Loadable(lazy(() => import('views/Unauthorized')));
 const ViewCustomer = Loadable(lazy(() => import('views/ViewCustomer')));
 const ViewDriver = Loadable(lazy(() => import('views/ViewDriver')));
+const DriverAlert = Loadable(lazy(() => import('views/DriverAlert')));
+const VehicleBreakdown = Loadable(lazy(() => import('views/VehicleBreakdown')));
 
 const MainRoutes = {
   path: '/',
@@ -282,6 +284,22 @@ const MainRoutes = {
     {
       path: '/unauthorized',
       element: <Unauthorized />
+    },
+    {
+      path: '/driver-alert',
+      element: (
+        <ProtectedRoute requiredRole="ADMIN">
+          <DriverAlert />
+        </ProtectedRoute>
+      )
+    },
+    {
+      path: '/breakdown',
+      element: (
+        <ProtectedRoute requiredRole="ADMIN">
+          <VehicleBreakdown />
+        </ProtectedRoute>
+      )
     }
   ]
 };

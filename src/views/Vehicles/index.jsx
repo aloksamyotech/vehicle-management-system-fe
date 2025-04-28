@@ -43,8 +43,8 @@ const VehiclePage = () => {
         vehicleColor: vehicle.vehicleColor,
         registrationExpiry: vehicle.registrationExpiry,
         isActive: vehicle.isActive,
-        image: vehicle.image || null,
-        doc: vehicle.doc || null,
+        image: vehicle.imageUrl ? vehicle.imageUrl.replace(/\\/g, '/') : null,
+        doc: vehicle.docUrl ? vehicle.docUrl.replace(/\\/g, '/') : null,
         vehicleGroupId: vehicle.vehicleGroup.id,
         group: vehicle.vehicleGroup?.name || 'N/A'
       }));

@@ -6,7 +6,7 @@ import LanguageIcon from '@mui/icons-material/Language';
 
 const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
-  const [lang, setLang] = useState(i18n.language || 'en');
+  const [lang, setLang] = useState('en');
 
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);

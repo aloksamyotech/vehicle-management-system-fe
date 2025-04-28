@@ -265,6 +265,8 @@
   "Income & Expense": "Einnahmen & Ausgaben",
   "Reports": "Berichte",
   "User Management": "Benutzerverwaltung",
+  "Driver Alert": "Fahrerwarnung",
+  "Vehicle Breakdown":"Fahrzeugpanne",
 
   "text.LOGOUT_SUCCESS": "Erfolgreich abgemeldet!",
   "text.LOGIN_SUCCESS": "Erfolgreich angemeldet!",
@@ -310,5 +312,17 @@
   "text.USER_UPDATED": "Benutzer erfolgreich aktualisiert",
   "text.SAVE_PERMISSIONS": "Berechtigungen speichern",
   "text.USER_PERMISSION": "Benutzerberechtigung",
-  "text.PERMISSION_ADDED": "Berechtigungen erfolgreich hinzugefügt"
+  "text.PERMISSION_ADDED": "Berechtigungen erfolgreich hinzugefügt",
+  "text.EDIT_PROFILE": "Profil bearbeiten",
+  "text.SAVE_PROFILE": "Profil speichern",
+  "text.CHANGE_PASSWORD": "Passwort ändern",
+  "text.UPDATE_CURRENCY": "Währung aktualisieren",
+  "text.PASSWORDS_DO_NOT_MATCH": "Passwörter stimmen nicht überein",
+  "text.PASSWORD_UPDATED_SUCCESSFULLY": "Passwort erfolgreich aktualisiert",
+  "text.OLD_PASSWORD": "Altes Passwort",
+  "text.NEW_PASSWORD": "Neues Passwort",
+  "text.CONFIRM_PASSWORD": "Passwort bestätigen",
+  "text.UPDATE_PASSWORD": "Passwort aktualisieren",
+  "text.DRIVER_ALERT": "Fahrerwarnung",
+  "text.VEHICLE_BREAKDOWN": "Fahrzeugpanne"
 }
