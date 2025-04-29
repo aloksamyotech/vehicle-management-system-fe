@@ -70,7 +70,8 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
             width: drawerWidth,
             borderRight: 'none',
             boxShadow: '0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15)',
-            top: { md: 62, sm: 0 }
+            top: { md: 62, sm: 0 },
+            margin: 0
           }
         }}
         ModalProps={{ keepMounted: true }}

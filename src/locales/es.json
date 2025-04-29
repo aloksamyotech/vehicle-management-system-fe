@@ -324,5 +324,6 @@
   "text.CONFIRM_PASSWORD": "Confirmar contraseña",
   "text.UPDATE_PASSWORD": "Actualizar contraseña",
   "text.DRIVER_ALERT": "Alerta del conductor",
-  "text.VEHICLE_BREAKDOWN": "Avería del vehículo"
+  "text.VEHICLE_BREAKDOWN": "Avería del vehículo",
+  "text.DRIVING_LICENSE": "Licencia de conducir"
 }

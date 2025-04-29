@@ -201,7 +201,7 @@ const FuelExpenseForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  {t('text.QUANTITY')}
+                  {t('text.QUANTITY')}(litres)
                 </FormLabel>
                 <Controller
                   name="quantity"

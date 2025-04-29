@@ -324,5 +324,6 @@
   "text.CONFIRM_PASSWORD": "Confirmer le mot de passe",
   "text.UPDATE_PASSWORD": "Mettre à jour le mot de passe",
   "text.DRIVER_ALERT": "Alerte conducteur",
-  "text.VEHICLE_BREAKDOWN": "Panne de véhicule"
+  "text.VEHICLE_BREAKDOWN": "Panne de véhicule",
+  "text.DRIVING_LICENSE": "Permis de conduire"
 }

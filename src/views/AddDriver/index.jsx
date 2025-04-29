@@ -345,7 +345,7 @@ const DriverForm = () => {
 
               <Grid item xs={12} sm={4} md={3}>
                 <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }} required>
-                  {t('text.TOTAL_EXP')}
+                  {t('text.TOTAL_EXP')}(in years)
                 </FormLabel>
                 <Controller
                   name="totalExp"
@@ -455,7 +455,7 @@ const DriverForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{t('text.DRIVER_PHOTO')}</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{t('text.DRIVER_PHOTO')}(optional)</FormLabel>
                 <Controller
                   name="image"
                   control={control}
@@ -488,7 +488,7 @@ const DriverForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{t('text.DRIVER_DOC')}</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{t('text.DRIVING_LICENSE')}(optional)</FormLabel>
                 <Controller
                   name="doc"
                   control={control}

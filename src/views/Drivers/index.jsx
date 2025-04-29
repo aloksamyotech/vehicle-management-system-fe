@@ -15,6 +15,7 @@ import { text } from 'common/constant';
 import ToggleSwitch from 'common/toggleSwitch';
 import { useTranslation } from 'react-i18next';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import UserImage from 'assets/images/user.jpeg';
 
 const DriverManagementPage = () => {
   const { t } = useTranslation();
@@ -74,10 +75,21 @@ const DriverManagementPage = () => {
       field: 'image',
       headerName: t('text.PHOTO'),
       width: 120,
-      renderCell: (params) => (
-        <img src={params.row.image} alt="driver" style={{ width: 50, height: 50, borderRadius: '10px', padding: '5px' }} />
-      )
-    },
+      renderCell: (params) => {
+        const imageSrc = params.row.image || UserImage; 
+        return (
+          <img
+            src={imageSrc}
+            alt="driver"
+            style={{ width: 50, height: 50, borderRadius: '10px', padding: '5px' }}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = UserImage;
+            }}
+          />
+        );
+      }
+    },    
     { field: 'name', headerName: t('text.NAME'), width: 150 },
     { field: 'mobileNo', headerName: t('text.MOBILE'), width: 150 },
     { field: 'licenseNo', headerName: t('text.LICENSE_NO'), width: 150 },

@@ -98,7 +98,7 @@ export function theme(customization) {
     },
     typography: {
       //fontFamily: `'Montserrat', sans-serif`,
-      fontFamily: `'Source Sans Pro', Arial, sans-serif`, 
+      fontFamily: `'Source Sans Pro', Arial, sans-serif`,
       h6: {
         fontWeight: 600,
         color: textSecondary,
@@ -158,9 +158,9 @@ export function theme(customization) {
         fontSize: '0.6875rem',
         fontWeight: 600,
         color: value.primary,
-        padding: '5px 15px 5px',
+        padding: 0,
         textTransform: 'uppercase',
-        marginTop: '10px'
+        marginTop: 0
       },
       subMenuCaption: {
         fontSize: '0.6875rem',
@@ -173,7 +173,16 @@ export function theme(customization) {
       MuiList: {
         styleOverrides: {
           root: {
-            overflow: 'hidden'
+            overflow: 'hidden',
+            marginTop: 0
+          }
+        }
+      },
+      MuiDrawer: {
+        styleOverrides: {
+          paper: {
+            backgroundColor: '#343a40',
+            color: '#ffffff'
           }
         }
       },
@@ -221,26 +230,22 @@ export function theme(customization) {
       MuiListItemButton: {
         styleOverrides: {
           root: {
-            color: textInversePrimary,
             paddingTop: '12px',
+            paddingLeft: '12px',
             paddingBottom: '12px',
-            '&.Mui-selected': {
-              '& .MuiListItemIcon-root': {
-                color: customization.navType === 'dark' ? value.menuHover : value.primary
-              },
-              color: customization.navType === 'dark' ? value.menuHover : value.primary,
-              backgroundColor: customization.navType !== 'dark' ? value.menuHover : value.primary
-            },
+            paddingRight: '8px',
+            padding: '0.4%',
+            color: '#ffffff',
             '&:hover': {
-              backgroundColor: customization.navType !== 'dark' ? value.menuHover : value.primary,
-              color: customization.navType === 'dark' ? value.menuHover : value.primary,
-              '& .MuiListItemIcon-root': {
-                color: customization.navType === 'dark' ? value.menuHover : value.primary
-              }
+              backgroundColor: '#494e53',
+              color: '#ffffff'
             },
-            button: {
+            '&.Mui-selected': {
+              backgroundColor: '#0769b4',
+              color: '#ffffff',
               '&:hover': {
-                backgroundColor: customization.navType !== 'dark' ? value.menuHover : value.primary
+                backgroundColor: '#494e53',
+                color: '#ffffff'
               }
             }
           }
@@ -249,7 +254,8 @@ export function theme(customization) {
       MuiListItemIcon: {
         styleOverrides: {
           root: {
-            minWidth: '36px',
+            minWidth: '30px', 
+            marginLeft: '-8px',
             color: textInversePrimary
           }
         }
@@ -305,6 +311,7 @@ export function theme(customization) {
           }
         }
       }
+   
     }
   });
 }
