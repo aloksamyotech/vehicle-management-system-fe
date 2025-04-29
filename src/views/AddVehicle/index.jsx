@@ -402,7 +402,7 @@ const VehicleForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{t('text.PHOTO')}</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{t('text.PHOTO')}(optional)</FormLabel>
                 <Controller
                   name="image"
                   control={control}
@@ -435,7 +435,7 @@ const VehicleForm = () => {
               </Grid>
 
               <Grid item xs={12} sm={4} md={3}>
-                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{t('text.DOCUMENT')}</FormLabel>
+                <FormLabel sx={{ fontWeight: 'bold', fontSize: '14px' }}>{t('text.DOCUMENT')}(optional)</FormLabel>
                 <Controller
                   name="doc"
                   control={control}

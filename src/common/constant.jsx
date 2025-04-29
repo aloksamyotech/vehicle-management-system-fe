@@ -325,5 +325,6 @@ export const text = {
   CONFIRM_PASSWORD: 'Confirm Password',
   UPDATE_PASSWORD: 'Update Password',
   DRIVER_ALERT: 'Driver Alert',
-  VEHICLE_BREAKDOWN: 'Vehicle Breakdown'
+  VEHICLE_BREAKDOWN: 'Vehicle Breakdown',
+  DRIVING_LICENSE: 'Driving License',
 };

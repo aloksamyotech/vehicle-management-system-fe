@@ -18,7 +18,10 @@ import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
-import SummarizeIcon from '@mui/icons-material/Summarize';
+import CarCrashIcon from '@mui/icons-material/CarCrash';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+
 import i18n from 'i18n';
 
 const icons = {
@@ -42,7 +45,9 @@ const icons = {
   CampaignIcon: CampaignIcon,
   AttachMoneyIcon: AttachMoneyIcon,
   VerifiedUserIcon: VerifiedUserIcon,
-  SummarizeIcon: SummarizeIcon
+  AssessmentIcon: AssessmentIcon,
+  CarCrashIcon:CarCrashIcon,
+  WarningAmberIcon:WarningAmberIcon,
 };
 
 const data = JSON.parse(localStorage.getItem('user'));
@@ -138,7 +143,7 @@ export const dashboard = {
           title: i18n.t('Vehicle Breakdown'),
           type: 'item',
           url: '/breakdown',
-          icon: icons['CampaignIcon']
+          icon: icons['CarCrashIcon']
         },
         {
           id: 'REMINDER_READ',
@@ -159,14 +164,14 @@ export const dashboard = {
           title: i18n.t('Driver Alert'),
           type: 'item',
           url: '/driver-alert',
-          icon: icons['CampaignIcon']
+          icon: icons['WarningAmberIcon']
         },
         {
           id: 'REPORTS_READ',
           title: i18n.t('Reports'),
           type: 'item',
           url: '/reports',
-          icon: icons['SummarizeIcon']
+          icon: icons['AssessmentIcon']
         },
         {
           id: 'USERS',

@@ -29,16 +29,16 @@ const ProfileSection = () => {
   };
 
   const logout = () => {
-    setOpen(false); 
+    setOpen(false);
     localStorage.clear();
     toast.success(t('text.LOGOUT_SUCCESS'));
     navigate('/login');
   };
 
   const profile = () => {
-    setOpen(false); 
+    setOpen(false);
     navigate('/profile');
-  }
+  };
 
   return (
     <>
@@ -53,24 +53,39 @@ const ProfileSection = () => {
                 <List
                   sx={{
                     width: '100%',
-                    maxWidth: 350,
+                    maxWidth: 300,
                     minWidth: 250,
                     backgroundColor: theme.palette.background.paper,
-                    pb: 0,
+                    p: 2,
                     borderRadius: '10px'
                   }}
                 >
-                  <ListItemButton onClick={profile}>
+                  <ListItemButton
+                    onClick={profile}
+                    sx={{
+                      '&:hover': {
+                        backgroundColor: '#e3f2fd'
+                      }
+                    }}
+                  >
                     <ListItemIcon>
                       <SettingsTwoToneIcon />
                     </ListItemIcon>
-                    <ListItemText primary={t('text.SETTINGS')} />
+                    <ListItemText secondary={t('text.SETTINGS')} />
                   </ListItemButton>
-                  <ListItemButton onClick={logout}>
+
+                  <ListItemButton
+                    onClick={logout}
+                    sx={{
+                      '&:hover': {
+                        backgroundColor: '#e3f2fd'
+                      }
+                    }}
+                  >
                     <ListItemIcon>
                       <LogoutIcon />
                     </ListItemIcon>
-                    <ListItemText primary={t('text.LOGOUT')} />
+                    <ListItemText secondary={t('text.LOGOUT')} />
                   </ListItemButton>
                 </List>
               </ClickAwayListener>
