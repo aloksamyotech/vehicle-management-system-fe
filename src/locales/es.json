@@ -325,5 +325,7 @@
   "text.UPDATE_PASSWORD": "Actualizar contraseña",
   "text.DRIVER_ALERT": "Alerta del conductor",
   "text.VEHICLE_BREAKDOWN": "Avería del vehículo",
-  "text.DRIVING_LICENSE": "Licencia de conducir"
+  "text.DRIVING_LICENSE": "Licencia de conducir",
+  "text.CHECKPOINTS_ADDED": "¡Puntos de control enviados con éxito!",
+  "text.FILL_CHECKPOINTS_FEILD": "¡Por favor, complete todos los campos antes de enviar!"
 }

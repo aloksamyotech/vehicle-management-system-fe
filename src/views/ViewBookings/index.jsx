@@ -72,8 +72,7 @@ const ViewBookingPage = () => {
     setOpenStatusDialog(false);
   };
 
-  const handleStatusUpdate = (newStatus) => {
-  };
+  const handleStatusUpdate = (newStatus) => {};
 
   const fetchBookingData = async () => {
     const response = await getApi(urls.booking.getById.replace(':id', id));
@@ -181,6 +180,10 @@ const ViewBookingPage = () => {
     });
   };
 
+  const handleAddCheckpoint = () => {
+    navigate('/add-checkpoints', { state: { bookingId: bookingId } });
+  };
+
   return (
     <Box>
       <CustomBreadcrumbs
@@ -265,7 +268,9 @@ const ViewBookingPage = () => {
                       <TableRow key={row.id}>
                         {' '}
                         <TableCell sx={{ border: '1px solid #ddd' }}>{index + 1}</TableCell>
-                        <TableCell sx={{ border: '1px solid #ddd' }}>{currencySymbol} {row.amount}</TableCell>
+                        <TableCell sx={{ border: '1px solid #ddd' }}>
+                          {currencySymbol} {row.amount}
+                        </TableCell>
                         <TableCell sx={{ border: '1px solid #ddd' }}>{row.description}</TableCell>
                         <TableCell sx={{ border: '1px solid #ddd' }}>{dayjs(row.createdAt).format('DD-MM-YYYY')}</TableCell>
                         <TableCell sx={{ border: '1px solid #ddd' }}>
@@ -299,7 +304,9 @@ const ViewBookingPage = () => {
                       <TableRow key={row.id}>
                         {' '}
                         <TableCell sx={{ border: '1px solid #ddd' }}>{index + 1}</TableCell>
-                        <TableCell sx={{ border: '1px solid #ddd' }}>{currencySymbol} {row.paidAmount}</TableCell>
+                        <TableCell sx={{ border: '1px solid #ddd' }}>
+                          {currencySymbol} {row.paidAmount}
+                        </TableCell>
                         <TableCell sx={{ border: '1px solid #ddd' }}>{row.notes}</TableCell>
                         <TableCell sx={{ border: '1px solid #ddd' }}>{dayjs(row.createdAt).format('DD-MM-YYYY')}</TableCell>
                         <TableCell sx={{ border: '1px solid #ddd' }}>
@@ -360,6 +367,25 @@ const ViewBookingPage = () => {
                     onClick={handleGenerateInvoice}
                   >
                     {t('text.GENERATE_INVOICE')}
+                  </Button>
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    sx={{
+                      background: '#28a745',
+                      p: '2px 2px',
+                      width: '100%',
+                      '&:hover': {
+                        backgroundColor: '#148638',
+                        p: '2px 2px'
+                      }
+                    }}
+                    onClick={handleAddCheckpoint}
+                  >
+                    {t('text.ADD_CHECKPOINTS')}
                   </Button>
                 </Grid>
 

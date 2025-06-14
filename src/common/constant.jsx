@@ -327,4 +327,8 @@ export const text = {
   DRIVER_ALERT: 'Driver Alert',
   VEHICLE_BREAKDOWN: 'Vehicle Breakdown',
   DRIVING_LICENSE: 'Driving License',
+  ADD_CHECKPOINTS:'Add Checkpoints',
+  SAVE_CHECKPOINTS: 'Save Checkpoints',
+  CHECKPOINTS_ADDED: 'Checkpoints submitted successfully!',
+  FILL_CHECKPOINTS_FEILD:'Please fill all the fields before submitting!'
 };

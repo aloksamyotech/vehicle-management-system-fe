@@ -32,6 +32,7 @@ const ViewCustomer = Loadable(lazy(() => import('views/ViewCustomer')));
 const ViewDriver = Loadable(lazy(() => import('views/ViewDriver')));
 const DriverAlert = Loadable(lazy(() => import('views/DriverAlert')));
 const VehicleBreakdown = Loadable(lazy(() => import('views/VehicleBreakdown')));
+const AddCheckpoints = Loadable(lazy(() => import('views/AddCheckpoints')));
 
 const MainRoutes = {
   path: '/',
@@ -300,7 +301,15 @@ const MainRoutes = {
           <VehicleBreakdown />
         </ProtectedRoute>
       )
-    }
+    },
+    {
+      path: '/add-checkpoints',
+      element: (
+        <ProtectedRoute requiredRole="ADMIN">
+          <AddCheckpoints />
+        </ProtectedRoute>
+      )
+    },
   ]
 };
 

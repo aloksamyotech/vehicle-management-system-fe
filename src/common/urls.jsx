@@ -82,6 +82,9 @@ export const urls = Object.freeze({
     customerReport: `${baseUrl}/booking/customer-bookings`,
     updateStatus: `${baseUrl}/booking/updateStatus/:id`,
     updateExpense: `${baseUrl}/booking/updateExpense/:id`,
+    addCheckpoint: `${baseUrl}/booking/:id/checkpoints`,
+    getCheckpoint: `${baseUrl}/booking/checkpoints/:bookingId`,
+    updateCheckpoint: `${baseUrl}/booking/checkpoints/:id`,
   },
   payment: {
     create: `${baseUrl}/payment/save`,

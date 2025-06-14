@@ -325,5 +325,7 @@
   "text.UPDATE_PASSWORD": "Mettre à jour le mot de passe",
   "text.DRIVER_ALERT": "Alerte conducteur",
   "text.VEHICLE_BREAKDOWN": "Panne de véhicule",
-  "text.DRIVING_LICENSE": "Permis de conduire"
+  "text.DRIVING_LICENSE": "Permis de conduire",
+  "text.CHECKPOINTS_ADDED": "Points de contrôle soumis avec succès !",
+  "text.FILL_CHECKPOINTS_FEILD": "Veuillez remplir tous les champs avant de soumettre !"
 }

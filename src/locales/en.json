@@ -326,5 +326,9 @@
   "text.UPDATE_PASSWORD": "Update Password",
   "text.DRIVER_ALERT": "Driver Alert",
   "text.VEHICLE_BREAKDOWN": "Vehicle Breakdown",
-  "text.DRIVING_LICENSE": "Driving License"
+  "text.DRIVING_LICENSE": "Driving License",
+  "text.ADD_CHECKPOINTS":"Add Checkpoints",
+  "text.SAVE_CHECKPOINTS": "Save Checkpoints",
+  "text.CHECKPOINTS_ADDED": "Checkpoints submitted successfully!",
+  "text.FILL_CHECKPOINTS_FEILD":"Please fill all the fields before submitting!"
 }
