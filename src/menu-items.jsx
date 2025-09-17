@@ -138,13 +138,13 @@ export const dashboard = {
           url: '/fuel',
           icon: icons['LocalGasStationIcon']
         },
-        {
-          id: 'VEHICLE_BREAKDOWN',
-          title: i18n.t('Vehicle Breakdown'),
-          type: 'item',
-          url: '/breakdown',
-          icon: icons['CarCrashIcon']
-        },
+        // {
+        //   id: 'VEHICLE_BREAKDOWN',
+        //   title: i18n.t('Vehicle Breakdown'),
+        //   type: 'item',
+        //   url: '/breakdown',
+        //   icon: icons['CarCrashIcon']
+        // },
         {
           id: 'REMINDER_READ',
           title: i18n.t('Reminder'),
@@ -159,13 +159,13 @@ export const dashboard = {
           url: '/finance',
           icon: icons['AttachMoneyIcon']
         },
-        {
-          id: 'DRIVER_ALERT',
-          title: i18n.t('Driver Alert'),
-          type: 'item',
-          url: '/driver-alert',
-          icon: icons['WarningAmberIcon']
-        },
+        // {
+        //   id: 'DRIVER_ALERT',
+        //   title: i18n.t('Driver Alert'),
+        //   type: 'item',
+        //   url: '/driver-alert',
+        //   icon: icons['WarningAmberIcon']
+        // },
         {
           id: 'REPORTS_READ',
           title: i18n.t('Reports'),

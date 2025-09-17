@@ -9,6 +9,7 @@ import CustomToolbar from 'common/customToolbar';
 import CustomBreadcrumbs from 'common/customBreadcrumbs';
 import { text } from 'common/constant.jsx';
 import { useTranslation } from 'react-i18next';
+import AddDriverReminderForm from './AlertAdd';
 
 const Alert = () => {
   const { t } = useTranslation();
@@ -153,7 +154,7 @@ const Alert = () => {
           <Typography variant="h4" sx={{ mb: 2 }}>
             {t('text.ADD_REM')}
           </Typography>
-         
+         <AddDriverReminderForm onSave={handleClose} onCancel={handleClose} refreshData={refreshData}></AddDriverReminderForm>
         </Box>
       </Modal>
     </>
