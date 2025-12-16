@@ -2,7 +2,7 @@ import React from 'react';
 import { Grid, Card, CardContent, Typography, Box, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import AuthLogin from './AuthLogin';
-import VehicleImage from 'assets/images/vehicle.jpg';
+import VehicleImage from '../../../public/vehicle.jpg';
 import LogoSection from 'layout/MainLayout/Header/LogoSection';
 import { useTranslation } from 'react-i18next';
 

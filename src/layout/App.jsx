@@ -4,7 +4,7 @@ import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import theme from 'themes';
 import Routes from 'routes/index';
@@ -15,14 +15,23 @@ import NavigationScroll from './NavigationScroll';
 const App = () => {
   const customization = useSelector((state) => state.customization);
   const navigate = useNavigate();
-
-  useEffect(() => {
+const location = useLocation();
+  // useEffect(() => {
+  //   const token = localStorage.getItem('token');
+  //   if (!token) {
+  //     navigate('/login');
+  //   }
+  // }, []);
+ useEffect(() => {
     const token = localStorage.getItem('token');
-    if (!token) {
+    const publicPaths = ['/login', '/track-driver/']; 
+
+    const isPublic = publicPaths.some(path => location.pathname.startsWith(path));
+
+    if (!token && !isPublic) {
       navigate('/login');
     }
-  }, []);
-
+  }, [location.pathname, navigate]);
   return (
     <>
       {

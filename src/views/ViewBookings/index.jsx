@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Backdrop, CircularProgress } from '@mui/material';
 import {
   Box,
   Grid,
@@ -49,6 +50,7 @@ const ViewBookingPage = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [tripExpense, setTripExpense] = useState([]);
   const [currencySymbol, setCurrencySymbol] = useState('');
+  const [loading, setLoading] = useState(false);
   const [bookingExpense, setBookingExpense] = useState({
     amount: '',
     description: ''
@@ -72,13 +74,17 @@ const ViewBookingPage = () => {
     setOpenStatusDialog(false);
   };
 
-  const handleStatusUpdate = (newStatus) => {
-  };
+  const handleStatusUpdate = (newStatus) => {};
 
   const fetchBookingData = async () => {
-    const response = await getApi(urls.booking.getById.replace(':id', id));
-    setBookings(response?.data);
-    setBookingId(response?.data?.id || 0);
+    try {
+      setLoading(true);
+      const response = await getApi(urls.booking.getById.replace(':id', id));
+      setBookings(response?.data);
+      setBookingId(response?.data?.id || 0);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -182,288 +188,303 @@ const ViewBookingPage = () => {
   };
 
   return (
-    <Box>
-      <CustomBreadcrumbs
-        title={t('text.BOOKING_DETAILS')}
-        links={[
-          { name: t('text.BOOKINGS'), path: '/booking' },
-          { name: t('text.BOOKING_DETAILS'), path: '' }
-        ]}
-      />
+    <>
+      {loading || !bookings.id ? (
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '60vh'
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Box>
+          <CustomBreadcrumbs
+            title={t('text.BOOKING_DETAILS')}
+            links={[
+              { name: t('text.BOOKINGS'), path: '/booking' },
+              { name: t('text.BOOKING_DETAILS'), path: '' }
+            ]}
+          />
 
-      <Card>
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={7}>
-            <Grid container spacing={2} padding={2} justifyContent="center">
-              {[
-                { title: t('text.TOTAL_AMOUNT'), value: bookings.totalAmt },
-                { title: t('text.PAID_AMOUNT'), value: paidAmount },
-                { title: t('text.PENDING_AMOUNT'), value: excess }
-              ].map((item, index) => (
-                <Grid item xs={12} sm={4} key={index} display="flex" justifyContent="center">
-                  <Card sx={{ textAlign: 'center', width: '100%', backgroundColor: '#f8f9fa' }}>
-                    <CardContent>
-                      <Typography variant="h6" fontWeight="bold">
-                        {item.title}
-                      </Typography>
-                      <Typography variant="h5">
-                        {' '}
-                        {currencySymbol} {item.value}
-                      </Typography>
-                    </CardContent>
-                  </Card>
+          <Card>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={7}>
+                <Grid container spacing={2} padding={2} justifyContent="center">
+                  {[
+                    { title: t('text.TOTAL_AMOUNT'), value: bookings.totalAmt },
+                    { title: t('text.PAID_AMOUNT'), value: paidAmount },
+                    { title: t('text.PENDING_AMOUNT'), value: excess }
+                  ].map((item, index) => (
+                    <Grid item xs={12} sm={4} key={index} display="flex" justifyContent="center">
+                      <Card sx={{ textAlign: 'center', width: '100%', backgroundColor: '#f8f9fa' }}>
+                        <CardContent>
+                          <Typography variant="h6" fontWeight="bold">
+                            {item.title}
+                          </Typography>
+                          <Typography variant="h5">
+                            {' '}
+                            {currencySymbol} {item.value}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  ))}
                 </Grid>
-              ))}
+
+                <Box sx={{ p: 2 }}>
+                  <Typography variant="h5">{t('text.OVERVIEW')}:</Typography>
+                  <Grid container alignItems="center" justifyContent="space-between">
+                    <Grid item xs={4} textAlign="left">
+                      <Typography variant="body1" fontWeight="bold">
+                        {bookings.tripStartLoc}({bookings.tripStartPincode})
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        {bookings.tripStartDate ? dayjs(bookings.tripStartDate).format('YYYY-MM-DD HH:mm') : 'N/A'}
+                      </Typography>
+                    </Grid>
+
+                    <Grid item xs={4} textAlign="center">
+                      <Typography variant="body1" fontWeight="bold">
+                        {t('text.TO')}
+                      </Typography>
+                    </Grid>
+
+                    <Grid item xs={4} textAlign="right">
+                      <Typography variant="body1" fontWeight="bold">
+                        {bookings.tripEndLoc}({bookings.tripEndPincode})
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        {bookings.tripEndDate ? dayjs(bookings.tripEndDate).format('YYYY-MM-DD HH:mm') : 'N/A'}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </Box>
+
+                <Divider />
+
+                <Box sx={{ mt: 2, p: 2 }}>
+                  <Typography variant="h5">{t('text.TRIP_EXPENSE')}</Typography>
+                  <TableContainer sx={{ border: '1px solid #ddd', borderRadius: '4px' }}>
+                    <Table size="small" aria-label="a dense table" sx={{ border: '1px solid #ddd', borderRadius: '4px' }}>
+                      <TableHead>
+                        <TableRow sx={{ backgroundColor: '#f4f4f4', p: 0 }}>
+                          <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>#</TableCell>
+                          <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{t('text.AMOUNT')}</TableCell>
+                          <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{t('text.COMMENTS')}</TableCell>
+                          <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{t('text.PAID_ON')}</TableCell>
+                          <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{t('text.ACTION')}</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {tripExpense.map((row, index) => (
+                          <TableRow key={row.id}>
+                            {' '}
+                            <TableCell sx={{ border: '1px solid #ddd' }}>{index + 1}</TableCell>
+                            <TableCell sx={{ border: '1px solid #ddd' }}>
+                              {currencySymbol} {row.amount}
+                            </TableCell>
+                            <TableCell sx={{ border: '1px solid #ddd' }}>{row.description}</TableCell>
+                            <TableCell sx={{ border: '1px solid #ddd' }}>{dayjs(row.createdAt).format('DD-MM-YYYY')}</TableCell>
+                            <TableCell sx={{ border: '1px solid #ddd' }}>
+                              <IconButton color="error" onClick={() => handleDeleteExpense(row.id)}>
+                                <DeleteIcon />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Box>
+
+                <Box sx={{ mt: 2, p: 2 }}>
+                  <Typography variant="h5">{t('text.PAYMENT_ACTIVITY')}</Typography>
+                  <TableContainer sx={{ border: '1px solid #ddd', borderRadius: '4px' }}>
+                    <Table size="small" aria-label="a dense table" sx={{ border: '1px solid #ddd', borderRadius: '4px' }}>
+                      <TableHead>
+                        <TableRow sx={{ backgroundColor: '#f4f4f4', p: 0 }}>
+                          {' '}
+                          <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>#</TableCell>
+                          <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{t('text.AMOUNT')}</TableCell>
+                          <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{t('text.COMMENTS')}</TableCell>
+                          <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{t('text.PAID_ON')}</TableCell>
+                          <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{t('text.ACTION')}</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {paymentData.map((row, index) => (
+                          <TableRow key={row.id}>
+                            {' '}
+                            <TableCell sx={{ border: '1px solid #ddd' }}>{index + 1}</TableCell>
+                            <TableCell sx={{ border: '1px solid #ddd' }}>
+                              {currencySymbol} {row.paidAmount}
+                            </TableCell>
+                            <TableCell sx={{ border: '1px solid #ddd' }}>{row.notes}</TableCell>
+                            <TableCell sx={{ border: '1px solid #ddd' }}>{dayjs(row.createdAt).format('DD-MM-YYYY')}</TableCell>
+                            <TableCell sx={{ border: '1px solid #ddd' }}>
+                              <IconButton color="error" onClick={() => handleDeletePayment(row.id)}>
+                                <DeleteIcon />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Box>
+              </Grid>
+
+              <Divider orientation="vertical" flexItem />
+
+              <Grid item xs={12} md={4}>
+                <Box sx={{ p: 2 }}>
+                  <Grid container spacing={2} justifyContent="center">
+                    <Grid item xs={12} sm={6}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        size="small"
+                        onClick={handleOpenPaymentDialog}
+                        sx={{ p: '2px 2px', width: '100%' }}
+                      >
+                        {t('text.ADD_PAYMENT')}
+                      </Button>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        size="small"
+                        onClick={handleOpenDialog}
+                        sx={{ p: '2px 2px', width: '100%' }}
+                      >
+                        {t('text.TRIP_EXPENSE')}
+                      </Button>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        sx={{
+                          background: '#28a745',
+                          p: '2px 2px',
+                          width: '100%',
+                          '&:hover': {
+                            backgroundColor: '#148638',
+                            p: '2px 2px'
+                          }
+                        }}
+                        onClick={handleGenerateInvoice}
+                      >
+                        {t('text.GENERATE_INVOICE')}
+                      </Button>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        sx={{
+                          background: '#f4a100',
+                          p: '2px 2px',
+                          width: '100%',
+                          '&:hover': {
+                            backgroundColor: '#cd9015',
+                            p: '2px 2px'
+                          }
+                        }}
+                        onClick={() => handleOpenStatusDialog(bookings.id, bookings.tripStatus)}
+                      >
+                        {t('text.UPDATE_STATUS')}
+                      </Button>
+                    </Grid>
+                  </Grid>
+
+                  <Typography variant="h6" fontWeight="bold" sx={{ mt: 2 }}>
+                    {t('text.CUSTOMER_INFO')}
+                  </Typography>
+                  <Typography variant="body2">{bookings?.customer?.name}</Typography>
+                  <Typography variant="body2">{bookings?.customer?.mobileNo}</Typography>
+                  <Typography variant="body2">{bookings?.customer?.email}</Typography>
+                  <Typography variant="body2">{bookings?.customer?.address}</Typography>
+
+                  <Typography variant="h6" fontWeight="bold" sx={{ mt: 2 }}>
+                    {t('text.DRIVER_INFO')}
+                  </Typography>
+                  <Typography variant="body2">{bookings?.driver?.name}</Typography>
+                  <Typography variant="body2">{bookings?.driver?.mobileNo}</Typography>
+                  <Typography variant="body2">{bookings?.driver?.address}</Typography>
+                  <Typography variant="h6" fontWeight="bold" sx={{ mt: 2 }}>
+                    {t('text.TRACKING_URL')}
+                  </Typography>
+                  <Typography variant="body2" color="primary">
+                    <a href={`https://fleet.samyotech.in/track-driver/${bookingId}`} target="_blank" rel="noopener noreferrer">
+                      https://fleet.samyotech.in/track-driver/{bookingId}
+                    </a>
+                  </Typography>
+                </Box>
+
+                <Dialog open={openDialog} onClose={handleCloseDialog}>
+                  <DialogTitle sx={{ fontWeight: 'bold', fontSize: '18px' }}>{t('text.ADD_TRIP_EXPENSE')}</DialogTitle>
+                  <DialogContent>
+                    <TextField
+                      fullWidth
+                      label={t('text.AMOUNT')}
+                      variant="outlined"
+                      margin="dense"
+                      value={bookingExpense.amount}
+                      onChange={(e) => setBookingExpense({ ...bookingExpense, amount: parseFloat(e.target.value) || 0 })}
+                    />
+                    <TextField
+                      fullWidth
+                      label={t('text.DESCRIPTION')}
+                      variant="outlined"
+                      margin="dense"
+                      multiline
+                      rows={3}
+                      value={bookingExpense.description}
+                      onChange={(e) => setBookingExpense({ ...bookingExpense, description: e.target.value })}
+                    />
+                  </DialogContent>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: 2 }}>
+                    <Button type="submit" variant="contained" onClick={handleAddExpense}>
+                      {t('text.ADD_EXPENSE')}
+                    </Button>
+                    <Button variant="outlined" onClick={handleCloseDialog}>
+                      {t('text.CANCEL')}
+                    </Button>
+                  </Box>
+                </Dialog>
+              </Grid>
             </Grid>
+          </Card>
 
-            <Box sx={{ p: 2 }}>
-              <Typography variant="h5">{t('text.OVERVIEW')}:</Typography>
-              <Grid container alignItems="center" justifyContent="space-between">
-                <Grid item xs={4} textAlign="left">
-                  <Typography variant="body1" fontWeight="bold">
-                    {bookings.tripStartLoc}({bookings.tripStartPincode})
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    {bookings.tripStartDate ? dayjs(bookings.tripStartDate).format('YYYY-MM-DD HH:mm') : 'N/A'}
-                  </Typography>
-                </Grid>
+          <PaymentDialog
+            open={openPaymentDialog}
+            handleClose={handleClosePaymentDialog}
+            totalAmount={totalAmount}
+            excess={excess}
+            bookingId={bookingId}
+            handleAddPayment={handleAddPayment}
+            fetchPaymentData={fetchPaymentData}
+          />
 
-                <Grid item xs={4} textAlign="center">
-                  <Typography variant="body1" fontWeight="bold">
-                    {t('text.TO')}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={4} textAlign="right">
-                  <Typography variant="body1" fontWeight="bold">
-                    {bookings.tripEndLoc}({bookings.tripEndPincode})
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    {bookings.tripEndDate ? dayjs(bookings.tripEndDate).format('YYYY-MM-DD HH:mm') : 'N/A'}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Box>
-
-            <Divider />
-
-            <Box sx={{ mt: 2, p: 2 }}>
-              <Typography variant="h5">{t('text.TRIP_EXPENSE')}</Typography>
-              <TableContainer sx={{ border: '1px solid #ddd', borderRadius: '4px' }}>
-                <Table size="small" aria-label="a dense table" sx={{ border: '1px solid #ddd', borderRadius: '4px' }}>
-                  <TableHead>
-                    <TableRow sx={{ backgroundColor: '#f4f4f4', p: 0 }}>
-                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>#</TableCell>
-                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{t('text.AMOUNT')}</TableCell>
-                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{t('text.COMMENTS')}</TableCell>
-                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{t('text.PAID_ON')}</TableCell>
-                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{t('text.ACTION')}</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {tripExpense.map((row, index) => (
-                      <TableRow key={row.id}>
-                        {' '}
-                        <TableCell sx={{ border: '1px solid #ddd' }}>{index + 1}</TableCell>
-                        <TableCell sx={{ border: '1px solid #ddd' }}>{currencySymbol} {row.amount}</TableCell>
-                        <TableCell sx={{ border: '1px solid #ddd' }}>{row.description}</TableCell>
-                        <TableCell sx={{ border: '1px solid #ddd' }}>{dayjs(row.createdAt).format('DD-MM-YYYY')}</TableCell>
-                        <TableCell sx={{ border: '1px solid #ddd' }}>
-                          <IconButton color="error" onClick={() => handleDeleteExpense(row.id)}>
-                            <DeleteIcon />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Box>
-
-            <Box sx={{ mt: 2, p: 2 }}>
-              <Typography variant="h5">{t('text.PAYMENT_ACTIVITY')}</Typography>
-              <TableContainer sx={{ border: '1px solid #ddd', borderRadius: '4px' }}>
-                <Table size="small" aria-label="a dense table" sx={{ border: '1px solid #ddd', borderRadius: '4px' }}>
-                  <TableHead>
-                    <TableRow sx={{ backgroundColor: '#f4f4f4', p: 0 }}>
-                      {' '}
-                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>#</TableCell>
-                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{t('text.AMOUNT')}</TableCell>
-                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{t('text.COMMENTS')}</TableCell>
-                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{t('text.PAID_ON')}</TableCell>
-                      <TableCell sx={{ border: '1px solid #ddd', fontWeight: 'bold' }}>{t('text.ACTION')}</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {paymentData.map((row, index) => (
-                      <TableRow key={row.id}>
-                        {' '}
-                        <TableCell sx={{ border: '1px solid #ddd' }}>{index + 1}</TableCell>
-                        <TableCell sx={{ border: '1px solid #ddd' }}>{currencySymbol} {row.paidAmount}</TableCell>
-                        <TableCell sx={{ border: '1px solid #ddd' }}>{row.notes}</TableCell>
-                        <TableCell sx={{ border: '1px solid #ddd' }}>{dayjs(row.createdAt).format('DD-MM-YYYY')}</TableCell>
-                        <TableCell sx={{ border: '1px solid #ddd' }}>
-                          <IconButton color="error" onClick={() => handleDeletePayment(row.id)}>
-                            <DeleteIcon />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Box>
-          </Grid>
-
-          <Divider orientation="vertical" flexItem />
-
-          <Grid item xs={12} md={4}>
-            <Box sx={{ p: 2 }}>
-              <Grid container spacing={2} justifyContent="center">
-                <Grid item xs={12} sm={6}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    size="small"
-                    onClick={handleOpenPaymentDialog}
-                    sx={{ p: '2px 2px', width: '100%' }}
-                  >
-                    {t('text.ADD_PAYMENT')}
-                  </Button>
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    size="small"
-                    onClick={handleOpenDialog}
-                    sx={{ p: '2px 2px', width: '100%' }}
-                  >
-                    {t('text.TRIP_EXPENSE')}
-                  </Button>
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <Button
-                    variant="contained"
-                    size="small"
-                    sx={{
-                      background: '#28a745',
-                      p: '2px 2px',
-                      width: '100%',
-                      '&:hover': {
-                        backgroundColor: '#148638',
-                        p: '2px 2px'
-                      }
-                    }}
-                    onClick={handleGenerateInvoice}
-                  >
-                    {t('text.GENERATE_INVOICE')}
-                  </Button>
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <Button
-                    variant="contained"
-                    size="small"
-                    sx={{
-                      background: '#f4a100',
-                      p: '2px 2px',
-                      width: '100%',
-                      '&:hover': {
-                        backgroundColor: '#cd9015',
-                        p: '2px 2px'
-                      }
-                    }}
-                    onClick={() => handleOpenStatusDialog(bookings.id, bookings.tripStatus)}
-                  >
-                    {t('text.UPDATE_STATUS')}
-                  </Button>
-                </Grid>
-              </Grid>
-
-              <Typography variant="h6" fontWeight="bold" sx={{ mt: 2 }}>
-                {t('text.CUSTOMER_INFO')}
-              </Typography>
-              <Typography variant="body2">{bookings?.customer?.name}</Typography>
-              <Typography variant="body2">{bookings?.customer?.mobileNo}</Typography>
-              <Typography variant="body2">{bookings?.customer?.email}</Typography>
-              <Typography variant="body2">{bookings?.customer?.address}</Typography>
-
-              <Typography variant="h6" fontWeight="bold" sx={{ mt: 2 }}>
-                {t('text.DRIVER_INFO')}
-              </Typography>
-              <Typography variant="body2">{bookings?.driver?.name}</Typography>
-              <Typography variant="body2">{bookings?.driver?.mobileNo}</Typography>
-              <Typography variant="body2">{bookings?.driver?.address}</Typography>
-              <Typography variant="h6" fontWeight="bold" sx={{ mt: 2 }}>
-                {t('text.TRACKING_URL')}
-              </Typography>
-              <Typography variant="body2" color="primary">
-                <a href="https://codeforts.com/vms/triptracking/67d226feda21d" target="_blank" rel="noopener noreferrer">
-                  https://codeforts.com/vms/triptracking/67d226feda21d
-                </a>
-              </Typography>
-
-              <Button variant="contained" sx={{ mt: 2, background: '#28a745' }}>
-                {t('text.SHARE_TO_CUSTOMER')}
-              </Button>
-            </Box>
-
-            <Dialog open={openDialog} onClose={handleCloseDialog}>
-              <DialogTitle sx={{ fontWeight: 'bold', fontSize: '18px' }}>{t('text.ADD_TRIP_EXPENSE')}</DialogTitle>
-              <DialogContent>
-                <TextField
-                  fullWidth
-                  label={t('text.AMOUNT')}
-                  variant="outlined"
-                  margin="dense"
-                  value={bookingExpense.amount}
-                  onChange={(e) => setBookingExpense({ ...bookingExpense, amount: parseFloat(e.target.value) || 0 })}
-                />
-                <TextField
-                  fullWidth
-                  label={t('text.DESCRIPTION')}
-                  variant="outlined"
-                  margin="dense"
-                  multiline
-                  rows={3}
-                  value={bookingExpense.description}
-                  onChange={(e) => setBookingExpense({ ...bookingExpense, description: e.target.value })}
-                />
-              </DialogContent>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: 2 }}>
-                <Button type="submit" variant="contained" onClick={handleAddExpense}>
-                  {t('text.ADD_EXPENSE')}
-                </Button>
-                <Button variant="outlined" onClick={handleCloseDialog}>
-                  {t('text.CANCEL')}
-                </Button>
-              </Box>
-            </Dialog>
-          </Grid>
-        </Grid>
-      </Card>
-
-      <PaymentDialog
-        open={openPaymentDialog}
-        handleClose={handleClosePaymentDialog}
-        totalAmount={totalAmount}
-        excess={excess}
-        bookingId={bookingId}
-        handleAddPayment={handleAddPayment}
-        fetchPaymentData={fetchPaymentData}
-      />
-
-      <BookingStatusDialog
-        open={openStatusDialog}
-        handleClose={handleCloseStatusDialog}
-        bookingId={selectedBookingId}
-        status={status}
-        onStatusUpdate={handleStatusUpdate}
-      />
-    </Box>
+          <BookingStatusDialog
+            open={openStatusDialog}
+            handleClose={handleCloseStatusDialog}
+            bookingId={selectedBookingId}
+            status={status}
+            onStatusUpdate={handleStatusUpdate}
+          />
+        </Box>
+      )}
+    </>
   );
 };
 

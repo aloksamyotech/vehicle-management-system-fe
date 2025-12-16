@@ -109,5 +109,11 @@ export const urls = Object.freeze({
   userManagement : {
     create: `${baseUrl}/usermanagement/add`,
     get: `${baseUrl}/usermanagement/fetch/:userId`
+  },
+  location:{
+  getById:`${baseUrl}/location/getById`,
+  reverse:`${baseUrl}/location/reverse`,
+  forward:`${baseUrl}/location/forward`,
+  tripByBookingId:`${baseUrl}/booking/locations`
   }
 });

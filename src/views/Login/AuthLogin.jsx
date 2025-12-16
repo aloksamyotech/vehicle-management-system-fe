@@ -82,61 +82,77 @@ const AuthLogin = ({ ...rest }) => {
           setSubmitting(false);
         }}
       >
-        {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
-          <form noValidate onSubmit={handleSubmit} {...rest}>
-            <FormControl fullWidth sx={{ mt: 2 }}>
-              <FormLabel htmlFor="email">{t('text.EMAIL_USERNAME')}</FormLabel>
-              <TextField
-                id="email"
-                error={Boolean(touched.email && errors.email)}
-                helperText={touched.email && errors.email}
-                name="email"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                type="email"
-                value={values.email}
-                variant="outlined"
-              />
-            </FormControl>
+        {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, setValues, submitForm }) => (
+          <>
+            <form noValidate onSubmit={handleSubmit} {...rest}>
+              <FormControl fullWidth sx={{ mt: 2 }}>
+                <FormLabel htmlFor="email">{t('text.EMAIL_USERNAME')}</FormLabel>
+                <TextField
+                  id="email"
+                  error={Boolean(touched.email && errors.email)}
+                  helperText={touched.email && errors.email}
+                  name="email"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  type="email"
+                  value={values.email}
+                  variant="outlined"
+                />
+              </FormControl>
 
-            <FormControl fullWidth error={Boolean(touched.password && errors.password)} sx={{ mt: 3, mb: 1 }}>
-              <FormLabel htmlFor="outlined-adornment-password">{t('text.PASSWORD')}</FormLabel>
-              <OutlinedInput
-                id="outlined-adornment-password"
-                type={showPassword ? 'text' : 'password'}
-                value={values.password}
-                name="password"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={handleClickShowPassword}
-                      onMouseDown={handleMouseDownPassword}
-                      edge="end"
-                      size="large"
-                    >
-                      {showPassword ? <Visibility /> : <VisibilityOff />}
-                    </IconButton>
-                  </InputAdornment>
-                }
-              />
-              {touched.password && errors.password && <FormHelperText error>{errors.password}</FormHelperText>}
-            </FormControl>
+              <FormControl fullWidth error={Boolean(touched.password && errors.password)} sx={{ mt: 3, mb: 1 }}>
+                <FormLabel htmlFor="outlined-adornment-password">{t('text.PASSWORD')}</FormLabel>
+                <OutlinedInput
+                  id="outlined-adornment-password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={values.password}
+                  name="password"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                        edge="end"
+                        size="large"
+                      >
+                        {showPassword ? <Visibility /> : <VisibilityOff />}
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                />
+                {touched.password && errors.password && <FormHelperText error>{errors.password}</FormHelperText>}
+              </FormControl>
 
-            {errors.submit && (
-              <Box mt={3}>
-                <FormHelperText error>{errors.submit}</FormHelperText>
+              {errors.submit && (
+                <Box mt={3}>
+                  <FormHelperText error>{errors.submit}</FormHelperText>
+                </Box>
+              )}
+              <Box mt={2}>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  onClick={() => {
+                    setValues({ email: 'admin@gmail.com', password: 'admin123' });
+                    // ek micro delay do taaki values update ho jayein
+                    setTimeout(() => {
+                      submitForm();
+                    }, 0);
+                  }}
+                >
+                  Auto Login
+                </Button>
               </Box>
-            )}
-
-            <Box mt={2}>
-              <Button color="primary" disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained">
-                {t('text.LOGIN')}
-              </Button>
-            </Box>
-          </form>
+              <Box mt={2}>
+                <Button color="primary" disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained">
+                  {t('text.LOGIN')}
+                </Button>
+              </Box>
+            </form>
+          </>
         )}
       </Formik>
     </>

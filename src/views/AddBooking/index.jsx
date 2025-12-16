@@ -202,9 +202,27 @@ const DriverForm = () => {
     return R * c;
   };
 
+  // const onSubmit = async (data) => {
+  //   const { ...filteredData } = data;
+  //   let response;
+  //   if (id) {
+  //     response = await updateApiPatch(urls.booking.update.replace(':id', id), filteredData);
+  //     toast.success(t('text.BOOKING_UPDATED'));
+  //   } else {
+  //     response = await postApi(urls.booking.create, filteredData);
+  //     toast.success(t('text.BOOKING_ADDED'));
+  //   }
+
+  //   reset();
+  //   navigate('/booking');
+  // };
+
   const onSubmit = async (data) => {
+  setLoading(true); 
+  try {
     const { ...filteredData } = data;
     let response;
+
     if (id) {
       response = await updateApiPatch(urls.booking.update.replace(':id', id), filteredData);
       toast.success(t('text.BOOKING_UPDATED'));
@@ -215,7 +233,12 @@ const DriverForm = () => {
 
     reset();
     navigate('/booking');
-  };
+  } catch (error) {
+    toast.error(t('text.ERROR_FETCHING')); 
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <>
@@ -603,7 +626,7 @@ const DriverForm = () => {
             </Grid>
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-              <Button variant="contained" color="primary" type="submit">
+              <Button variant="contained" color="primary" type="submit" disabled={loading}>
                 {id ? t('text.UPDATE_BOOKING') : t('text.ADD_BOOKING')}
               </Button>
             </Box>
